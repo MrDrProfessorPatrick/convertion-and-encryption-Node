@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <fieldset>
+      <legend>Choose compress algorithms you want to use:</legend>
+
+      <div>
+        <input type="checkbox" id="zlib" name="zlib" checked />
+        <label for="zlib">Zlib</label>
+      </div>
+
+      <div>
+        <input type="checkbox" id="brotli" name="brotli" />
+        <label for="brotli">Brotli</label>
+      </div>
+
+      <div>
+        <input type="checkbox" id="deflate" name="deflate" />
+        <label for="deflate">Deflate</label>
+      </div>
+    </fieldset>
+
+    <h2>Chose your file</h2>
+    <form
+      action="/sendfile"
+      method="POST"
+      enctype="multipart/form-data"
+      id="form"
+    >
+      <div class="chose-file-container">
+        <label for="inputFile" class="chose-file-button">Chose file</label>
+        <span class="file-availability" id="fileName">No file chosen</span>
+        <input type="file" name="file" id="inputFile" style="display: none" />
+      </div>
+
+      <button class="file-manager-button">Upload</button>
+    </form>
+
+    <div class="compressions-container">
+      <div class="zlib-compression">
+        <h3>Zlib compresstion</h3>
+        <div class="scale-container"></div>
+      </div>
+    </div>
+
+    <style>
+      body {
+        background-color: rgb(214, 214, 214);
+      }
+
+      form {
+        display: flex;
+      }
+
+      .compressions-container {
+        margin-top: 50px;
+        width: 60%;
+        height: 20px;
+      }
+
+      .zlib-not-compressed-scale {
+        width: 100%;
+        height: 10px;
+        background-color: green;
+        border: 2px solid white;
+        border-radius: 5px;
+      }
+
+      .chose-file-container {
+        width: 300px;
+      }
+
+      .chose-file-button {
+        display: inline-block;
+        background-color: white;
+        border: 1px solid black;
+        border-radius: 4px;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+        vertical-align: middle;
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      .chose-file-button:hover {
+        background-color: rgb(119, 64, 64);
+      }
+
+      .file-manager-button {
+        background-color: rgb(33, 77, 33);
+        border: none;
+        width: 100px;
+        height: 30px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .file-manager-button:hover {
+        background-color: rgb(52, 119, 52);
+      }
+    </style>
+
+    <script>
+      const file = document.getElementById("inputFile");
+      const fileName = document.getElementById("fileName");
+      const submitInput = document.getElementById("inputSubmit");
+      const form = document.getElementById("form");
+
+      const zlibCompressionContainer =
+        document.body.querySelector(".scale-container");
+
+      form.addEventListener("submit", submintFile);
+      file.addEventListener("change", changeFile);
+
+      function changeFile(e) {
+        console.log("e.target.files[0]", e.target.files);
+        fileName.innerHTML = e.target.files[0].name;
+      }
+
+      function submintFile(e) {
+        e.preventDefault();
+
+        const form = e.currentTarget;
+        const url = new URL(form.action);
+        const formData = new FormData(form);
+
+        const fetchOptions = {
+          method: form.method,
+          body: formData,
+        };
+
+        async function getFileSizes() {
+          let collectedData = "";
+          let response = await fetch(url, fetchOptions);
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder("utf8");
+          const readerRes = await reader.read();
+          return decoder.decode(readerRes.value);
+        }
+        getFileSizes().then((result) => {
+          console.log("result", result);
+          const sizeObj = JSON.parse(result);
+          const initialScale = document.createElement("div");
+          initialScale.style.backgroundColor = "green";
+          initialScale.style.height = "10px";
+          initialScale.style.width = "100%";
+
+          const initialSize = document.createElement("div");
+          initialSize.style.fontWeight = "bold";
+          initialSize.style.textAlign = "center";
+          initialSize.innerHTML = sizeObj.originalSize + " kb";
+
+          zlibCompressionContainer.append(initialScale);
+          zlibCompressionContainer.append(initialSize);
+
+          let compressedScaleWidth =
+            Number(sizeObj.compressedSize * 100) / Number(sizeObj.originalSize);
+
+          const compressedScale = document.createElement("div");
+          compressedScale.style.backgroundColor = "green";
+          compressedScale.style.height = "10px";
+          compressedScale.style.width = `${compressedScaleWidth}%`;
+
+          const compressedSize = document.createElement("div");
+          compressedSize.style.fontWeight = "bold";
+          compressedSize.style.textAlign = "center";
+          compressedSize.innerHTML = sizeObj.compressedSize + " kb";
+
+          zlibCompressionContainer.append(compressedScale);
+          zlibCompressionContainer.append(compressedSize);
+
+          return;
+        });
+      }
+    </script>
+  </body>
+</html>
