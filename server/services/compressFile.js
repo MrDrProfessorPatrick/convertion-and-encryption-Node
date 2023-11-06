@@ -13,11 +13,21 @@ async function compressFile(req, res, next) {
     // res.setHeader("Content-Type", req.file.mimetype);
     // res.setHeader("Content-Disposition", disposition);
     const pathToFile = __dirname;
-
     const gzipStream = zlib.createGzip();
-    console.log("req.body.file", req.file.size);
+    const deflateStream = zlib.DeflateRaw();
+    const brotliStream = zlib.BrotliCompress();
+
+    console.log("req.body", req.body);
     const fileSize = req.file.size;
     const startTimeToCompress = Date.now();
+
+    const compressionInfo = {
+      originalSize: fileSize.toString(),
+      zlibCompressionSize: "",
+      deflateCompressionSize: "",
+      brotliCompressionSize: "",
+      zlibTimeToCompress: "",
+    };
 
     class ReadableStream extends Readable {
       constructor(options) {
@@ -37,35 +47,61 @@ async function compressFile(req, res, next) {
       }
     }
 
-    // const writableStream = fs.createWriteStream(
-    //   `${pathToFile}/../compressed_files/compressed_${req.file.filename}`
-    // );
+    const writableStreamDeflate = fs.createWriteStream(
+      `${pathToFile}/../compressed_files/deflate_compressed_${req.file.filename}`
+    );
+
+    const writableStreamZlib = fs.createWriteStream(
+      `${pathToFile}/../compressed_files/zlib_compressed_${req.file.filename}`
+    );
+
+    const writableStreamBrotli = fs.createWriteStream(
+      `${pathToFile}/../compressed_files/brotli_compressed_${req.file.filename}`
+    );
 
     class GetBytesQuantity extends Transform {
       constructor(options) {
         super(options);
+        this.options = options;
         this.compressedDataByteLength = 0;
       }
 
       _transform(chunk, encoding, done) {
         this.compressedDataByteLength = this.compressedDataByteLength +=
           Buffer.byteLength(chunk);
+        this.push(chunk);
         done();
       }
 
       _flush(cb) {
         console.log("startTimeToCompress", startTimeToCompress);
         let timeToCompress = Date.now() - startTimeToCompress;
-        console.log("timeToCompress", timeToCompress);
-        this.push(
-          Buffer.from(
-            JSON.stringify({
-              compressedSize: this.compressedDataByteLength.toString(),
-              originalSize: fileSize.toString(),
-              timeToCompress: timeToCompress.toString(),
-            })
-          )
-        );
+        console.log("options", this.options);
+
+        if (this.options === "deflate") {
+          compressionInfo.deflateCompressionSize =
+            this.compressedDataByteLength.toString();
+        }
+
+        if (this.options === "zlib") {
+          compressionInfo.zlibCompressionSize =
+            this.compressedDataByteLength.toString();
+        }
+
+        if (this.options === "brotli") {
+          compressionInfo.brotliCompressionSize =
+            this.compressedDataByteLength.toString();
+        }
+
+        // this.push(
+        //   Buffer.from(
+        //     JSON.stringify({
+        //       compressedSize: this.compressedDataByteLength.toString(),
+        //       originalSize: fileSize.toString(),
+        //       timeToCompress: timeToCompress.toString(),
+        //     })
+        //   )
+        // );
         cb();
       }
     }
@@ -74,24 +110,67 @@ async function compressFile(req, res, next) {
       `${pathToFile}/../../uploads/${req.file.filename}`
     );
 
-    const getBytesQuantity = new GetBytesQuantity();
+    const getBytesQuantityDeflate = new GetBytesQuantity("deflate");
+    const getBytesQuantityZlib = new GetBytesQuantity("zlib");
+    const getBytesQuantityBrotli = new GetBytesQuantity("brotli");
 
-    async function runCountBytesStream() {
-      await pipeline(
-        readableStream,
-        gzipStream,
-        getBytesQuantity,
-        res,
-        (error) => {
-          if (error) {
-            console.error(error);
-          }
-
-          console.log("Count bytes stream process completed");
+    function runCountBytesStream(compressionMethods) {
+      // run pipeline in for of compressionMethods and in the last one return object you need
+      for (let i = 0; i <= compressionMethods.length; i++) {
+        if (compressionMethods[i] === "deflate") {
+          pipeline(
+            readableStream,
+            deflateStream,
+            getBytesQuantityDeflate,
+            writableStreamDeflate,
+            (error) => {
+              if (error) {
+                console.error("Error catched in Deflate", error);
+              }
+              if (i === compressionMethods.length - 1) {
+                return res.status(200).json(compressionInfo);
+              }
+            }
+          );
         }
-      );
+
+        if (compressionMethods[i] === "gzip") {
+          pipeline(
+            readableStream,
+            gzipStream,
+            getBytesQuantityZlib,
+            writableStreamZlib,
+            (error) => {
+              if (error) {
+                console.error("Error catched in Deflate", error);
+              }
+              if (i === compressionMethods.length - 1) {
+                return res.status(200).json(compressionInfo);
+              }
+            }
+          );
+        }
+
+        if (compressionMethods[i] === "brotli") {
+          pipeline(
+            readableStream,
+            brotliStream,
+            getBytesQuantityBrotli,
+            writableStreamBrotli,
+            (error) => {
+              if (error) {
+                console.error("Error catched in Deflate", error);
+              }
+              if (i === compressionMethods.length - 1) {
+                return res.status(200).json(compressionInfo);
+              }
+            }
+          );
+        }
+      }
     }
-    runCountBytesStream();
+
+    runCountBytesStream(["deflate", "gzip", "brotli"]);
   } catch (error) {
     console.log("error catched", error);
   }

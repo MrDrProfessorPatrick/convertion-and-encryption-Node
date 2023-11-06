@@ -130,6 +130,8 @@
         const url = new URL(form.action);
         const formData = new FormData(form);
 
+        formData.append("zlibCompression", false);
+
         const fetchOptions = {
           method: form.method,
           body: formData,
@@ -137,12 +139,15 @@
 
         async function getFileSizes() {
           let collectedData = "";
+          console.log("formData", formData);
+
           let response = await fetch(url, fetchOptions);
           const reader = response.body.getReader();
           const decoder = new TextDecoder("utf8");
           const readerRes = await reader.read();
           return decoder.decode(readerRes.value);
         }
+
         getFileSizes().then((result) => {
           console.log("result", result);
           const sizeObj = JSON.parse(result);
