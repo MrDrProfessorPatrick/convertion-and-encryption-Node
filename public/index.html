@@ -10,8 +10,8 @@
       <legend>Choose compress algorithms you want to use:</legend>
 
       <div>
-        <input type="checkbox" id="zlib" name="zlib" checked />
-        <label for="zlib">Zlib</label>
+        <input type="checkbox" id="gzip" name="gzip" checked />
+        <label for="gzip">Gzip</label>
       </div>
 
       <div>
@@ -42,9 +42,20 @@
     </form>
 
     <div class="compressions-container">
+      <div class="original-size">
+        <h3>Original size</h3>
+      </div>
       <div class="zlib-compression">
-        <h3>Zlib compresstion</h3>
-        <div class="scale-container"></div>
+        <h3>Gzip compresstion</h3>
+        <div class="zlib-scale-container"></div>
+      </div>
+      <div class="brotli-compression">
+        <h3>Brotli compresstion</h3>
+        <div class="brotli-scale-container"></div>
+      </div>
+      <div class="deflate-compression">
+        <h3>Deflate compresstion</h3>
+        <div class="deflate-scale-container"></div>
       </div>
     </div>
 
@@ -112,25 +123,83 @@
       const submitInput = document.getElementById("inputSubmit");
       const form = document.getElementById("form");
 
-      const zlibCompressionContainer =
-        document.body.querySelector(".scale-container");
+      const gzipCheckPoint = document.getElementById("gzip");
+      const deflateCheckPoint = document.getElementById("deflate");
+      const brotliCheckPoint = document.getElementById("brotli");
+
+      function renderInitialScale(containerToInsert, sizeObj) {
+        const isInitialScaleExists = document.getElementById("initialScale");
+        const isInitialSizeExists = document.getElementById("initialSize");
+
+        if (isInitialScaleExists) isInitialScaleExists.remove();
+        if (isInitialSizeExists) isInitialSizeExists.remove();
+
+        const initialScale = document.createElement("div");
+        initialScale.id = "initialScale";
+        initialScale.style.backgroundColor = "green";
+        initialScale.style.height = "10px";
+        initialScale.style.width = "100%";
+
+        const initialSize = document.createElement("div");
+        initialSize.id = "initialSize";
+        initialSize.style.fontWeight = "bold";
+        initialSize.style.textAlign = "center";
+        initialSize.innerHTML = sizeObj.originalSize + " kb";
+
+        containerToInsert.append(initialScale);
+        containerToInsert.append(initialSize);
+      }
+
+      function renderGzipScale(containerToInsert, sizeObj) {
+        const isGzipScaleExists = document.getElementById("gzipCompressScale");
+        const isGzipSizeExists = document.getElementById("gzipCompressSize");
+
+        if (isGzipScaleExists) isGzipScaleExists.remove();
+        if (isGzipSizeExists) isGzipSizeExists.remove();
+
+        let compressedScaleWidth =
+          Number(sizeObj.gzipCompressionSize * 100) /
+          Number(sizeObj.originalSize);
+
+        const compressedScale = document.createElement("div");
+        compressedScale.id = "gzipCompressScale";
+        compressedScale.style.backgroundColor = "green";
+        compressedScale.style.height = "10px";
+        compressedScale.style.width = `${compressedScaleWidth}%`;
+
+        const compressedSize = document.createElement("div");
+        compressedSize.id = "gzipCompressSize";
+        compressedSize.style.fontWeight = "bold";
+        compressedSize.style.textAlign = "center";
+        compressedSize.innerHTML = sizeObj.gzipCompressionSize + " kb";
+
+        containerToInsert.append(compressedScale);
+        containerToInsert.append(compressedSize);
+      }
+
+      const originalSizeContainer =
+        document.body.querySelector(".original-size");
+
+      const zlibCompressionContainer = document.body.querySelector(
+        ".zlib-scale-container"
+      );
 
       form.addEventListener("submit", submintFile);
       file.addEventListener("change", changeFile);
 
       function changeFile(e) {
-        console.log("e.target.files[0]", e.target.files);
         fileName.innerHTML = e.target.files[0].name;
       }
 
       function submintFile(e) {
         e.preventDefault();
-
         const form = e.currentTarget;
         const url = new URL(form.action);
         const formData = new FormData(form);
 
-        formData.append("zlibCompression", false);
+        formData.append("gzip", gzipCheckPoint.checked);
+        formData.append("deflate", deflateCheckPoint.checked);
+        formData.append("brotli", brotliCheckPoint.checked);
 
         const fetchOptions = {
           method: form.method,
@@ -151,36 +220,13 @@
         getFileSizes().then((result) => {
           console.log("result", result);
           const sizeObj = JSON.parse(result);
-          const initialScale = document.createElement("div");
-          initialScale.style.backgroundColor = "green";
-          initialScale.style.height = "10px";
-          initialScale.style.width = "100%";
+          renderInitialScale(originalSizeContainer, sizeObj);
 
-          const initialSize = document.createElement("div");
-          initialSize.style.fontWeight = "bold";
-          initialSize.style.textAlign = "center";
-          initialSize.innerHTML = sizeObj.originalSize + " kb";
+          if (sizeObj.gzipCompressionSize) {
+            renderGzipScale(zlibCompressionContainer, sizeObj);
+          }
 
-          zlibCompressionContainer.append(initialScale);
-          zlibCompressionContainer.append(initialSize);
-
-          let compressedScaleWidth =
-            Number(sizeObj.compressedSize * 100) / Number(sizeObj.originalSize);
-
-          const compressedScale = document.createElement("div");
-          compressedScale.style.backgroundColor = "green";
-          compressedScale.style.height = "10px";
-          compressedScale.style.width = `${compressedScaleWidth}%`;
-
-          const compressedSize = document.createElement("div");
-          compressedSize.style.fontWeight = "bold";
-          compressedSize.style.textAlign = "center";
-          compressedSize.innerHTML = sizeObj.compressedSize + " kb";
-
-          zlibCompressionContainer.append(compressedScale);
-          zlibCompressionContainer.append(compressedSize);
-
-          return;
+          // do the same for brotli and defalte
         });
       }
     </script>

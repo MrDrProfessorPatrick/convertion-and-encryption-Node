@@ -16,14 +16,19 @@ async function compressFile(req, res, next) {
     const gzipStream = zlib.createGzip();
     const deflateStream = zlib.DeflateRaw();
     const brotliStream = zlib.BrotliCompress();
+    let compressionMethods = [];
 
-    console.log("req.body", req.body);
+    console.log("req.body", req.body, req.body.gzip);
     const fileSize = req.file.size;
     const startTimeToCompress = Date.now();
 
+    if (req.body.gzip === "true") compressionMethods.push("gzip");
+    if (req.body.deflate === "true") compressionMethods.push("deflate");
+    if (req.body.brotli === "true") compressionMethods.push("brotli");
+
     const compressionInfo = {
       originalSize: fileSize.toString(),
-      zlibCompressionSize: "",
+      gzipCompressionSize: "",
       deflateCompressionSize: "",
       brotliCompressionSize: "",
       zlibTimeToCompress: "",
@@ -83,8 +88,8 @@ async function compressFile(req, res, next) {
             this.compressedDataByteLength.toString();
         }
 
-        if (this.options === "zlib") {
-          compressionInfo.zlibCompressionSize =
+        if (this.options === "gzip") {
+          compressionInfo.gzipCompressionSize =
             this.compressedDataByteLength.toString();
         }
 
@@ -111,11 +116,12 @@ async function compressFile(req, res, next) {
     );
 
     const getBytesQuantityDeflate = new GetBytesQuantity("deflate");
-    const getBytesQuantityZlib = new GetBytesQuantity("zlib");
+    const getBytesQuantityGzip = new GetBytesQuantity("gzip");
     const getBytesQuantityBrotli = new GetBytesQuantity("brotli");
 
     function runCountBytesStream(compressionMethods) {
       // run pipeline in for of compressionMethods and in the last one return object you need
+      console.log("compressionsMethods", compressionMethods);
       for (let i = 0; i <= compressionMethods.length; i++) {
         if (compressionMethods[i] === "deflate") {
           pipeline(
@@ -138,7 +144,7 @@ async function compressFile(req, res, next) {
           pipeline(
             readableStream,
             gzipStream,
-            getBytesQuantityZlib,
+            getBytesQuantityGzip,
             writableStreamZlib,
             (error) => {
               if (error) {
@@ -170,7 +176,7 @@ async function compressFile(req, res, next) {
       }
     }
 
-    runCountBytesStream(["deflate", "gzip", "brotli"]);
+    runCountBytesStream(compressionMethods);
   } catch (error) {
     console.log("error catched", error);
   }
