@@ -150,28 +150,33 @@
         containerToInsert.append(initialSize);
       }
 
-      function renderGzipScale(containerToInsert, sizeObj) {
-        const isGzipScaleExists = document.getElementById("gzipCompressScale");
-        const isGzipSizeExists = document.getElementById("gzipCompressSize");
+      function renderCompressionScale(
+        containerToInsert,
+        initialSize,
+        compressionSize,
+        compressScaleId,
+        comressSizeId
+      ) {
+        const isGzipScaleExists = document.getElementById(compressScaleId);
+        const isGzipSizeExists = document.getElementById(comressSizeId);
 
         if (isGzipScaleExists) isGzipScaleExists.remove();
         if (isGzipSizeExists) isGzipSizeExists.remove();
 
         let compressedScaleWidth =
-          Number(sizeObj.gzipCompressionSize * 100) /
-          Number(sizeObj.originalSize);
+          Number(compressionSize * 100) / Number(initialSize);
 
         const compressedScale = document.createElement("div");
-        compressedScale.id = "gzipCompressScale";
+        compressedScale.id = compressScaleId;
         compressedScale.style.backgroundColor = "green";
         compressedScale.style.height = "10px";
         compressedScale.style.width = `${compressedScaleWidth}%`;
 
         const compressedSize = document.createElement("div");
-        compressedSize.id = "gzipCompressSize";
+        compressedSize.id = comressSizeId;
         compressedSize.style.fontWeight = "bold";
         compressedSize.style.textAlign = "center";
-        compressedSize.innerHTML = sizeObj.gzipCompressionSize + " kb";
+        compressedSize.innerHTML = compressionSize + " kb";
 
         containerToInsert.append(compressedScale);
         containerToInsert.append(compressedSize);
@@ -182,6 +187,14 @@
 
       const zlibCompressionContainer = document.body.querySelector(
         ".zlib-scale-container"
+      );
+
+      const brotliCompressionContainer = document.body.querySelector(
+        ".brotli-scale-container"
+      );
+
+      const deflateCompressionContainer = document.body.querySelector(
+        ".deflate-scale-container"
       );
 
       form.addEventListener("submit", submintFile);
@@ -221,12 +234,36 @@
           console.log("result", result);
           const sizeObj = JSON.parse(result);
           renderInitialScale(originalSizeContainer, sizeObj);
-
+          console.log("sizeObj", sizeObj);
           if (sizeObj.gzipCompressionSize) {
-            renderGzipScale(zlibCompressionContainer, sizeObj);
+            renderCompressionScale(
+              zlibCompressionContainer,
+              sizeObj.originalSize,
+              sizeObj.gzipCompressionSize,
+              "compressScaleGzipId",
+              "comressSizeGzipId"
+            );
           }
 
-          // do the same for brotli and defalte
+          if (sizeObj.brotliCompressionSize) {
+            renderCompressionScale(
+              brotliCompressionContainer,
+              sizeObj.originalSize,
+              sizeObj.brotliCompressionSize,
+              "compressScaleBrotliId",
+              "compressSizeBrotliId"
+            );
+          }
+
+          if (sizeObj.deflateCompressionSize) {
+            renderCompressionScale(
+              deflateCompressionContainer,
+              sizeObj.originalSize,
+              sizeObj.deflateCompressionSize,
+              "compressScaleDeflateId",
+              "compressSizeDeflateId"
+            );
+          }
         });
       }
     </script>

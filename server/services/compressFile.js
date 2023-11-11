@@ -57,7 +57,7 @@ async function compressFile(req, res, next) {
     );
 
     const writableStreamZlib = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/zlib_compressed_${req.file.filename}`
+      `${pathToFile}/../compressed_files/gzip_compressed_${req.file.filename}`
     );
 
     const writableStreamBrotli = fs.createWriteStream(
