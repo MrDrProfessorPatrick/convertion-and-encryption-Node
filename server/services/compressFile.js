@@ -86,16 +86,19 @@ async function compressFile(req, res, next) {
         if (this.options === "deflate") {
           compressionInfo.deflateCompressionSize =
             this.compressedDataByteLength.toString();
+          compressionInfo.deflateFileName = `deflate_compressed_${req.file.filename}`;
         }
 
         if (this.options === "gzip") {
           compressionInfo.gzipCompressionSize =
             this.compressedDataByteLength.toString();
+          compressionInfo.gzipFileName = `gzip_compressed_${req.file.filename}`;
         }
 
         if (this.options === "brotli") {
           compressionInfo.brotliCompressionSize =
             this.compressedDataByteLength.toString();
+          compressionInfo.brotliFileName = `brotli_compressed_${req.file.filename}`;
         }
 
         // this.push(

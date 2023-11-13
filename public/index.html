@@ -32,13 +32,20 @@
       enctype="multipart/form-data"
       id="form"
     >
-      <div class="chose-file-container">
-        <label for="inputFile" class="chose-file-button">Chose file</label>
-        <span class="file-availability" id="fileName">No file chosen</span>
-        <input type="file" name="file" id="inputFile" style="display: none" />
+      <div class="upload-download-panel">
+        <div class="upload-container">
+          <label for="inputFile" class="chose-file-button">Chose file</label>
+          <span class="file-availability" id="fileName">No file chosen</span>
+          <input type="file" name="file" id="inputFile" style="display: none" />
+          <button class="file-manager-button">Upload</button>
+        </div>
+        <div class="download-container">
+          <div class="download-files"></div>
+          <button class="file-manager-button" id="download-button">
+            Download
+          </button>
+        </div>
       </div>
-
-      <button class="file-manager-button">Upload</button>
     </form>
 
     <div class="compressions-container">
@@ -46,15 +53,15 @@
         <h3>Original size</h3>
       </div>
       <div class="zlib-compression">
-        <h3>Gzip compresstion</h3>
+        <h3>Gzip compression</h3>
         <div class="zlib-scale-container"></div>
       </div>
       <div class="brotli-compression">
-        <h3>Brotli compresstion</h3>
+        <h3>Brotli compression</h3>
         <div class="brotli-scale-container"></div>
       </div>
       <div class="deflate-compression">
-        <h3>Deflate compresstion</h3>
+        <h3>Deflate compression</h3>
         <div class="deflate-scale-container"></div>
       </div>
     </div>
@@ -65,6 +72,10 @@
       }
 
       form {
+        display: flex;
+      }
+
+      .upload-download-panel {
         display: flex;
       }
 
@@ -82,8 +93,19 @@
         border-radius: 5px;
       }
 
-      .chose-file-container {
+      .upload-container {
         width: 300px;
+      }
+
+      .download-container {
+        display: flex;
+        width: 300px;
+        background-color: bisque;
+        margin-left: 40px;
+      }
+
+      .download-files {
+        min-width: 300px;
       }
 
       .chose-file-button {
@@ -122,7 +144,8 @@
       const fileName = document.getElementById("fileName");
       const submitInput = document.getElementById("inputSubmit");
       const form = document.getElementById("form");
-
+      const downloadButton = document.getElementById("download-button");
+      let downloadedFileName = "";
       const gzipCheckPoint = document.getElementById("gzip");
       const deflateCheckPoint = document.getElementById("deflate");
       const brotliCheckPoint = document.getElementById("brotli");
@@ -182,6 +205,21 @@
         containerToInsert.append(compressedSize);
       }
 
+      function renderCompressedFileName(fileName) {
+        const compressedFilesContainer =
+          document.querySelector(".download-files");
+
+        const isCompressedFileNameExists = document.getElementById(fileName);
+
+        if (isCompressedFileNameExists) isCompressedFileNameExists.remove();
+
+        const compressedFileName = document.createElement("div");
+        compressedFileName.id = fileName;
+        compressedFileName.innerHTML = fileName;
+
+        compressedFilesContainer.append(compressedFileName);
+      }
+
       const originalSizeContainer =
         document.body.querySelector(".original-size");
 
@@ -199,9 +237,69 @@
 
       form.addEventListener("submit", submintFile);
       file.addEventListener("change", changeFile);
+      downloadButton.addEventListener("click", downloadFiles);
 
       function changeFile(e) {
         fileName.innerHTML = e.target.files[0].name;
+      }
+
+      async function downloadFiles(e) {
+        e.preventDefault();
+        let downloadedFilesResponse = await fetch("/downloadfiles", {
+          method: "POST",
+        })
+          .then((response) => {
+            downloadedFileName = response.headers
+              .get("Content-Disposition")
+              .match(/\"([^"]+)\./gi)[0];
+
+            downloadedFileName = downloadedFileName.substring(
+              1,
+              downloadedFileName.length - 1
+            );
+
+            return response.body;
+          })
+          .then((rb) => {
+            console.log("rb", rb);
+            const reader = rb.getReader();
+
+            return new ReadableStream({
+              start(controller) {
+                // The following function handles each data chunk
+                function push() {
+                  // "done" is a Boolean and value a "Uint8Array"
+                  return reader.read().then(({ done, value }) => {
+                    // If there is no more data to read
+                    if (done) {
+                      console.log("value done", value);
+                      controller.close();
+                      return value;
+                    }
+                    // Get the data and send it to the browser via the controller
+                    console.log("value", value);
+                    controller.enqueue(value);
+                    // Check chunks by logging to the console
+                    return push();
+                  });
+                }
+
+                return push();
+              },
+            });
+          })
+          .then((stream) => new Response(stream))
+          .then((response) => response.blob())
+          .then((blob) => {
+            let fileUrl = URL.createObjectURL(blob);
+            const fileLink = document.createElement("a");
+            fileLink.href = fileUrl;
+
+            fileLink.setAttribute("download", `${downloadedFileName}.gz`);
+            document.body.appendChild(fileLink);
+            fileLink.click();
+            fileLink.remove();
+          });
       }
 
       function submintFile(e) {
@@ -243,6 +341,7 @@
               "compressScaleGzipId",
               "comressSizeGzipId"
             );
+            renderCompressedFileName(sizeObj.gzipFileName);
           }
 
           if (sizeObj.brotliCompressionSize) {
@@ -253,6 +352,7 @@
               "compressScaleBrotliId",
               "compressSizeBrotliId"
             );
+            renderCompressedFileName(sizeObj.brotliFileName);
           }
 
           if (sizeObj.deflateCompressionSize) {
@@ -263,6 +363,7 @@
               "compressScaleDeflateId",
               "compressSizeDeflateId"
             );
+            renderCompressedFileName(sizeObj.deflateFileName);
           }
         });
       }
