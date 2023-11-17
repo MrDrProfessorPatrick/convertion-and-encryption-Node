@@ -245,61 +245,67 @@
 
       async function downloadFiles(e) {
         e.preventDefault();
-        let downloadedFilesResponse = await fetch("/downloadfiles", {
-          method: "POST",
-        })
-          .then((response) => {
-            downloadedFileName = response.headers
-              .get("Content-Disposition")
-              .match(/\"([^"]+)\./gi)[0];
 
-            downloadedFileName = downloadedFileName.substring(
-              1,
-              downloadedFileName.length - 1
-            );
+        let filesNameToDownload = [];
 
-            return response.body;
+        let documentsNameContainers =
+          document.querySelector(".download-files").children;
+
+        for (let element of documentsNameContainers) {
+          filesNameToDownload.push(element.id);
+          await downloadFileRequest(element.id);
+        }
+
+        async function downloadFileRequest(downloadFileName) {
+          console.log("downloadFileName", downloadFileName);
+          await fetch("/downloadfiles", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json;charset=utf-8",
+            },
+            body: JSON.stringify({ fileName: downloadFileName }),
           })
-          .then((rb) => {
-            console.log("rb", rb);
-            const reader = rb.getReader();
+            .then((response) => {
+              return response.body;
+            })
+            .then((rb) => {
+              const reader = rb.getReader();
 
-            return new ReadableStream({
-              start(controller) {
-                // The following function handles each data chunk
-                function push() {
-                  // "done" is a Boolean and value a "Uint8Array"
-                  return reader.read().then(({ done, value }) => {
-                    // If there is no more data to read
-                    if (done) {
-                      console.log("value done", value);
-                      controller.close();
-                      return value;
-                    }
-                    // Get the data and send it to the browser via the controller
-                    console.log("value", value);
-                    controller.enqueue(value);
-                    // Check chunks by logging to the console
-                    return push();
-                  });
-                }
+              return new ReadableStream({
+                start(controller) {
+                  // The following function handles each data chunk
+                  function push() {
+                    // "done" is a Boolean and value a "Uint8Array"
+                    return reader.read().then(({ done, value }) => {
+                      // If there is no more data to read
+                      if (done) {
+                        controller.close();
+                        return value;
+                      }
+                      // Get the data and send it to the browser via the controller
+                      controller.enqueue(value);
+                      // Check chunks by logging to the console
+                      return push();
+                    });
+                  }
 
-                return push();
-              },
+                  return push();
+                },
+              });
+            })
+            .then((stream) => new Response(stream))
+            .then((response) => response.blob())
+            .then((blob) => {
+              let fileUrl = URL.createObjectURL(blob);
+              const fileLink = document.createElement("a");
+              fileLink.href = fileUrl;
+
+              fileLink.setAttribute("download", `${downloadFileName}`);
+              document.body.appendChild(fileLink);
+              fileLink.click();
+              fileLink.remove();
             });
-          })
-          .then((stream) => new Response(stream))
-          .then((response) => response.blob())
-          .then((blob) => {
-            let fileUrl = URL.createObjectURL(blob);
-            const fileLink = document.createElement("a");
-            fileLink.href = fileUrl;
-
-            fileLink.setAttribute("download", `${downloadedFileName}.gz`);
-            document.body.appendChild(fileLink);
-            fileLink.click();
-            fileLink.remove();
-          });
+        }
       }
 
       function submintFile(e) {
@@ -329,7 +335,6 @@
         }
 
         getFileSizes().then((result) => {
-          console.log("result", result);
           const sizeObj = JSON.parse(result);
           renderInitialScale(originalSizeContainer, sizeObj);
           console.log("sizeObj", sizeObj);

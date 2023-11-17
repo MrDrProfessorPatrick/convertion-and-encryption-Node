@@ -1,30 +1,35 @@
 const fs = require("node:fs");
 const { pipeline } = require("readable-stream");
+var MultiStream = require("multistream");
 
-function downloadCompressedFiles(req, res) {
+async function downloadCompressedFiles(req, res, next) {
   if (!req.body) {
     return res.status(400).json("No body were received");
   }
 
-  const pathToFile = __dirname;
-  const file = `${pathToFile}/../compressed_files/zlib_compressed_bigTxt.txt`;
-  const readableStream = fs.createReadStream(
-    `${pathToFile}/../compressed_files/zlib_compressed_bigTxt.txt`
-  );
+  let fileToDownload = req.body.fileName;
 
-  res.setHeader(
-    "Content-disposition",
-    `attachment; filename="zlib_compressed_bigTxt.txt"`
-  );
+  async function downloadFiles(fileToDownload) {
+    const pathToFile = __dirname;
 
-  res.setHeader("Content-type", "multipart/form-data");
+    res.setHeader(
+      "Content-disposition",
+      `attachment; filename="${fileToDownload}"`
+    );
+    res.setHeader("Content-type", "multipart/form-data");
 
-  return pipeline(readableStream, res, (error) => {
-    if (error) {
-      console.log(error, "Error in pipeline");
-    }
-    console.log("Stream finished successfully");
-  });
+    let readableStreams = fs.createReadStream(
+      `${pathToFile}/../compressed_files/${fileToDownload}`
+    );
+
+    pipeline(readableStreams, res, (error) => {
+      if (error) {
+        console.error("Error catched in Deflate", error);
+      }
+    });
+  }
+
+  downloadFiles(fileToDownload);
 }
 
 module.exports = { downloadCompressedFiles };

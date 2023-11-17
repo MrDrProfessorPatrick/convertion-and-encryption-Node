@@ -34,6 +34,10 @@ async function compressFile(req, res, next) {
       zlibTimeToCompress: "",
     };
 
+    let fileNameGz = req.file.filename.replace(/\.\w+/, ".gz");
+    let fileNameBr = req.file.filename.replace(/\.\w+/, ".br");
+    let fileNameDeflate = req.file.filename.replace(/\.\w+/, ".deflate");
+
     class ReadableStream extends Readable {
       constructor(options) {
         super(options);
@@ -53,15 +57,15 @@ async function compressFile(req, res, next) {
     }
 
     const writableStreamDeflate = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/deflate_compressed_${req.file.filename}`
+      `${pathToFile}/../compressed_files/deflate_compressed_${fileNameDeflate}`
     );
 
     const writableStreamZlib = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/gzip_compressed_${req.file.filename}`
+      `${pathToFile}/../compressed_files/gzip_compressed_${fileNameGz}`
     );
 
     const writableStreamBrotli = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/brotli_compressed_${req.file.filename}`
+      `${pathToFile}/../compressed_files/brotli_compressed_${fileNameBr}`
     );
 
     class GetBytesQuantity extends Transform {
@@ -81,24 +85,23 @@ async function compressFile(req, res, next) {
       _flush(cb) {
         console.log("startTimeToCompress", startTimeToCompress);
         let timeToCompress = Date.now() - startTimeToCompress;
-        console.log("options", this.options);
 
         if (this.options === "deflate") {
           compressionInfo.deflateCompressionSize =
             this.compressedDataByteLength.toString();
-          compressionInfo.deflateFileName = `deflate_compressed_${req.file.filename}`;
+          compressionInfo.deflateFileName = `deflate_compressed_${fileNameDeflate}`;
         }
 
         if (this.options === "gzip") {
           compressionInfo.gzipCompressionSize =
             this.compressedDataByteLength.toString();
-          compressionInfo.gzipFileName = `gzip_compressed_${req.file.filename}`;
+          compressionInfo.gzipFileName = `gzip_compressed_${fileNameGz}`;
         }
 
         if (this.options === "brotli") {
           compressionInfo.brotliCompressionSize =
             this.compressedDataByteLength.toString();
-          compressionInfo.brotliFileName = `brotli_compressed_${req.file.filename}`;
+          compressionInfo.brotliFileName = `brotli_compressed_${fileNameBr}`;
         }
 
         // this.push(
