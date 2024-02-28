@@ -3,375 +3,176 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Document</title>
   </head>
   <body>
-    <fieldset>
-      <legend>Choose compress algorithms you want to use:</legend>
+    <button id="setCompressionButton">Compression</button>
+    <button id="setDecompressionButton">Decompression</button>
+    <div class="compression-container">
+      <fieldset>
+        <legend>Choose compress algorithms you want to use:</legend>
 
-      <div>
-        <input type="checkbox" id="gzip" name="gzip" checked />
-        <label for="gzip">Gzip</label>
-      </div>
-
-      <div>
-        <input type="checkbox" id="brotli" name="brotli" />
-        <label for="brotli">Brotli</label>
-      </div>
-
-      <div>
-        <input type="checkbox" id="deflate" name="deflate" />
-        <label for="deflate">Deflate</label>
-      </div>
-    </fieldset>
-
-    <h2>Chose your file</h2>
-    <form
-      action="/sendfile"
-      method="POST"
-      enctype="multipart/form-data"
-      id="form"
-    >
-      <div class="upload-download-panel">
-        <div class="upload-container">
-          <label for="inputFile" class="chose-file-button">Chose file</label>
-          <span class="file-availability" id="fileName">No file chosen</span>
-          <input type="file" name="file" id="inputFile" style="display: none" />
-          <button class="file-manager-button">Upload</button>
+        <div>
+          <input type="checkbox" id="gzip" name="gzip" checked />
+          <label for="gzip">Gzip</label>
         </div>
-        <div class="download-container">
-          <div class="download-files"></div>
-          <button class="file-manager-button" id="download-button">
-            Download
-          </button>
-        </div>
-      </div>
-    </form>
 
-    <div class="compressions-container">
-      <div class="original-size">
-        <h3>Original size</h3>
-      </div>
-      <div class="zlib-compression">
-        <h3>Gzip compression</h3>
-        <div class="zlib-scale-container"></div>
-      </div>
-      <div class="brotli-compression">
-        <h3>Brotli compression</h3>
-        <div class="brotli-scale-container"></div>
-      </div>
-      <div class="deflate-compression">
-        <h3>Deflate compression</h3>
-        <div class="deflate-scale-container"></div>
+        <div>
+          <input type="checkbox" id="brotli" name="brotli" />
+          <label for="brotli">Brotli</label>
+        </div>
+
+        <div>
+          <input type="checkbox" id="deflate" name="deflate" />
+          <label for="deflate">Deflate</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Choose encryption you want to use:</legend>
+
+        <div>
+          <input type="checkbox" id="gzip" name="symetric" />
+          <label for="symetric">Symetric</label>
+        </div>
+
+        <div>
+          <input type="checkbox" id="asymetric" name="asymetric" />
+          <label for="asymetric">Asymetric</label>
+        </div>
+      </fieldset>
+
+      <h2>Chose your file</h2>
+      <form
+        action="/sendfile"
+        method="POST"
+        enctype="multipart/form-data"
+        id="form"
+      >
+        <div class="upload-download-panel">
+          <div class="upload-container">
+            <label for="inputFile" class="chose-file-button">Chose file</label>
+            <span class="file-availability" id="fileName">No file chosen</span>
+            <input
+              type="file"
+              name="file"
+              id="inputFile"
+              style="display: none"
+            />
+            <button class="file-manager-button">Upload</button>
+          </div>
+          <div class="download-container">
+            <div class="download-files"></div>
+            <button class="file-manager-button" id="download-button">
+              Download
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="compressions-container-measurement">
+        <div class="original-size">
+          <h3>Original size</h3>
+        </div>
+        <div class="zlib-compression">
+          <h3>Gzip compression</h3>
+          <div class="zlib-scale-container"></div>
+        </div>
+        <div class="brotli-compression">
+          <h3>Brotli compression</h3>
+          <div class="brotli-scale-container"></div>
+        </div>
+        <div class="deflate-compression">
+          <h3>Deflate compression</h3>
+          <div class="deflate-scale-container"></div>
+        </div>
       </div>
     </div>
 
-    <style>
-      body {
-        background-color: rgb(214, 214, 214);
-      }
+    <!-- DECOMPRESSION SECTION -->
+    <div class="decompression-container-hidden">
+      <fieldset>
+        <legend>Choose type of the file you want to decompress:</legend>
 
-      form {
-        display: flex;
-      }
+        <div>
+          <input
+            type="radio"
+            id="textDecompress"
+            name="fileToDecompressType"
+            checked
+          />
+          <label for="textDecompress">Text</label>
+        </div>
 
-      .upload-download-panel {
-        display: flex;
-      }
+        <div>
+          <input
+            type="radio"
+            id="imageDecompress"
+            name="fileToDecompressType"
+          />
+          <label for="imageDecompress">Image</label>
+        </div>
+      </fieldset>
 
-      .compressions-container {
-        margin-top: 50px;
-        width: 60%;
-        height: 20px;
-      }
+      <form
+        action="/decompress"
+        method="POST"
+        enctype="application/gzip"
+        id="decompressionForm"
+      >
+        <div class="decompression-container">
+          <label for="inputFileDecompression" class="chose-file-button"
+            >Chose file</label
+          >
+          <span class="file-availability" id="fileNameDecompression"
+            >No file chosen</span
+          >
+          <input
+            type="file"
+            name="file"
+            id="inputFileDecompression"
+            style="display: none"
+          />
+          <button class="file-manager-button" id="decompressionUpload">
+            Decompress
+          </button>
+        </div>
+      </form>
+    </div>
 
-      .zlib-not-compressed-scale {
-        width: 100%;
-        height: 10px;
-        background-color: green;
-        border: 2px solid white;
-        border-radius: 5px;
-      }
-
-      .upload-container {
-        width: 300px;
-      }
-
-      .download-container {
-        display: flex;
-        width: 300px;
-        background-color: bisque;
-        margin-left: 40px;
-      }
-
-      .download-files {
-        min-width: 300px;
-      }
-
-      .chose-file-button {
-        display: inline-block;
-        background-color: white;
-        border: 1px solid black;
-        border-radius: 4px;
-        width: 80px;
-        height: 30px;
-        cursor: pointer;
-        vertical-align: middle;
-        line-height: 30px;
-        padding-left: 10px;
-      }
-
-      .chose-file-button:hover {
-        background-color: rgb(119, 64, 64);
-      }
-
-      .file-manager-button {
-        background-color: rgb(33, 77, 33);
-        border: none;
-        width: 100px;
-        height: 30px;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-
-      .file-manager-button:hover {
-        background-color: rgb(52, 119, 52);
-      }
-    </style>
+    <script type="text/javascript" src="/js/compression.js"></script>
+    <script type="text/javascript" src="/js/decompression.js"></script>
 
     <script>
-      const file = document.getElementById("inputFile");
-      const fileName = document.getElementById("fileName");
-      const submitInput = document.getElementById("inputSubmit");
-      const form = document.getElementById("form");
-      const downloadButton = document.getElementById("download-button");
-      let downloadedFileName = "";
-      const gzipCheckPoint = document.getElementById("gzip");
-      const deflateCheckPoint = document.getElementById("deflate");
-      const brotliCheckPoint = document.getElementById("brotli");
-
-      function renderInitialScale(containerToInsert, sizeObj) {
-        const isInitialScaleExists = document.getElementById("initialScale");
-        const isInitialSizeExists = document.getElementById("initialSize");
-
-        if (isInitialScaleExists) isInitialScaleExists.remove();
-        if (isInitialSizeExists) isInitialSizeExists.remove();
-
-        const initialScale = document.createElement("div");
-        initialScale.id = "initialScale";
-        initialScale.style.backgroundColor = "green";
-        initialScale.style.height = "10px";
-        initialScale.style.width = "100%";
-
-        const initialSize = document.createElement("div");
-        initialSize.id = "initialSize";
-        initialSize.style.fontWeight = "bold";
-        initialSize.style.textAlign = "center";
-        initialSize.innerHTML = sizeObj.originalSize + " kb";
-
-        containerToInsert.append(initialScale);
-        containerToInsert.append(initialSize);
-      }
-
-      function renderCompressionScale(
-        containerToInsert,
-        initialSize,
-        compressionSize,
-        compressScaleId,
-        comressSizeId
-      ) {
-        const isGzipScaleExists = document.getElementById(compressScaleId);
-        const isGzipSizeExists = document.getElementById(comressSizeId);
-
-        if (isGzipScaleExists) isGzipScaleExists.remove();
-        if (isGzipSizeExists) isGzipSizeExists.remove();
-
-        let compressedScaleWidth =
-          Number(compressionSize * 100) / Number(initialSize);
-
-        const compressedScale = document.createElement("div");
-        compressedScale.id = compressScaleId;
-        compressedScale.style.backgroundColor = "green";
-        compressedScale.style.height = "10px";
-        compressedScale.style.width = `${compressedScaleWidth}%`;
-
-        const compressedSize = document.createElement("div");
-        compressedSize.id = comressSizeId;
-        compressedSize.style.fontWeight = "bold";
-        compressedSize.style.textAlign = "center";
-        compressedSize.innerHTML = compressionSize + " kb";
-
-        containerToInsert.append(compressedScale);
-        containerToInsert.append(compressedSize);
-      }
-
-      function renderCompressedFileName(fileName) {
-        const compressedFilesContainer =
-          document.querySelector(".download-files");
-
-        const isCompressedFileNameExists = document.getElementById(fileName);
-
-        if (isCompressedFileNameExists) isCompressedFileNameExists.remove();
-
-        const compressedFileName = document.createElement("div");
-        compressedFileName.id = fileName;
-        compressedFileName.innerHTML = fileName;
-
-        compressedFilesContainer.append(compressedFileName);
-      }
-
-      const originalSizeContainer =
-        document.body.querySelector(".original-size");
-
-      const zlibCompressionContainer = document.body.querySelector(
-        ".zlib-scale-container"
+      // SWITCHER
+      let compressionButton = document.getElementById("setCompressionButton");
+      let decompressionButton = document.getElementById(
+        "setDecompressionButton"
+      );
+      let compressionContainer = document.querySelector(
+        ".compression-container"
+      );
+      let decompressionContainer = document.querySelector(
+        ".decompression-container-hidden"
       );
 
-      const brotliCompressionContainer = document.body.querySelector(
-        ".brotli-scale-container"
-      );
+      compressionButton.addEventListener("click", () => {
+        decompressionContainer.classList.add("decompression-container-hidden");
+        decompressionContainer.classList.remove("decompression-container");
 
-      const deflateCompressionContainer = document.body.querySelector(
-        ".deflate-scale-container"
-      );
+        compressionContainer.classList.add("compressions-container");
+        compressionContainer.classList.remove("compressions-container-hidden");
+      });
+      decompressionButton.addEventListener("click", () => {
+        compressionContainer.classList.add("compressions-container-hidden");
+        compressionContainer.classList.remove("compressions-container");
 
-      form.addEventListener("submit", submintFile);
-      file.addEventListener("change", changeFile);
-      downloadButton.addEventListener("click", downloadFiles);
-
-      function changeFile(e) {
-        fileName.innerHTML = e.target.files[0].name;
-      }
-
-      async function downloadFiles(e) {
-        e.preventDefault();
-
-        let filesNameToDownload = [];
-
-        let documentsNameContainers =
-          document.querySelector(".download-files").children;
-
-        for (let element of documentsNameContainers) {
-          filesNameToDownload.push(element.id);
-          await downloadFileRequest(element.id);
-        }
-
-        async function downloadFileRequest(downloadFileName) {
-          console.log("downloadFileName", downloadFileName);
-          await fetch("/downloadfiles", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json;charset=utf-8",
-            },
-            body: JSON.stringify({ fileName: downloadFileName }),
-          })
-            .then((response) => {
-              return response.body;
-            })
-            .then((rb) => {
-              const reader = rb.getReader();
-
-              return new ReadableStream({
-                start(controller) {
-                  // The following function handles each data chunk
-                  function push() {
-                    // "done" is a Boolean and value a "Uint8Array"
-                    return reader.read().then(({ done, value }) => {
-                      // If there is no more data to read
-                      if (done) {
-                        controller.close();
-                        return value;
-                      }
-                      // Get the data and send it to the browser via the controller
-                      controller.enqueue(value);
-                      // Check chunks by logging to the console
-                      return push();
-                    });
-                  }
-
-                  return push();
-                },
-              });
-            })
-            .then((stream) => new Response(stream))
-            .then((response) => response.blob())
-            .then((blob) => {
-              let fileUrl = URL.createObjectURL(blob);
-              const fileLink = document.createElement("a");
-              fileLink.href = fileUrl;
-
-              fileLink.setAttribute("download", `${downloadFileName}`);
-              document.body.appendChild(fileLink);
-              fileLink.click();
-              fileLink.remove();
-            });
-        }
-      }
-
-      function submintFile(e) {
-        e.preventDefault();
-        const form = e.currentTarget;
-        const url = new URL(form.action);
-        const formData = new FormData(form);
-
-        formData.append("gzip", gzipCheckPoint.checked);
-        formData.append("deflate", deflateCheckPoint.checked);
-        formData.append("brotli", brotliCheckPoint.checked);
-
-        const fetchOptions = {
-          method: form.method,
-          body: formData,
-        };
-
-        async function getFileSizes() {
-          let collectedData = "";
-          console.log("formData", formData);
-
-          let response = await fetch(url, fetchOptions);
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder("utf8");
-          const readerRes = await reader.read();
-          return decoder.decode(readerRes.value);
-        }
-
-        getFileSizes().then((result) => {
-          const sizeObj = JSON.parse(result);
-          renderInitialScale(originalSizeContainer, sizeObj);
-          console.log("sizeObj", sizeObj);
-          if (sizeObj.gzipCompressionSize) {
-            renderCompressionScale(
-              zlibCompressionContainer,
-              sizeObj.originalSize,
-              sizeObj.gzipCompressionSize,
-              "compressScaleGzipId",
-              "comressSizeGzipId"
-            );
-            renderCompressedFileName(sizeObj.gzipFileName);
-          }
-
-          if (sizeObj.brotliCompressionSize) {
-            renderCompressionScale(
-              brotliCompressionContainer,
-              sizeObj.originalSize,
-              sizeObj.brotliCompressionSize,
-              "compressScaleBrotliId",
-              "compressSizeBrotliId"
-            );
-            renderCompressedFileName(sizeObj.brotliFileName);
-          }
-
-          if (sizeObj.deflateCompressionSize) {
-            renderCompressionScale(
-              deflateCompressionContainer,
-              sizeObj.originalSize,
-              sizeObj.deflateCompressionSize,
-              "compressScaleDeflateId",
-              "compressSizeDeflateId"
-            );
-            renderCompressedFileName(sizeObj.deflateFileName);
-          }
-        });
-      }
+        decompressionContainer.classList.add("decompression-container");
+        decompressionContainer.classList.remove(
+          "decompression-container-hidden"
+        );
+      });
     </script>
   </body>
 </html>

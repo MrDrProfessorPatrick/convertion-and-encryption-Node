@@ -18,7 +18,6 @@ async function compressFile(req, res, next) {
     const brotliStream = zlib.BrotliCompress();
     let compressionMethods = [];
 
-    console.log("req.body", req.body, req.body.gzip);
     const fileSize = req.file.size;
     const startTimeToCompress = Date.now();
 
@@ -34,9 +33,9 @@ async function compressFile(req, res, next) {
       zlibTimeToCompress: "",
     };
 
-    let fileNameGz = req.file.filename.replace(/\.\w+/, ".gz");
-    let fileNameBr = req.file.filename.replace(/\.\w+/, ".br");
-    let fileNameDeflate = req.file.filename.replace(/\.\w+/, ".deflate");
+    let fileNameGz = req.file.filename.replace(/\.\w+/, ".txt");
+    let fileNameBr = req.file.filename.replace(/\.\w+/, ".txt");
+    let fileNameDeflate = req.file.filename.replace(/\.\w+/, ".txt");
 
     class ReadableStream extends Readable {
       constructor(options) {
@@ -83,7 +82,6 @@ async function compressFile(req, res, next) {
       }
 
       _flush(cb) {
-        console.log("startTimeToCompress", startTimeToCompress);
         let timeToCompress = Date.now() - startTimeToCompress;
 
         if (this.options === "deflate") {
@@ -127,7 +125,6 @@ async function compressFile(req, res, next) {
 
     function runCountBytesStream(compressionMethods) {
       // run pipeline in for of compressionMethods and in the last one return object you need
-      console.log("compressionsMethods", compressionMethods);
       for (let i = 0; i <= compressionMethods.length; i++) {
         if (compressionMethods[i] === "deflate") {
           pipeline(
