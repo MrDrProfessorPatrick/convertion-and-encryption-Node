@@ -1,4 +1,3 @@
-const { text } = require("express");
 const {
   createCipheriv,
   createDecipheriv,
@@ -11,44 +10,42 @@ function encryptSymetricService(textToEncrypt, key) {
 
   const keySalt = scryptSync(key, "salt", 24);
   const nonce = randomBytes(12);
-  // const aad = Buffer.from("0123456789", "hex");
+
   const cipher = createCipheriv("aes-192-ccm", keySalt, nonce, {
     authTagLength: 16,
   });
-  // cipher.setAAD(aad, {
-  //   plaintextLength: Buffer.byteLength(textToEncrypt),
-  // });
+
   let ciphertext = cipher.update(textToEncrypt, "utf8", "base64");
   ciphertext += cipher.final("base64");
   const tag = cipher.getAuthTag();
-  let nonceString = nonce.toString("hex");
-  // let aadString = aad.toString("hex");
+  let nonceString = nonce.toString("base64");
+
   let tagString = tag.toString("base64");
 
-  let responseCipher = nonce + "/" + tag + "/" + ciphertext;
+  let responseCipher = nonceString + "-" + tagString + "-" + ciphertext;
   console.log("responseCipher", responseCipher);
   return { responseCipher };
 }
 
-function decryptSymetricService(cipher, key, nonce, tag) {
+function decryptSymetricService(cipher, key) {
   const keySalt = scryptSync(key, "salt", 24);
+
+  let [nonce, tag, cipherText] = cipher.split("-");
+
+  console.log("nonce", nonce, "tag", tag, "cipherText", cipherText);
 
   const decipher = createDecipheriv(
     "aes-192-ccm",
     keySalt,
-    Buffer.from(nonce, "hex"),
+    Buffer.from(nonce, "base64"),
     {
       authTagLength: 16,
     }
   );
 
-  // decipher.setAAD(Buffer.from(aad, "hex"), {
-  //   plaintextLength: Buffer.byteLength(cipher),
-  // });
-
   decipher.setAuthTag(Buffer.from(tag, "base64"));
 
-  const decryptedPlaintext = decipher.update(cipher, "base64", "utf8");
+  const decryptedPlaintext = decipher.update(cipherText, "base64", "utf8");
 
   try {
     decipher.final("utf8");
@@ -76,8 +73,8 @@ async function decryptSymetric(req, res, next) {
   if (!req.body) {
     return res.status(400).json("No text for encryption was received");
   }
-  let { password, text, nonce, aad, tag } = req.body;
-  let decryptedText = decryptSymetricService(text, password, nonce, tag);
+  let { password, text } = req.body;
+  let decryptedText = decryptSymetricService(text, password);
   return res.status(200).json({ decryptedText });
 }
 

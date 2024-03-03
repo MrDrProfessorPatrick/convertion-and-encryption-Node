@@ -14,17 +14,17 @@
         <legend>Choose compress algorithms you want to use:</legend>
 
         <div>
-          <input type="checkbox" id="gzip" name="gzip" checked />
+          <input type="radio" id="gzip" name="compression " checked />
           <label for="gzip">Gzip</label>
         </div>
 
         <div>
-          <input type="checkbox" id="brotli" name="brotli" />
+          <input type="radio" id="brotli" name="compression" />
           <label for="brotli">Brotli</label>
         </div>
 
         <div>
-          <input type="checkbox" id="deflate" name="deflate" />
+          <input type="radio" id="deflate" name="compression" />
           <label for="deflate">Deflate</label>
         </div>
       </fieldset>
@@ -33,12 +33,12 @@
         <legend>Choose encryption you want to use:</legend>
 
         <div>
-          <input type="checkbox" id="gzip" name="symetric" />
+          <input type="radio" id="gzip" name="encryption" />
           <label for="symetric">Symetric</label>
         </div>
 
         <div>
-          <input type="checkbox" id="asymetric" name="asymetric" />
+          <input type="radio" id="asymetric" name="encryption" />
           <label for="asymetric">Asymetric</label>
         </div>
       </fieldset>
@@ -145,7 +145,7 @@
     <script type="text/javascript" src="/js/decompression.js"></script>
 
     <script>
-      // SWITCHER
+      // SWITCHER COMPRESSION-DECOMPRESSION
       let compressionButton = document.getElementById("setCompressionButton");
       let decompressionButton = document.getElementById(
         "setDecompressionButton"
