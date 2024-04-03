@@ -14,7 +14,12 @@
         <legend>Choose compress algorithms you want to use:</legend>
 
         <div>
-          <input type="radio" id="gzip" name="compression " checked />
+          <input type="radio" id="nocompression" name="compression" checked />
+          <label for="nocompression">No compression</label>
+        </div>
+
+        <div>
+          <input type="radio" id="gzip" name="compression" />
           <label for="gzip">Gzip</label>
         </div>
 
@@ -31,6 +36,11 @@
 
       <fieldset>
         <legend>Choose encryption you want to use:</legend>
+
+        <div>
+          <input type="radio" id="noencryption" name="encryption" checked />
+          <label for="noencryption">No compression</label>
+        </div>
 
         <div>
           <input type="radio" id="gzip" name="encryption" />

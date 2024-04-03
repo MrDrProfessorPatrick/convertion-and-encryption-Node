@@ -10,28 +10,34 @@ function changeFile(e) {
   fileNameDecompression.innerHTML = e.target.files[0].name;
 }
 
-async function decompressFile(e) {\
+async function decompressFile(e) {
   try {
     e.preventDefault();
     const form = e.currentTarget;
     const url = new URL(form.action);
-  
+
     const fileExtensionToDownload = imageTypeCheckbox.checked ? "png" : "txt";
-  
+
     const fetchOptions = {
       method: form.method,
       headers: { "Content-Type": "application/gzip" },
       body: fileDecompression.files[0],
     };
-  
+
     console.log("fileDecompression.files[0]", fileDecompression.files[0].name);
-  
+
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/);
-  
-    if(currentFileExtension !== '.gz' || currentFileExtension !== ".br" || currentFileExtension !== ".deflate"){
-      throw new Error('We cannot decompress this file. File must have one of the following extensions as .gz, .br, .deflate')
+
+    if (
+      currentFileExtension !== ".gz" ||
+      currentFileExtension !== ".br" ||
+      currentFileExtension !== ".deflate"
+    ) {
+      throw new Error(
+        "We cannot decompress this file. File must have one of the following extensions as .gz, .br, .deflate"
+      );
     }
-  
+
     // await fetch(url, fetchOptions)
     //   .then((response) => {
     //     console.log("response.body", response.body);
@@ -39,7 +45,7 @@ async function decompressFile(e) {\
     //   })
     //   .then((rb) => {
     //     const reader = rb.getReader();
-  
+
     //     return new ReadableStream({
     //       start(controller) {
     //         // The following function handles each data chunk
@@ -57,7 +63,7 @@ async function decompressFile(e) {\
     //             return push();
     //           });
     //         }
-  
+
     //         return push();
     //       },
     //     });
@@ -68,7 +74,7 @@ async function decompressFile(e) {\
     //     let fileUrl = URL.createObjectURL(blob);
     //     const fileLink = document.createElement("a");
     //     fileLink.href = fileUrl;
-  
+
     //     fileLink.setAttribute("download", `DECOMPRESSED_FILE.${fileExtension}`); // change extension
     //     document.body.appendChild(fileLink);
     //     fileLink.click();
@@ -77,7 +83,6 @@ async function decompressFile(e) {\
   } catch (error) {
     console.log(error);
   }
-
 }
 
 fileDecompression.addEventListener("change", changeFile);

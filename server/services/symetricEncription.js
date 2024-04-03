@@ -4,10 +4,11 @@ const {
   randomBytes,
   scryptSync,
 } = require("node:crypto");
+const fs = require("node:fs");
+const { pipeline } = require("node:stream");
+const encryptSymetricStream = require("./encryptSymetricStream");
 
 function encryptSymetricService(textToEncrypt, key) {
-  const buf = Buffer.from("hello world", "utf8");
-
   const keySalt = scryptSync(key, "salt", 24);
   const nonce = randomBytes(12);
 
@@ -23,7 +24,6 @@ function encryptSymetricService(textToEncrypt, key) {
   let tagString = tag.toString("base64");
 
   let responseCipher = nonceString + "-" + tagString + "-" + ciphertext;
-  console.log("responseCipher", responseCipher);
   return { responseCipher };
 }
 
@@ -31,8 +31,6 @@ function decryptSymetricService(cipher, key) {
   const keySalt = scryptSync(key, "salt", 24);
 
   let [nonce, tag, cipherText] = cipher.split("-");
-
-  console.log("nonce", nonce, "tag", tag, "cipherText", cipherText);
 
   const decipher = createDecipheriv(
     "aes-192-ccm",
@@ -56,10 +54,25 @@ function decryptSymetricService(cipher, key) {
 }
 
 async function encryptSymetric(req, res, next) {
+  console.log("req.body", req.body);
   if (!req.body) {
     return res.status(400).json("No text for encryption was received");
   }
-  let { password, text } = req.body;
+  console.log("req.file", req.file);
+  if (req.file) {
+    let readableStream = fs.createReadStream(req.file);
+
+    let writableEncryptionStream = fs.createWriteStream(
+      `${__dirname}/../encrypted_files/encrypted${req.file.filename}`
+    );
+    let symcetricEncryptyon = new pipeline(
+      readableStream,
+      encryptSymetricStream,
+      writableEncryptionStream
+    );
+  }
+
+  let { password = 1, text } = req.body;
 
   if (!password || !text) {
     return res.status(400).json("No text or password were provided");

@@ -93,6 +93,7 @@ const deflateCompressionContainer = document.body.querySelector(
 
 form.addEventListener("submit", submintFile);
 file.addEventListener("change", changeFile);
+
 downloadButton.addEventListener("click", downloadFiles);
 
 function changeFile(e) {
@@ -113,7 +114,6 @@ async function downloadFiles(e) {
   }
 
   async function downloadFileRequest(downloadFileName) {
-    console.log("downloadFileName", downloadFileName);
     await fetch("/downloadfiles", {
       method: "POST",
       headers: {

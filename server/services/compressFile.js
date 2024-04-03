@@ -33,9 +33,7 @@ async function compressFile(req, res, next) {
       zlibTimeToCompress: "",
     };
 
-    let fileNameGz = req.file.filename.replace(/\.\w+/, ".txt");
-    let fileNameBr = req.file.filename.replace(/\.\w+/, ".txt");
-    let fileNameDeflate = req.file.filename.replace(/\.\w+/, ".txt");
+    let fileNameTxt = req.file.filename.replace(/\.\w+/, ".txt");
 
     class ReadableStream extends Readable {
       constructor(options) {
@@ -56,15 +54,15 @@ async function compressFile(req, res, next) {
     }
 
     const writableStreamDeflate = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/deflate_compressed_${fileNameDeflate}`
+      `${pathToFile}/../compressed_files/deflate_compressed_${fileNameTxt}`
     );
 
     const writableStreamZlib = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/gzip_compressed_${fileNameGz}`
+      `${pathToFile}/../compressed_files/gzip_compressed_${fileNameTxt}`
     );
 
     const writableStreamBrotli = fs.createWriteStream(
-      `${pathToFile}/../compressed_files/brotli_compressed_${fileNameBr}`
+      `${pathToFile}/../compressed_files/brotli_compressed_${fileNameTxt}`
     );
 
     class GetBytesQuantity extends Transform {
