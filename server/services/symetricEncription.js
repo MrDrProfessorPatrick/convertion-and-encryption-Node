@@ -5,6 +5,7 @@ const {
   scryptSync,
 } = require("node:crypto");
 const fs = require("node:fs");
+const multer = require("multer");
 const { pipeline } = require("node:stream");
 const encryptSymetricStream = require("./encryptSymetricStream");
 
@@ -55,10 +56,11 @@ function decryptSymetricService(cipher, key) {
 
 async function encryptSymetric(req, res, next) {
   console.log("req.body", req.body);
+  console.log("req.file", req.file);
+
   if (!req.body) {
     return res.status(400).json("No text for encryption was received");
   }
-  console.log("req.file", req.file);
   if (req.file) {
     let readableStream = fs.createReadStream(req.file);
 
@@ -72,7 +74,7 @@ async function encryptSymetric(req, res, next) {
     );
   }
 
-  let { password = 1, text } = req.body;
+  let { password, text } = req.body;
 
   if (!password || !text) {
     return res.status(400).json("No text or password were provided");

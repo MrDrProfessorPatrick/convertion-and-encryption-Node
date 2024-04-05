@@ -1,7 +1,7 @@
 const file = document.getElementById("inputFile");
 const fileName = document.getElementById("fileName");
 const submitInput = document.getElementById("inputSubmit");
-const form = document.getElementById("form");
+// const form = document.getElementById("form");
 const downloadButton = document.getElementById("download-button");
 let downloadedFileName = "";
 const gzipCheckPoint = document.getElementById("gzip");
@@ -91,7 +91,7 @@ const deflateCompressionContainer = document.body.querySelector(
   ".deflate-scale-container"
 );
 
-form.addEventListener("submit", submintFile);
+// form.addEventListener("submit", submintFile);
 file.addEventListener("change", changeFile);
 
 downloadButton.addEventListener("click", downloadFiles);

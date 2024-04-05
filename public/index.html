@@ -54,12 +54,7 @@
       </fieldset>
 
       <h2>Chose your file</h2>
-      <form
-        action="/sendfile"
-        method="POST"
-        enctype="multipart/form-data"
-        id="form"
-      >
+      <form id="send-file-form">
         <div class="upload-download-panel">
           <div class="upload-container">
             <label for="inputFile" class="chose-file-button">Chose file</label>
@@ -70,7 +65,7 @@
               id="inputFile"
               style="display: none"
             />
-            <button class="file-manager-button">Upload</button>
+            <button class="file-manager-button" type="submit">Upload</button>
           </div>
           <div class="download-container">
             <div class="download-files"></div>
@@ -166,6 +161,7 @@
       let decompressionContainer = document.querySelector(
         ".decompression-container-hidden"
       );
+      let sendFileForm = document.getElementById("send-file-form");
 
       compressionButton.addEventListener("click", () => {
         decompressionContainer.classList.add("decompression-container-hidden");
@@ -183,6 +179,21 @@
           "decompression-container-hidden"
         );
       });
+
+      sendFileForm.onsubmit = async (e) => {
+        e.preventDefault();
+        console.log("FORM SUBMITED");
+        let formData = new FormData(sendFileForm);
+        console.log("formData", formData);
+
+        await fetch("/encryptsymetric", {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        });
+      };
     </script>
   </body>
 </html>
