@@ -5,7 +5,6 @@ const {
   scryptSync,
 } = require("node:crypto");
 const fs = require("node:fs");
-const multer = require("multer");
 const { pipeline } = require("node:stream");
 const encryptSymetricStream = require("./encryptSymetricStream");
 
@@ -70,7 +69,16 @@ async function encryptSymetric(req, res, next) {
     let symcetricEncryptyon = new pipeline(
       readableStream,
       encryptSymetricStream,
-      writableEncryptionStream
+      writableEncryptionStream,
+      (error) => {
+        if (error) {
+          return res
+            .status(400)
+            .json("Error occred on file symetric encryption");
+        } else {
+          return res.status(200).json("Succesfully encrypted");
+        }
+      }
     );
   }
 

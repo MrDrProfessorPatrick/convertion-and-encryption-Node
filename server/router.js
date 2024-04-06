@@ -13,6 +13,7 @@ const {
 } = require("./services/downloadCompressedFiles");
 
 const router = new Router();
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads");
@@ -28,10 +29,12 @@ const storage = multer.diskStorage({
 
 var upload = multer({ storage });
 
+// const encryptionUpload = multer({ dest: "up" });
+
 router.post("/sendfile", upload.single("file"), compressFile);
 router.post("/downloadfiles", downloadCompressedFiles);
 router.post("/decompress", decompressFile);
-router.post("/encryptsymetric", encryptSymetric);
+router.post("/encryptsymetric", upload.single("file"), encryptSymetric);
 router.post("/decryptsymetric", decryptSymetric);
 
 module.exports = router;
