@@ -1,6 +1,5 @@
 const fs = require("node:fs");
 const { pipeline } = require("readable-stream");
-var MultiStream = require("multistream");
 
 async function downloadCompressedFiles(req, res, next) {
   if (!req.body) {

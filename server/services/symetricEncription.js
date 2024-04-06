@@ -6,7 +6,7 @@ const {
 } = require("node:crypto");
 const fs = require("node:fs");
 const { pipeline } = require("node:stream");
-const encryptSymetricStream = require("./encryptSymetricStream");
+const EncryptSymetricStream = require("./encryptSymetricStream");
 
 function encryptSymetricService(textToEncrypt, key) {
   const keySalt = scryptSync(key, "salt", 24);
@@ -57,24 +57,26 @@ async function encryptSymetric(req, res, next) {
   console.log("req.body", req.body);
   console.log("req.file", req.file);
 
-  if (!req.body) {
-    return res.status(400).json("No text for encryption was received");
-  }
+  // if (!req.body) {
+  //   return res.status(400).json("No text for encryption was received");
+  // }
   if (req.file) {
-    let readableStream = fs.createReadStream(req.file);
+    let readableStream = fs.createReadStream(req.file.path);
 
     let writableEncryptionStream = fs.createWriteStream(
-      `${__dirname}/../encrypted_files/encrypted${req.file.filename}`
+      `${__dirname}/../../encrypted_files/encrypted${req.file.filename}`
     );
-    let symcetricEncryptyon = new pipeline(
+
+    pipeline(
       readableStream,
-      encryptSymetricStream,
+      EncryptSymetricStream,
       writableEncryptionStream,
       (error) => {
         if (error) {
+          console.log('error in pipeline symetricEncription', error);
           return res
             .status(400)
-            .json("Error occred on file symetric encryption");
+            .json("Error occured on file symetric encryption");
         } else {
           return res.status(200).json("Succesfully encrypted");
         }
@@ -82,14 +84,14 @@ async function encryptSymetric(req, res, next) {
     );
   }
 
-  let { password, text } = req.body;
+  // let { password, text } = req.body;
 
-  if (!password || !text) {
-    return res.status(400).json("No text or password were provided");
-  }
+  // if (!password || !text) {
+  //   return res.status(400).json("No text or password were provided");
+  // }
 
-  let encryptedObj = encryptSymetricService(text, password);
-  return res.status(200).json(encryptedObj);
+  // let encryptedObj = encryptSymetricService(text, password);
+  // return res.status(200).json(encryptedObj);
 }
 
 async function decryptSymetric(req, res, next) {

@@ -1,6 +1,6 @@
 const { Readable, Writable, Transform, pipeline } = require("readable-stream");
 
-class encryptSymetricStream extends Transform {
+class EncryptSymetricStream extends Transform {
   constructor(options) {
     super(options);
     this.options = options;
@@ -13,4 +13,4 @@ class encryptSymetricStream extends Transform {
   }
 }
 
-module.exports = encryptSymetricStream;
+module.exports = new EncryptSymetricStream();
