@@ -81,3 +81,7 @@ form {
 .file-manager-button:hover {
   background-color: rgb(52, 119, 52);
 }
+
+.password-input-hidden{
+  display: none;
+}

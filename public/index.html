@@ -38,17 +38,17 @@
         <legend>Choose encryption you want to use:</legend>
 
         <div>
-          <input type="radio" id="noencryption" name="encryption" checked />
+          <input type="radio" id="noEncryption" name="encryption" value="noencryption" checked />
           <label for="noencryption">No encryption</label>
         </div>
 
         <div>
-          <input type="radio" id="gzip" name="encryption" />
+          <input type="radio" id="symetricEncryption" value="symetricEncryption" name="encryption" />
           <label for="symetric">Symetric</label>
         </div>
 
         <div>
-          <input type="radio" id="asymetric" name="encryption" />
+          <input type="radio" id="asymetricEncryption" value="asymetricEncryption" name="encryption" />
           <label for="asymetric">Asymetric</label>
         </div>
       </fieldset>
@@ -65,6 +65,11 @@
               id="inputFile"
               style="display: none"
             />
+            <div id="passwordInputContainer">
+              <input id="passwordInput" type="text" name="encryptionPassword">
+              <label for="encryptionPassword">Enter password</label>
+            </div>
+
             <button class="file-manager-button" type="submit">Upload</button>
           </div>
           <div class="download-container">
@@ -180,17 +185,48 @@
         );
       });
 
+
+    </script>
+
+
+
+    <script>
+
+      const noEncryptionInput = document.getElementById("noEncryption");
+      const symetricEncryptionInput = document.getElementById("symetricEncryption");
+      const asymetricEncryptionInput = document.getElementById("asymetricEncryption");
+
+      let passwordFormContainer = document.getElementById("passwordInputContainer");
+
+      noEncryptionInput.addEventListener('change', (e)=>{
+        console.log('noEncryptionToggled', e.target.value)
+        passwordFormContainer.classList.add('password-input-hidden');
+
+      })
+
+      symetricEncryptionInput.addEventListener('change', ()=>{
+        console.log('symetricEncryptionInput')
+        passwordFormContainer.classList.remove('password-input-hidden');
+      })
+
+      asymetricEncryptionInput.addEventListener('change', ()=>{
+        console.log('asymetricEncryptionInput')
+        passwordFormContainer.classList.remove('password-input-hidden');
+
+      })
+
       sendFileForm.onsubmit = async (e) => {
         e.preventDefault();
-        console.log("FORM SUBMITED");
-        let formData = new FormData(sendFileForm);
-        console.log("formData", formData);
+      console.log("FORM SUBMITED");
+      let formData = new FormData(sendFileForm);
+      console.log("formData", formData);
 
-        await fetch("/encryptsymetric", {
-          method: "POST",
-          body: formData,
-        });
-      };
+      await fetch("/encryptsymetric", {
+        method: "POST",
+        body: formData,
+      });
+    };
     </script>
+
   </body>
 </html>
