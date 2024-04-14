@@ -1,16 +1,17 @@
 const { Readable, Writable, Transform, pipeline } = require("readable-stream");
+const encryptSymetricService = require('../helpers/encryptServices');
 
 class EncryptSymetricStream extends Transform {
   constructor(options) {
     super(options);
-    this.options = options;
+    this.key = options;
   }
 
   _transform(chunk, encoding, done) {
-    console.log("chunk in encryptSymetricStream", chunk.toString());
-    this.push(chunk);
+    
+    this.push(encryptSymetricService(chunk.toString(), this.key));
     done();
   }
 }
 
-module.exports = new EncryptSymetricStream();
+module.exports = EncryptSymetricStream;
