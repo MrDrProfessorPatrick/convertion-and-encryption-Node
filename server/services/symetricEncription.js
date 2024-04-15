@@ -9,10 +9,6 @@ const { pipeline } = require("node:stream");
 const EncryptSymetricStream = require("./encryptSymetricStream");
 
 async function encryptSymetric(req, res, next) {
-  console.log("req.body", req.body);
-  console.log("req.file", req.file);
-
-
   // if (!req.body) {
   //   return res.status(400).json("No text for encryption was received");
   // }
@@ -20,11 +16,11 @@ async function encryptSymetric(req, res, next) {
   let { encryptionPassword, text } = req.body;
 
   if (req.file) {
-    console.log('password in encryptSymetric request', encryptionPassword)
+    console.log("password in encryptSymetric request", encryptionPassword);
     let readableStream = fs.createReadStream(req.file.path);
     let encryptSymetric = new EncryptSymetricStream(encryptionPassword);
     let writableEncryptionStream = fs.createWriteStream(
-      `${__dirname}/../../encrypted_files/encrypted${req.file.filename}`
+      `${__dirname}/../encrypted_files/encrypted${req.file.filename}`
     );
 
     pipeline(
@@ -33,7 +29,7 @@ async function encryptSymetric(req, res, next) {
       writableEncryptionStream,
       (error) => {
         if (error) {
-          console.log('error in pipeline symetricEncription', error);
+          console.log("error in pipeline symetricEncription", error);
           return res
             .status(400)
             .json("Error occured on file symetric encryption");
@@ -57,7 +53,7 @@ async function decryptSymetric(req, res, next) {
     return res.status(400).json("No text for encryption was received");
   }
 
-  if(req.file) {
+  if (req.file) {
     // DO DECRYPTION WITH PIPELINE
   }
 
