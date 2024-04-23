@@ -6,7 +6,7 @@ const {
 } = require("node:crypto");
 const fs = require("node:fs");
 const { pipeline } = require("node:stream");
-const EncryptSymetricStream = require("./encryptSymetricStream");
+const EncryptSymetricStream = require("../helpers/encryptSymetricStream");
 
 async function encryptSymetric(req, res, next) {
   // if (!req.body) {
