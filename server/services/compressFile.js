@@ -1,4 +1,4 @@
-const CompressionFactory = require('../FactoryMethods/compressionFactory');
+const Compression = require('../FactoryMethods/compressionFactory');
 
 async function compressFile(req, res, next) {
   if (!req.file) {
@@ -7,20 +7,32 @@ async function compressFile(req, res, next) {
   // regarding req options call CompressionFactory or any other
 
   try {
-    const disposition = 'attachment; filename="' + req.file.filename + '"';
-    // res.set("Content-Encoding", "gzip");
-    // res.setHeader("Content-Type", req.file.mimetype);
-    // res.setHeader("Content-Disposition", disposition);
-    const pathToFile = __dirname;
+    let compression;
+    let encryptionMethod = false;
 
-    let compressionMethods = [];
+    console.log('BODY ', req.body)
 
     const fileSize = req.file.size;
+    const fileName = req.file.filename;
     const startTimeToCompress = Date.now();
 
-    if (req.body.gzip === "true") compressionMethods.push("gzip");
-    if (req.body.deflate === "true") compressionMethods.push("deflate");
-    if (req.body.brotli === "true") compressionMethods.push("brotli");
+    if(req.body.symetricEncryption || req.body.asymetricEncryption) encryptionMethod = 'symetricEncryption';
+
+    if (req.body.gzip === "true") {
+      compression = new Compression('gzip', encryptionMethod, fileSize, fileName);
+    };
+    
+    if (req.body.deflate === "true") {
+      compression = new Compression('deflate', encryptionMethod, fileSize, fileName);
+    };
+
+    if (req.body.brotli === "true") {
+      compression = new Compression('brotli', encryptionMethod, fileSize, fileName);
+    };
+    console.log('compression class', compression);
+    let compressionResult = compression.compress();
+
+    return res.status(200).json(compressionResult);
    
   } catch (error) {
     console.log("error catched", error);

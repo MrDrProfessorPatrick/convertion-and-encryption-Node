@@ -1,12 +1,21 @@
 const file = document.getElementById("inputFile");
 const fileName = document.getElementById("fileName");
 const submitInput = document.getElementById("inputSubmit");
-// const form = document.getElementById("form");
+const form = document.getElementById("send-file-form");
 const downloadButton = document.getElementById("download-button");
-let downloadedFileName = "";
 const gzipCheckPoint = document.getElementById("gzip");
 const deflateCheckPoint = document.getElementById("deflate");
 const brotliCheckPoint = document.getElementById("brotli");
+const noEncryptionInput = document.getElementById("noEncryption");
+const symetricEncryptionInput = document.getElementById("symetricEncryption");
+const asymetricEncryptionInput = document.getElementById("asymetricEncryption");
+const noDecryptionInput = document.getElementById("noDecryptionRadio");
+const decryptionInput = document.getElementById("decryptionRadio");
+const encryptionPassword = document.getElementById("passwordInput");
+const decryptionPassword = document.getElementById('decryptionPassword');
+
+let downloadedFileName = "";
+
 
 function renderInitialScale(containerToInsert, sizeObj) {
   const isInitialScaleExists = document.getElementById("initialScale");
@@ -91,7 +100,7 @@ const deflateCompressionContainer = document.body.querySelector(
   ".deflate-scale-container"
 );
 
-// form.addEventListener("submit", submintFile);
+form.addEventListener("submit", submintFile);
 file.addEventListener("change", changeFile);
 
 downloadButton.addEventListener("click", downloadFiles);
@@ -166,26 +175,26 @@ async function downloadFiles(e) {
 function submintFile(e) {
   e.preventDefault();
   const form = e.currentTarget;
-  const url = new URL(form.action);
   const formData = new FormData(form);
 
   formData.append("gzip", gzipCheckPoint.checked);
   formData.append("deflate", deflateCheckPoint.checked);
   formData.append("brotli", brotliCheckPoint.checked);
-
-  const fetchOptions = {
-    method: form.method,
-    body: formData,
-  };
+  formData.append('symetricEncryption', symetricEncryptionInput.checked);
+  formData.append('asymetricEncryption', asymetricEncryptionInput.checked);
 
   async function getFileSizes() {
     let collectedData = "";
-    console.log("formData", formData);
 
-    let response = await fetch(url, fetchOptions);
+  let response = await fetch('/sendfile', {
+      method:"POST",
+      body: formData,
+    })
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder("utf8");
     const readerRes = await reader.read();
+
     return decoder.decode(readerRes.value);
   }
 
