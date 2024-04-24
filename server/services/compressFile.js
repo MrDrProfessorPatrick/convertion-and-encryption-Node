@@ -5,32 +5,33 @@ async function compressFile(req, res, next) {
     return res.status(400).json("No File was received");
   }
   // regarding req options call CompressionFactory or any other
-
   try {
-    let compression;
     let encryptionMethod = false;
 
     console.log('BODY ', req.body)
 
     const fileSize = req.file.size;
     const fileName = req.file.filename;
+    const password = req.body.encryptionPassword;
     const startTimeToCompress = Date.now();
+    let compressionMethods = [];
 
     if(req.body.symetricEncryption || req.body.asymetricEncryption) encryptionMethod = 'symetricEncryption';
 
     if (req.body.gzip === "true") {
-      compression = new Compression('gzip', encryptionMethod, fileSize, fileName);
+      compressionMethods.push('gzip');
     };
     
     if (req.body.deflate === "true") {
-      compression = new Compression('deflate', encryptionMethod, fileSize, fileName);
+      compressionMethods.push('deflate');
     };
 
     if (req.body.brotli === "true") {
-      compression = new Compression('brotli', encryptionMethod, fileSize, fileName);
+      compressionMethods.push('brotli');
     };
-    console.log('compression class', compression);
-    let compressionResult = compression.compress();
+
+    let compression = new Compression(compressionMethods, encryptionMethod, password, fileSize, fileName);
+    let compressionResult = await compression.compress();
 
     return res.status(200).json(compressionResult);
    

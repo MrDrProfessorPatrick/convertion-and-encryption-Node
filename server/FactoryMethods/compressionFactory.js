@@ -8,14 +8,15 @@ const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 
 class Compression {
 
-  constructor(compressionMethods, encryptionMethod, originalFileSize, fileName){
+  constructor(compressionMethods, encryptionMethod, password, originalFileSize, fileName){
     this.compressionMethods = compressionMethods;
     this.encryptionMethod = encryptionMethod;
+    this.password = password;
     this.originalFileSize = originalFileSize;
     this.fileName = fileName;
   }
 
-  compress(){
+  async compress(){
     try{
         let gzipStream ;
         let deflateStream;
@@ -58,21 +59,21 @@ class Compression {
           `${pathToFile}/../../uploads/${this.fileName}`
         );
 
-        if(this.compressionMethods === 'brotli'){
+        if(this.compressionMethods.includes('brotli')){
           brotliStream = zlib.BrotliCompress();
           writableStreamBrotli = fs.createWriteStream(
             `${pathToFile}/../compressed_files/brotli_compressed_${fileNameTxt}`
           );
         }
 
-        if(this.compressionMethods === 'gzip'){
+        if(this.compressionMethods.includes('gzip')){
           gzipStream = zlib.createGzip();
           writableStreamGzip = fs.createWriteStream(
             `${pathToFile}/../compressed_files/gzip_compressed_${fileNameTxt}`
           );
         }
 
-        if(this.compressionMethods === 'deflate'){
+        if(this.compressionMethods.includes('deflate')){
            deflateStream = zlib.DeflateRaw();
            writableStreamDeflate = fs.createWriteStream(
             `${pathToFile}/../compressed_files/deflate_compressed_${fileNameTxt}`
@@ -82,47 +83,53 @@ class Compression {
         const getBytesQuantityDeflate = new GetBytesQuantity({compressionMethod:"deflate", compressionInfo});
         const getBytesQuantityGzip = new GetBytesQuantity({compressionMethod:"gzip", compressionInfo});
         const getBytesQuantityBrotli = new GetBytesQuantity({compressionMethod:"brotli", compressionInfo});
+        const symetricEncryptionStream = new EncryptSymetricStream(this.password);
 
-          async function transformFile(){
-            if (this.compressionMethods === 'deflate') {
-              this.encryptionMethod ? 
-                pipelineMaker({readableStream, 
-                  transformStreams:[EncryptSymetricStream, deflateStream, getBytesQuantityDeflate], 
-                  writableStream: writableStreamDeflate
-                }) :
-                pipelineMaker({readableStream, 
-                  transformStreams:[deflateStream, getBytesQuantityDeflate], 
-                  writableStream: writableStreamDeflate
-                });
-            }
+          async function transformFile(compresionMethods, encryptionMethod){
+            compresionMethods.forEach((method) =>{
 
-            if (this.compressionMethods === 'gzip') {
-              this.encryptionMethod ? 
-                pipelineMaker({readableStream, 
-                  transformStreams:[EncryptSymetricStream, gzipStream, getBytesQuantityGzip], 
-                  writableStream: writableStreamGzip
-                }) :
-                pipelineMaker({readableStream, 
-                  transformStreams:[gzipStream, getBytesQuantityGzip], 
-                  writableStream: writableStreamGzip
-                });
-            }
-          
+              if (method === 'deflate') {
+                encryptionMethod ? 
+                  pipelineMaker({readableStream, 
+                    transformStreams:[symetricEncryptionStream, deflateStream, getBytesQuantityDeflate], 
+                    writableStream: writableStreamDeflate
+                  }) :
+                  pipelineMaker({readableStream, 
+                    transformStreams:[deflateStream, getBytesQuantityDeflate], 
+                    writableStream: writableStreamDeflate
+                  });
+              }
 
-            if (this.compressionMethods === 'brotli') {
-              this.encryptionMethod ? 
-                pipelineMaker({readableStream, 
-                  transformStreams:[EncryptSymetricStream, brotliStream, getBytesQuantityBrotli], 
-                  writableStream: writableStreamBrotli
-                }) :
-                pipelineMaker({readableStream, 
-                  transformStreams:[brotliStream, getBytesQuantityBrotli], 
-                  writableStream: writableStreamBrotli
-                });
-            }
+              if (method === 'gzip') {
+                encryptionMethod ? 
+                  pipelineMaker({readableStream, 
+                    transformStreams:[symetricEncryptionStream, gzipStream, getBytesQuantityGzip], 
+                    writableStream: writableStreamGzip
+                  }) :
+                  pipelineMaker({readableStream, 
+                    transformStreams:[gzipStream, getBytesQuantityGzip], 
+                    writableStream: writableStreamGzip
+                  });
+              }
+
+              if (method ===  'brotli') {
+                encryptionMethod ? 
+                  pipelineMaker({readableStream, 
+                    transformStreams:[symetricEncryptionStream, brotliStream, getBytesQuantityBrotli], 
+                    writableStream: writableStreamBrotli
+                  }) :
+                  pipelineMaker({readableStream, 
+                    transformStreams:[brotliStream, getBytesQuantityBrotli], 
+                    writableStream: writableStreamBrotli
+                  });
+              }
+
+            })
           }
 
-         transformFile().then(() => compressionInfo);
+          await  transformFile(this.compressionMethods, this.encryptionMethod);
+
+          return compressionInfo;
       } catch (error) {
         console.log("error catched", error);
       }
