@@ -5,6 +5,8 @@ class GetBytesQuantity extends Transform {
       super(options);
       this.compressionMethod = options.compressionMethod;
       this.compressionInfo = options.compressionInfo;
+      this.startTime = options.startTime;
+      this.fileName = options.fileNameZipped;
       this.compressedDataByteLength = 0;
     }
 
@@ -16,36 +18,26 @@ class GetBytesQuantity extends Transform {
     }
 
     _flush(cb) {
-      // let timeToCompress = Date.now() - startTimeToCompress;
-
-      if (this.compressionMethod  === "deflate") {
+      if (this.compressionMethod === "deflate") {
         this.compressionInfo.deflateCompressionSize =
           this.compressedDataByteLength.toString();
-          // this.compressionInfo.deflateFileName = `deflate_compressed_${fileNameDeflate}`;
-        // TODO check fileNameDeflate/fileNameGz/fileNameBr
+          this.compressionInfo.deflateFileName = `deflate_compressed_${this.fileName}`;
+          this.compressionInfo.deflateCompressionTime = Date.now() - this.startTime;
       }
 
-      if (this.compressionMethod  === "gzip") {
+      if (this.compressionMethod === "gzip") {
         this.compressionInfo.gzipCompressionSize =
           this.compressedDataByteLength.toString();
-          // this.compressionInfo.gzipFileName = `gzip_compressed_${fileNameGz}`;
+          this.compressionInfo.gzipFileName = `gzip_compressed_${this.fileName}`;
+          this.compressionInfo.gzipCompressionTime = Date.now() - this.startTime;
       }
 
-      if (this.compressionMethod  === "brotli") {
+      if (this.compressionMethod === "brotli") {
         this.compressionInfo.brotliCompressionSize =
           this.compressedDataByteLength.toString();
-          // this.compressionInfo.brotliFileName = `brotli_compressed_${fileNameBr}`;
+          this.compressionInfo.brotliFileName = `brotli_compressed_${this.fileName}`;
+          this.compressionInfo.brotliCompressionTime = Date.now() - this.startTime;
       }
-
-      // this.push(
-      //   Buffer.from(
-      //     JSON.stringify({
-      //       compressedSize: this.compressedDataByteLength.toString(),
-      //       originalSize: fileSize.toString(),
-      //       timeToCompress: timeToCompress.toString(),
-      //     })
-      //   )
-      // );
       cb();
     }
   }

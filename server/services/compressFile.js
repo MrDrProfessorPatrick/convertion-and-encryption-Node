@@ -13,7 +13,6 @@ async function compressFile(req, res, next) {
     const fileSize = req.file.size;
     const fileName = req.file.filename;
     const password = req.body.encryptionPassword;
-    const startTimeToCompress = Date.now();
     let compressionMethods = [];
 
     if(req.body.symetricEncryption || req.body.asymetricEncryption) encryptionMethod = 'symetricEncryption';
