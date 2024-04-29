@@ -16,7 +16,7 @@ async function encryptSymetric(req, res, next) {
   let { encryptionPassword, text } = req.body;
 
   if (req.file) {
-    console.log("password in encryptSymetric request", encryptionPassword);
+    
     let readableStream = fs.createReadStream(req.file.path);
     let encryptSymetric = new EncryptSymetricStream(encryptionPassword);
     let writableEncryptionStream = fs.createWriteStream(

@@ -2,19 +2,19 @@ const { Readable } = require("readable-stream");
 const zlib = require("zlib");
 const fs = require("node:fs");
 
-const pipelineMaker = require('../helpers/pipelineMaker');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
 
-class Compression {
+class TransformFile {
 
-  constructor(compressionMethods, encryptionMethod, password, originalFileSize, fileName){
+  constructor(compressionMethods, encryptionMethod, password, originalFileSize, fileName, filePath){
     this.compressionMethods = compressionMethods;
     this.encryptionMethod = encryptionMethod;
     this.password = password;
     this.originalFileSize = originalFileSize;
     this.fileName = fileName;
+    this.filePath = filePath
   }
 
   async compress(){
@@ -40,6 +40,7 @@ class Compression {
           gzipCompressionTime: "",
           deflateCompressionTime: "",
           brotliCompressionTime: "",
+          encryptedFileName:"",
         };
 
         let fileNameTxt = this.fileName.replace(/\.\w+/, ".txt");
@@ -144,6 +145,28 @@ class Compression {
       console.log("error catched", error);
     }
   }
+
+  async encryptSymmetric(){
+    try {
+      let readableStream = fs.createReadStream(this.filePath);
+      let encryptSymetric = new EncryptSymetricStream({password:this.password});
+      let writableEncryptionStream = fs.createWriteStream(
+        `${__dirname}/../../encrypted_files/encrypted${this.fileName}`
+      );
+      let encryptedFileName = `encrypted${this.fileName}`;
+
+      await pipeline(
+        readableStream,
+        encryptSymetric,
+        writableEncryptionStream,
+      ).catch((err)=> console.log(err, 'Error in pipeline in encryptSymetric'));
+  
+      return {encryptedFileName, originalSize: this.originalFileSize}
+    } catch (error) {
+      console.log(error, 'Error catched in ecryptSymetric')
+    }
+
+  }
 }
 
-module.exports = Compression;
+module.exports = TransformFile;

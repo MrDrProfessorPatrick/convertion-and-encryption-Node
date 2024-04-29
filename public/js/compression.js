@@ -200,7 +200,9 @@ function submintFile(e) {
 
   getFileSizes().then((result) => {
     const sizeObj = JSON.parse(result);
-    renderInitialScale(originalSizeContainer, sizeObj);
+
+
+  renderInitialScale(originalSizeContainer, sizeObj);
 
     if (sizeObj.gzipCompressionSize) {
       renderCompressionScale(
@@ -233,6 +235,11 @@ function submintFile(e) {
         "compressSizeDeflateId"
       );
       renderCompressedFileName(sizeObj.deflateFileName);
+    }
+
+    if(sizeObj.encryptedFileName){
+      console.log('sizeObj for encryptedFileName')
+      renderCompressedFileName(sizeObj.encryptedFileName);
     }
   });
 }
