@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const pipelineMaker = require('../helpers/pipelineMaker');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
+const { pipeline } = require("node:stream/promises");
 
 class Compression {
 
@@ -24,6 +25,7 @@ class Compression {
         let writableStreamDeflate;
         let writableStreamGzip;
         let writableStreamBrotli;
+        let innerThis = this;
 
         const pathToFile = __dirname;
 
@@ -86,68 +88,62 @@ class Compression {
           );
         }
 
-        const symetricEncryptionStream = new EncryptSymetricStream(this.password);
+        const symetricEncryptionStream = new EncryptSymetricStream(this.password, this.encryptionMethod);
 
-          async function transformFile(compresionMethods, encryptionMethod){
+          async function pipelineCompressor(){
+            for await(let method of innerThis.compressionMethods){
 
-            compresionMethods.forEach((method) =>{
-              if (method === 'deflate') {
+              if(method === 'deflate'){
                 let startTime = Date.now();
-                encryptionMethod ? 
-                  pipelineMaker({readableStream, 
-                    transformStreams:[
-                      symetricEncryptionStream, 
-                      deflateStream, 
-                      new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped})], 
-                    writableStream: writableStreamDeflate
-                  }) :
-                  pipelineMaker({readableStream, 
-                    transformStreams:[deflateStream, getBytesQuantityDeflate], 
-                    writableStream: writableStreamDeflate
-                  });
-              }
+                let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
 
-              if (method === 'gzip') {
-                let startTime = Date.now();
-                encryptionMethod ? 
-                  pipelineMaker({readableStream, 
-                    transformStreams:[
-                      symetricEncryptionStream,
-                      gzipStream,
-                      new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped})], 
-                    writableStream: writableStreamGzip
-                  }) :
-                  pipelineMaker({readableStream, 
-                    transformStreams:[gzipStream, getBytesQuantityGzip], 
-                    writableStream: writableStreamGzip
-                  });
-              }
+                await pipeline(
+                  readableStream, 
+                  symetricEncryptionStream, 
+                  deflateStream, 
+                  getStreamData, 
+                  writableStreamDeflate
+                );
+              }  
 
-              if (method ===  'brotli') {
-                let startTime = Date.now();
-                encryptionMethod ? 
-                  pipelineMaker({readableStream, 
-                    transformStreams:[
-                      symetricEncryptionStream,
-                      brotliStream,
-                      new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped})], 
-                    writableStream: writableStreamBrotli
-                  }) :
-                  pipelineMaker({readableStream, 
-                    transformStreams:[brotliStream, getBytesQuantityBrotli], 
-                    writableStream: writableStreamBrotli
-                  });
-              }
-            })
+            if (method === 'gzip') {
+              let startTime = Date.now();
+              let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+
+              await pipeline(
+                readableStream, 
+                symetricEncryptionStream, 
+                gzipStream, 
+                getStreamData, 
+                writableStreamGzip
+              );
+            }
+
+            if (method === 'brotli') {
+              let startTime = Date.now();
+              let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+
+              await pipeline(
+                readableStream, 
+                symetricEncryptionStream, 
+                brotliStream, 
+                getStreamData, 
+                writableStreamBrotli
+              );
+            }
+
           }
-
-          await  transformFile(this.compressionMethods, this.encryptionMethod);
-          
-          return compressionInfo;
-      } catch (error) {
-        console.log("error catched", error);
+        
+        return compressionInfo;
       }
+
+      let compressionInfoResult = await pipelineCompressor();
+      return compressionInfoResult;
+        
+    } catch (error) {
+      console.log("error catched", error);
     }
+  }
 }
 
 module.exports = Compression;

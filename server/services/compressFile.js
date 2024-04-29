@@ -29,11 +29,18 @@ async function compressFile(req, res, next) {
       compressionMethods.push('brotli');
     };
 
-    let compression = new Compression(compressionMethods, encryptionMethod, password, fileSize, fileName);
+    let compression = new Compression(
+      compressionMethods,
+      encryptionMethod,
+      password,
+      fileSize,
+      fileName
+    );
+    
     let compressionResult = await compression.compress();
 
     return res.status(200).json(compressionResult);
-   
+
   } catch (error) {
     console.log("error catched", error);
   }
