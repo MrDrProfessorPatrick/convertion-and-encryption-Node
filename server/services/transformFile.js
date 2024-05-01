@@ -52,7 +52,7 @@ async function transformFile(req, res, next) {
       return res.status(200).json('No options were chosen');
     }
   } catch (error) {
-    console.log("error catched", error);
+    return res.status(400).json('Error occured on encryption')
   }
 }
 

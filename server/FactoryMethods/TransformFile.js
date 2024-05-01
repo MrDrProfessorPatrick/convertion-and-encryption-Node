@@ -65,14 +65,32 @@ class TransformFile {
         const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
 
           async function pipelineCompressor(){
-            for await(let method of innerThis.compressionMethods){
+            try {
+              for await(let method of innerThis.compressionMethods){
 
-              if(method === 'deflate'){
+                if(method === 'deflate'){
+                  let startTime = Date.now();
+                  let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+                  let compressionStream = new CompressionStream('deflate');
+                  let writableStream = fs.createWriteStream(
+                    `${pathToFile}/../../compressed_files/deflate_compressed_${fileNameZipped}`
+                  );
+  
+                  await pipeline(
+                    readableStream, 
+                    symetricEncryptionStream, 
+                    compressionStream, 
+                    getStreamData, 
+                    writableStream
+                  ).catch((error)=>console.log(error, 'Error in deflate pipeline'));
+                }  
+  
+              if (method === 'gzip') {
                 let startTime = Date.now();
                 let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
-                let compressionStream = new CompressionStream('deflate');
+                let compressionStream = new CompressionStream('gzip');
                 let writableStream = fs.createWriteStream(
-                  `${pathToFile}/../../compressed_files/deflate_compressed_${fileNameZipped}`
+                  `${pathToFile}/../../compressed_files/gzip_compressed_${fileNameZipped}`
                 );
 
                 await pipeline(
@@ -81,49 +99,36 @@ class TransformFile {
                   compressionStream, 
                   getStreamData, 
                   writableStream
+                ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
+              }
+  
+              if (method === 'brotli') {
+                let startTime = Date.now();
+                let getStreamData = new GetBytesQuantity({compressionMethod: method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+                let compressionStream = new CompressionStream('brotli');
+                let writableStream = fs.createWriteStream(
+                  `${pathToFile}/../../compressed_files/brotli_compressed_${fileNameZipped}`
                 );
-              }  
-
-            if (method === 'gzip') {
-              let startTime = Date.now();
-              let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
-              let compressionStream = new CompressionStream('gzip');
-              let writableStream = fs.createWriteStream(
-                `${pathToFile}/../../compressed_files/gzip_compressed_${fileNameZipped}`
-              );
-
-              await pipeline(
-                readableStream, 
-                symetricEncryptionStream, 
-                compressionStream, 
-                getStreamData, 
-                writableStream
-              );
+  
+                await pipeline(
+                  readableStream, 
+                  symetricEncryptionStream, 
+                  compressionStream, 
+                  getStreamData, 
+                  writableStream
+                ).catch((error)=>console.log(error, 'Error in brotli pipeline'));
+              }
             }
+            console.log('compressionInfo', compressionInfo)
+            return compressionInfo;
 
-            if (method === 'brotli') {
-              let startTime = Date.now();
-              let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
-              let compressionStream = new CompressionStream('brotli');
-              let writableStream = fs.createWriteStream(
-                `${pathToFile}/../../compressed_files/brotli_compressed_${fileNameZipped}`
-              );
-
-              await pipeline(
-                readableStream, 
-                symetricEncryptionStream, 
-                compressionStream, 
-                getStreamData, 
-                writableStream
-              );
+            } catch (error) {
+              console.log(error, 'Error catched in pipelineCompressor')
             }
-
-          }
-        
-        return compressionInfo;
       }
 
       let compressionInfoResult = await pipelineCompressor();
+      console.log('compressionInfoResult', compressionInfoResult)
       return compressionInfoResult;
         
     } catch (error) {
