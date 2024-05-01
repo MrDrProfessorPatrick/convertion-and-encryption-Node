@@ -1,4 +1,4 @@
-const { Readable, Writable, Transform, pipeline } = require("readable-stream");
+const {Transform } = require("readable-stream");
 const decryptSymetricService = require("./decryptSymetricService");
 
 class DecryptSymetricStream extends Transform {

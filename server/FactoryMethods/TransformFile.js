@@ -1,7 +1,7 @@
 const { Readable } = require("readable-stream");
-const zlib = require("zlib");
 const fs = require("node:fs");
 
+const CompressionStream = require('../helpers/CompressionStream');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
@@ -19,12 +19,6 @@ class TransformFile {
 
   async compress(){
     try {
-        let gzipStream ;
-        let deflateStream;
-        let brotliStream;
-        let writableStreamDeflate;
-        let writableStreamGzip;
-        let writableStreamBrotli;
         let innerThis = this;
 
         const pathToFile = __dirname;
@@ -68,28 +62,7 @@ class TransformFile {
           `${pathToFile}/../../uploads/${this.fileName}`
         );
 
-        if(this.compressionMethods.includes('brotli')){
-          brotliStream = zlib.BrotliCompress();
-          writableStreamBrotli = fs.createWriteStream(
-            `${pathToFile}/../../compressed_files/brotli_compressed_${fileNameTxt}`
-          );
-        }
-
-        if(this.compressionMethods.includes('gzip')){
-          gzipStream = zlib.createGzip();
-          writableStreamGzip = fs.createWriteStream(
-            `${pathToFile}/../../compressed_files/gzip_compressed_${fileNameTxt}`
-          );
-        }
-
-        if(this.compressionMethods.includes('deflate')){
-           deflateStream = zlib.DeflateRaw();
-           writableStreamDeflate = fs.createWriteStream(
-            `${pathToFile}/../../compressed_files/deflate_compressed_${fileNameTxt}`
-          );
-        }
-
-        const symetricEncryptionStream = new EncryptSymetricStream(this.password, this.encryptionMethod);
+        const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
 
           async function pipelineCompressor(){
             for await(let method of innerThis.compressionMethods){
@@ -97,39 +70,51 @@ class TransformFile {
               if(method === 'deflate'){
                 let startTime = Date.now();
                 let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+                let compressionStream = new CompressionStream('deflate');
+                let writableStream = fs.createWriteStream(
+                  `${pathToFile}/../../compressed_files/deflate_compressed_${fileNameZipped}`
+                );
 
                 await pipeline(
                   readableStream, 
                   symetricEncryptionStream, 
-                  deflateStream, 
+                  compressionStream, 
                   getStreamData, 
-                  writableStreamDeflate
+                  writableStream
                 );
               }  
 
             if (method === 'gzip') {
               let startTime = Date.now();
               let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+              let compressionStream = new CompressionStream('gzip');
+              let writableStream = fs.createWriteStream(
+                `${pathToFile}/../../compressed_files/gzip_compressed_${fileNameZipped}`
+              );
 
               await pipeline(
                 readableStream, 
                 symetricEncryptionStream, 
-                gzipStream, 
+                compressionStream, 
                 getStreamData, 
-                writableStreamGzip
+                writableStream
               );
             }
 
             if (method === 'brotli') {
               let startTime = Date.now();
               let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameTxt});
+              let compressionStream = new CompressionStream('brotli');
+              let writableStream = fs.createWriteStream(
+                `${pathToFile}/../../compressed_files/brotli_compressed_${fileNameZipped}`
+              );
 
               await pipeline(
                 readableStream, 
                 symetricEncryptionStream, 
-                brotliStream, 
+                compressionStream, 
                 getStreamData, 
-                writableStreamBrotli
+                writableStream
               );
             }
 
