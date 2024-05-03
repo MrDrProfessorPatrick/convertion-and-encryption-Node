@@ -18,7 +18,7 @@ async function transformFile(req, res, next) {
     const fileSize = req.file.size;
     const fileName = req.file.filename;
     const filePath = req.file.path;
-    const password = req.body.encryptionPassword;
+    const password = req.body.password;
 
     let compressionMethods = [];
 // TODO change for different type of encryption;
@@ -56,15 +56,15 @@ async function transformFile(req, res, next) {
       return res.status(200).json(compressionResult);
 
     } else if(password) {
-      let encryptionResult = await transform.encryptSymmetric();
+        let encryptionResult = await transform.encryptSymmetric();
 
-      return res.status(200).json(encryptionResult);
+        return res.status(200).json(encryptionResult);
 
     } else {
-      return res.status(200).json('No options were chosen');
+        return res.status(200).json('No options were chosen');
     }
   } catch (error) {
-    return res.status(400).json('Error occured on encryption')
+      return res.status(400).json('Error occured on encryption')
   }
 }
 

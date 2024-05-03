@@ -6,6 +6,9 @@ const decompressButton = document.getElementById("decompressionUpload");
 const imageTypeCheckbox = document.getElementById("imageDecompress");
 const textTypeCheckbox = document.getElementById("textDecompress");
 
+const decryptionPassword = document.getElementById('decryptionPassword');
+
+
 function changeFile(e) {
   fileNameDecompression.innerHTML = e.target.files[0].name;
 }
@@ -13,9 +16,9 @@ function changeFile(e) {
 async function decompressFile(e) {
   try {
     e.preventDefault();
-    console.log('form in decompression', form)
     const formData = new FormData(decompressionForm);
     formData.append('decryption', true);
+    formData.append('password', decryptionPassword.value)
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/);
 
     // if (

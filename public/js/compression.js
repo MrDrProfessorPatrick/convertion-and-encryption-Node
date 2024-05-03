@@ -12,7 +12,6 @@ const asymetricEncryptionInput = document.getElementById("asymetricEncryption");
 const noDecryptionInput = document.getElementById("noDecryptionRadio");
 const decryptionInput = document.getElementById("decryptionRadio");
 const encryptionPassword = document.getElementById("passwordInput");
-const decryptionPassword = document.getElementById('decryptionPassword');
 
 let downloadedFileName = "";
 

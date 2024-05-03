@@ -121,7 +121,6 @@ class TransformFile {
                 ).catch((error)=>console.log(error, 'Error in brotli pipeline'));
               }
             }
-            console.log('compressionInfo', compressionInfo)
             return compressionInfo;
 
             } catch (error) {
@@ -130,7 +129,6 @@ class TransformFile {
       }
 
       let compressionInfoResult = await pipelineCompressor();
-      console.log('compressionInfoResult', compressionInfoResult)
       return compressionInfoResult;
         
     } catch (error) {
