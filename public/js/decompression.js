@@ -13,33 +13,26 @@ function changeFile(e) {
 async function decompressFile(e) {
   try {
     e.preventDefault();
-    const form = e.currentTarget;
-    const url = new URL(form.action);
-
-    const fileExtensionToDownload = imageTypeCheckbox.checked ? "png" : "txt";
-
-    const fetchOptions = {
-      method: form.method,
-      headers: { "Content-Type": "application/gzip" },
-      body: fileDecompression.files[0],
-    };
-
-    console.log("fileDecompression.files[0]", fileDecompression.files[0].name);
-
+    console.log('form in decompression', form)
+    const formData = new FormData(decompressionForm);
+    formData.append('decryption', true);
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/);
 
-    if (
-      currentFileExtension !== ".gz" ||
-      currentFileExtension !== ".br" ||
-      currentFileExtension !== ".deflate"
-    ) {
-      throw new Error(
-        "We cannot decompress this file. File must have one of the following extensions as .gz, .br, .deflate"
-      );
-    }
+    // if (
+    //   currentFileExtension !== ".gz" ||
+    //   currentFileExtension !== ".br" ||
+    //   currentFileExtension !== ".deflate"
+    // ) {
+    //   throw new Error(
+    //     "We cannot decompress this file. File must have one of the following extensions as .gz, .br, .deflate"
+    //   );
+    // }
 
-    // await fetch(url, fetchOptions)
-    //   .then((response) => {
+    await fetch('/sendfile', {
+      method: 'POST',
+      body: formData,
+    })
+    // .then((response) => {
     //     console.log("response.body", response.body);
     //     return response.body;
     //   })
@@ -75,7 +68,7 @@ async function decompressFile(e) {
     //     const fileLink = document.createElement("a");
     //     fileLink.href = fileUrl;
 
-    //     fileLink.setAttribute("download", `DECOMPRESSED_FILE.${fileExtension}`); // change extension
+    //     fileLink.setAttribute("download", `DECOMPRESSED_FILE.txt`); // change extension
     //     document.body.appendChild(fileLink);
     //     fileLink.click();
     //     fileLink.remove();

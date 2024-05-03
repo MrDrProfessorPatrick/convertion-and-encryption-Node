@@ -15,9 +15,9 @@ function encryptSymetricService(textToEncrypt, key) {
 
   let tagString = tag.toString("base64");
 
-  console.log("LENGTH", nonceString.length, tagString.length); // 16 - 24
+  console.log("LENGTH", nonceString.length, tagString.length, ciphertext.length); // 16 - 24 - 87384
 
-  let responseCipher = nonceString + "-" + tagString + "-" + ciphertext + "&&";
+  let responseCipher = nonceString + tagString + ciphertext;
   return responseCipher;
 }
 

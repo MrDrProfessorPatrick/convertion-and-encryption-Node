@@ -1,6 +1,8 @@
 const TransformFile = require('../FactoryMethods/TransformFile');
 
 async function transformFile(req, res, next) {
+  console.log('BODY ', req.body, req.file)
+
   if (!req.file) {
     return res.status(400).json("No File was received");
   }
@@ -8,7 +10,10 @@ async function transformFile(req, res, next) {
   try {
     let encryptionMethod = false;
 
-    console.log('BODY ', req.body)
+    const decryption = req.body.decryption;
+    const encryption = req.body.encryption;
+    const compression = req.body.compression;
+    const decompression = req.body.decompression;
 
     const fileSize = req.file.size;
     const fileName = req.file.filename;
@@ -31,7 +36,7 @@ async function transformFile(req, res, next) {
       compressionMethods.push('brotli');
     };
 
-    let compression = new TransformFile(
+    let transform = new TransformFile(
       compressionMethods,
       encryptionMethod,
       password,
@@ -40,14 +45,21 @@ async function transformFile(req, res, next) {
       filePath
     );
 
+    if(decryption){
+     let transformResult = transform.decryptSymmetric();
+     return res.status(200).json(transformResult);
+    }
+
     if(req.body.gzip === 'true'  || req.body.deflate === 'true' || req.body.brotli === 'true'){
-      let compressionResult = await compression.compress();
+      let compressionResult = await transform.compress();
       
       return res.status(200).json(compressionResult);
+
     } else if(password) {
-      let encryptionResult = await compression.encryptSymmetric();
+      let encryptionResult = await transform.encryptSymmetric();
 
       return res.status(200).json(encryptionResult);
+
     } else {
       return res.status(200).json('No options were chosen');
     }

@@ -5,6 +5,8 @@ const CompressionStream = require('../helpers/CompressionStream');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
+const uploadsPath = require('../../uploads/uploadsFolderPath');
+const DecryptSymetricStream = require("../helpers/decryptSymetricStream");
 
 class TransformFile {
 
@@ -136,6 +138,19 @@ class TransformFile {
     }
   }
 
+  // async decompress(){
+  //   try {
+  //     const currentFolderPath = __dirname;
+
+  //     let readableStream = fs.createReadStream(`${currentFolderPath}/../../uploads/${this.fileName}`);
+
+  //     await pipeline(readableStream, )
+      
+  //   } catch (error) {
+      
+  //   }
+  // }
+
   async encryptSymmetric(){
     try {
       let readableStream = fs.createReadStream(this.filePath);
@@ -155,7 +170,24 @@ class TransformFile {
     } catch (error) {
       console.log(error, 'Error catched in ecryptSymetric')
     }
+  }
 
+  async decryptSymmetric(){
+
+    try {
+      let readableStream = fs.createReadStream(`${uploadsPath}/${this.fileName}`);
+      let decryptSymetric = new DecryptSymetricStream(this.password);
+      let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`)
+      
+      await pipeline(readableStream, decryptSymetric, writableDecryptionStream).catch((error)=>{
+        return 'Error in pipeline';
+      })
+
+      return "Succesfully decrypted";
+    } catch (error) {
+      console.log(error, "Error catched in decryptSymmetric")
+      return "Error during Symmetric decryption"
+    }
   }
 }
 

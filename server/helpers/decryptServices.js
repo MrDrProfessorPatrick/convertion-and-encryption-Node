@@ -1,6 +1,13 @@
-function decryptSymetricService(cipher, key) {
-    const keySalt = scryptSync(key, "salt", 24);
+const {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  scryptSync,
+} = require("node:crypto");
   
+  function decryptSymetricService(cipher, key) {
+    const keySalt = scryptSync(key, "salt", 24);
+  // split by length 16-24-87384;
     let [nonce, tag, cipherText] = cipher.split("-");
   
     const decipher = createDecipheriv(
@@ -23,3 +30,5 @@ function decryptSymetricService(cipher, key) {
       throw new Error("Authentication failed!", { cause: err });
     }
   }
+
+  module.exports = decryptSymetricService;

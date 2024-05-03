@@ -167,25 +167,20 @@
 
 
       <form
-        action="/decompress"
+        action="/sendfile"
         method="POST"
-        enctype="application/gzip"
         id="decompressionForm"
       >
         <div class="decompression-container">
-          <label for="inputFileDecompression" class="chose-file-button"
-            >Chose file</label
-          >
-          <span class="file-availability" id="fileNameDecompression"
-            >No file chosen</span
-          >
+          <label for="inputFileDecompression" class="chose-file-button">Chose file</label>
+          <span class="file-availability" id="fileNameDecompression">No file chosen</span>
           <input
             type="file"
             name="file"
             id="inputFileDecompression"
-            style="display: none"
+            style="display:none"
           />
-          <button class="file-manager-button" id="decompressionUpload">
+          <button class="file-manager-button" id="decompressionUpload" type="submit">
             Download
           </button>
         </div>
@@ -251,7 +246,6 @@
       })
 
       decryptionInput.addEventListener('change', ()=>{
-        console.log('decryptionInput change')
         decryptPasswordContainer.classList.remove('password-input-hidden');
       })
 
