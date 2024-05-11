@@ -1,0 +1,18 @@
+// abcdc -> abcdcba
+// cdcba
+// find what part shoul be added 
+// length can be even or not
+
+function checkIfPalindrome(str){
+let checkCount = 0;
+	if(str === str.split('').reverse().join('')) return checkCount;
+  checkCount++;
+  checkIfPalindrome(str.split('').slice(1).join('')) // check without first letter
+}
+
+function solution(st) {
+// call checkIfPalindrome recursively to check if arg is a palindrome;
+
+
+
+}

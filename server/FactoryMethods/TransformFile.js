@@ -171,13 +171,13 @@ class TransformFile {
   }
 
   async decryptSymmetric(){
-
     try {
       let readableStream = fs.createReadStream(`${uploadsPath}/${this.fileName}`);
       let decryptSymetric = new DecryptSymetricStream(this.password);
-      let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`)
+      let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`);
       
       await pipeline(readableStream, decryptSymetric, writableDecryptionStream).catch((error)=>{
+        console.log(error, 'Error in decryptSymmetric pipeline');
         return 'Error in pipeline';
       })
 

@@ -45,24 +45,23 @@ async function transformFile(req, res, next) {
       filePath
     );
 
-    if(decryption){
-     let transformResult = transform.decryptSymmetric();
-     return res.status(200).json(transformResult);
-    }
+  if(decryption) {
+    let transformResult = transform.decryptSymmetric();
+    return res.status(200).json(transformResult);
+  }
 
-    if(req.body.gzip === 'true'  || req.body.deflate === 'true' || req.body.brotli === 'true'){
-      let compressionResult = await transform.compress();
-      
-      return res.status(200).json(compressionResult);
-
-    } else if(password) {
-        let encryptionResult = await transform.encryptSymmetric();
-
-        return res.status(200).json(encryptionResult);
-
-    } else {
-        return res.status(200).json('No options were chosen');
-    }
+  if(req.body.gzip === 'true'  || req.body.deflate === 'true' || req.body.brotli === 'true') {
+    let compressionResult = await transform.compress();
+    return res.status(200).json(compressionResult);
+  }
+    
+  if(password) {
+    let encryptionResult = await transform.encryptSymmetric();
+    return res.status(200).json(encryptionResult);
+  } 
+        
+  return res.status(200).json('No options were chosen');
+  
   } catch (error) {
       return res.status(400).json('Error occured on encryption')
   }

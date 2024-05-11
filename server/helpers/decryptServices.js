@@ -8,8 +8,12 @@ const {
   function decryptSymetricService(cipher, key) {
     const keySalt = scryptSync(key, "salt", 24);
   // split by length 16-24-87384;
-    let [nonce, tag, cipherText] = cipher.split("-");
-  
+    console.log('cipher.length in decryptSymetricService', cipher.length);
+    let nonce = cipher.substring(0, 16);
+    let tag = cipher.substring(16, 40);
+    let cipherText = cipher.substring(40);
+    // 16-24-65496 received
+    console.log('nonce', nonce, 'tag', tag, 'cipherText.length', cipherText.length);
     const decipher = createDecipheriv(
       "aes-192-ccm",
       keySalt,

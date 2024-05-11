@@ -12,13 +12,11 @@ function encryptSymetricService(textToEncrypt, key) {
   ciphertext += cipher.final("base64");
   const tag = cipher.getAuthTag();
   let nonceString = nonce.toString("base64");
-
   let tagString = tag.toString("base64");
+  console.log('ciphertext', ciphertext);
+  console.log("LENGTH ENCRYPTED STRING BASE64", nonceString.length, tagString.length, ciphertext.length); // 16 - 24 - 87384
 
-  console.log("LENGTH", nonceString.length, tagString.length, ciphertext.length); // 16 - 24 - 87384
-
-  let responseCipher = nonceString + tagString + ciphertext;
-  return responseCipher;
+  return Buffer.from(nonceString + tagString + ciphertext) ;
 }
 
 module.exports = encryptSymetricService;
