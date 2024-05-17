@@ -13,10 +13,15 @@ function encryptSymetricService(textToEncrypt, key) {
   const tag = cipher.getAuthTag();
   let nonceString = nonce.toString("base64");
   let tagString = tag.toString("base64");
-  console.log('ciphertext', ciphertext);
-  console.log("LENGTH ENCRYPTED STRING BASE64", nonceString.length, tagString.length, ciphertext.length); // 16 - 24 - 87384
 
-  return Buffer.from(nonceString + tagString + ciphertext) ;
+  return Buffer.from(nonceString + tagString + ciphertext);
 }
 
 module.exports = encryptSymetricService;
+
+// 65536 firstChunk before encryption
+// 26145 secondChunk before encryption 
+// 87384 - 87424 firstChunk ENCRYPTED middleLong2.txt
+// 34860 secondChunk ENCRYPTED middleLong2.txt
+
+
