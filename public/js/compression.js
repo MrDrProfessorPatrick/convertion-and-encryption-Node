@@ -110,7 +110,7 @@ function changeFile(e) {
 
 async function downloadFiles(e) {
   e.preventDefault();
-
+console.log('downloadFiles')
   let filesNameToDownload = [];
 
   let documentsNameContainers =
