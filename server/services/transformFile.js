@@ -1,7 +1,9 @@
+const fs = require("node:fs");
+
 const TransformFile = require('../FactoryMethods/TransformFile');
+const uploadsPath = require('../../uploads/uploadsFolderPath');
 
 async function transformFile(req, res, next) {
-  console.log('BODY ', req.body, req.file)
 
   if (!req.file) {
     return res.status(400).json("No File was received");
@@ -45,6 +47,20 @@ async function transformFile(req, res, next) {
       filePath
     );
 
+  if(decompression){
+
+    let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
+
+    let readableStreams = fs.createReadStream(
+      `${uploadsPath}/${fileName}`
+    );
+
+    let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);
+
+    await transform.decompress(readableStreams, res);
+    return;
+  }  
+
   if(decryption) {
     let transformResult = transform.decryptSymmetric();
     return res.status(200).json(transformResult);
@@ -63,7 +79,8 @@ async function transformFile(req, res, next) {
   return res.status(200).json('No options were chosen');
   
   } catch (error) {
-      return res.status(400).json('Error occured on encryption')
+      console.log(error, 'Error occured on decompression');
+      return res.status(400).json('Error occured on decompression');
   }
 }
 

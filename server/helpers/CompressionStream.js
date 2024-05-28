@@ -9,15 +9,15 @@ class CompressionStream extends Transform {
 
     _transform(chunk, encoding, done) {
       if(this.compressionType === 'gzip'){
-        this.push(zlib.gzipSync(chunk).toString('base64'));
+        this.push(zlib.gzipSync(chunk));
       }
 
       if(this.compressionType === 'brotli'){
-        this.push(zlib.brotliCompressSync(chunk).toString('base64'));
+        this.push(zlib.brotliCompressSync(chunk));
       }
 
       if(this.compressionType === 'deflate'){
-        this.push(zlib.deflateSync(chunk).toString('base64'));
+        this.push(zlib.deflateSync(chunk));
       }
       done();
     }

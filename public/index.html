@@ -109,7 +109,7 @@
           <input
             type="radio"
             id="noDecompression"
-            name="fileToDecompressType"
+            name="decompression"
             checked
           />
           <label for="textDecompress">No decompression</label>
@@ -119,7 +119,7 @@
           <input
             type="radio"
             id="textDecompress"
-            name="fileToDecompressType"
+            name="decompression"
           />
           <label for="textDecompress">Text</label>
         </div>
@@ -128,7 +128,7 @@
           <input
             type="radio"
             id="imageDecompress"
-            name="fileToDecompressType"
+            name="decompression"
           />
           <label for="imageDecompress">Image</label>
         </div>
@@ -140,7 +140,7 @@
       <input
         type="radio"
         id="noDecryptionRadio"
-        name="decrypt"
+        name="decryption"
         checked
     />
   </div>
@@ -150,7 +150,7 @@
       <input
         type="radio"
         id="decryptionRadio"
-        name="decrypt"
+        name="decryption"
         
     />
   </div>
@@ -167,8 +167,6 @@
 
 
       <form
-        action="/sendfile"
-        method="POST"
         id="decompressionForm"
       >
         <div class="decompression-container">
