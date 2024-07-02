@@ -65,7 +65,8 @@ class TransformFile {
         );
 
         const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
-          async function pipelineCompressor(){
+          
+        async function pipelineCompressor(){
             try {
               for await(let method of innerThis.compressionMethods){
 
@@ -78,7 +79,7 @@ class TransformFile {
                   let writableStream = fs.createWriteStream(
                     `${pathToFile}/../../modified_files/${fileNameZipped}`
                   );
-  
+  // 16384 -> 21888 -> 16527 this is length of chunks before encryption -> after encryption -> after compression
                   await pipeline(
                     readableStream, 
                     symetricEncryptionStream, 
@@ -102,7 +103,7 @@ class TransformFile {
                   readableStream, 
                   symetricEncryptionStream, 
                   compressionStream, 
-                  getStreamData, 
+                  getStreamData,
                   writableStream
                 ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
               }
@@ -145,17 +146,21 @@ class TransformFile {
   async decompress(readable, writable){
     try {
       const currentFolderPath = __dirname;
-      let decompresStream = null;
+      let decompressionType = '';
 
       let extensionName = this.fileName.split('.').reverse()[0];
 
-      if(extensionName === 'gz') decompresStream = new DecompressionStream('gzip');
-      if(extensionName === 'br') decompresStream = new DecompressionStream('brotli');
-      if(extensionName === 'zz') decompresStream = new DecompressionStream('deflate');
+      if(extensionName === 'gz') decompressionType = 'gzip';
+      if(extensionName === 'br') decompressionType = 'brotli';
+      if(extensionName === 'zz') decompressionType = 'deflate';
       // something wrong with decompression method
 
+      let decompresStream = new DecompressionStream(decompressionType);
+      let decryptSymetric = new DecryptSymetricStream({key:this.password});
+
       if(!decompresStream) return;
-      await pipeline(readable, decompresStream, writable)
+
+      await pipeline(readable, decompresStream, decryptSymetric, writable)
       .catch((error)=>console.log(error, 'Error in decompress pipeline'));
 
     } catch (error) {
@@ -184,14 +189,15 @@ class TransformFile {
     }
   }
 
-  async decryptSymmetric(){
+  async decryptSymmetric(writableStream){
     try {
+      console.log('this.password decryptSymmetric',  this.password)
       // encrypted size is higher then highWaterMark limit in encrypton, that's why highWaterMark should be increased here
       let readableStream = fs.createReadStream(`${uploadsPath}/${this.fileName}`, { highWaterMark: 87424 });
-      let decryptSymetric = new DecryptSymetricStream(this.password);
+      let decryptSymetric = new DecryptSymetricStream({key:this.password});
       let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`);
       
-      await pipeline(readableStream, decryptSymetric, writableDecryptionStream).catch((error)=>{
+      await pipeline(readableStream, decryptSymetric, writableStream).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         return 'Error in pipeline';
       })

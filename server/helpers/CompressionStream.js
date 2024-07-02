@@ -8,7 +8,11 @@ class CompressionStream extends Transform {
     }
 
     _transform(chunk, encoding, done) {
+      console.log('compression chunk.length', chunk)
       if(this.compressionType === 'gzip'){
+        console.log('chunk.length in CompressionStream', chunk.length);
+        console.log('compressed and encrypted chunk.length', zlib.gzipSync(chunk).length)
+
         this.push(zlib.gzipSync(chunk));
       }
 
@@ -19,6 +23,7 @@ class CompressionStream extends Transform {
       if(this.compressionType === 'deflate'){
         this.push(zlib.deflateSync(chunk));
       }
+      
       done();
     }
   }
