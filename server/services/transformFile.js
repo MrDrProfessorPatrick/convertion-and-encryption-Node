@@ -57,8 +57,8 @@ async function transformFile(req, res, next) {
 
     let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);
 
-    await transform.decompress(readableStreams, res);
-    return;
+    transform.decompress(readableStreams, writableStream);
+    return
   }  
 
   if(decryption) {

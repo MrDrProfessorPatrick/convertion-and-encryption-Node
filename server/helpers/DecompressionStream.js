@@ -10,30 +10,40 @@ class DecompressionStream extends Transform {
 
     _transform(chunk, encoding, done) {
         try {
-            this.data.push(chunk);
+
+            if(this.compressionType === 'gzip'){
+                let gzipDecompressed = zlib.gunzipSync(chunk);
+                this.push(gzipDecompressed);
+            }
+
+            if(this.compressionType === 'brotli'){
+                this.push(zlib.brotliDecompressSync(chunk));
+            }
+
+            if(this.compressionType === 'deflate'){
+                this.push(zlib.deflateRawSync(chunk));
+            }
 
             done();
-
         } catch (error) {
             console.log('Error catched in _transform DecompressionStream', error)
         }
     }
 
-    _flush(cb){
+    // _flush(cb){
+    //     if(this.compressionType === 'gzip'){
+    //         this.push(zlib.gunzipSync(Buffer.concat(this.data)));
+    //     }
 
-        if(this.compressionType === 'gzip'){
-            this.push(zlib.gunzipSync(Buffer.concat(this.data)));
-        }
+    //     if(this.compressionType === 'brotli'){
+    //         this.push(zlib.brotliDecompressSync(Buffer.concat(this.data)));
+    //     }
 
-        if(this.compressionType === 'brotli'){
-            this.push(zlib.brotliDecompressSync(Buffer.concat(this.data)));
-        }
-
-        if(this.compressionType === 'deflate'){
-            this.push(zlib.deflateRawSync(Buffer.concat(this.data)));
-        }
-        cb()
-    }
+    //     if(this.compressionType === 'deflate'){
+    //         this.push(zlib.deflateRawSync(Buffer.concat(this.data)));
+    //     }
+    //     cb()
+    // }
   }
 
   module.exports = DecompressionStream;

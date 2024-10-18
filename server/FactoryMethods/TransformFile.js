@@ -67,72 +67,72 @@ class TransformFile {
         const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
           
         async function pipelineCompressor(){
-            try {
-              for await(let method of innerThis.compressionMethods){
+          try {
+            for await(let method of innerThis.compressionMethods){
 
-                if(method === 'deflate'){
-                  let startTime = Date.now();
-                  let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".zz");
-                  let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
-                  let compressionStream = new CompressionStream('deflate');
-
-                  let writableStream = fs.createWriteStream(
-                    `${pathToFile}/../../modified_files/${fileNameZipped}`
-                  );
-  // 16384 -> 21888 -> 16527 this is length of chunks before encryption -> after encryption -> after compression
-                  await pipeline(
-                    readableStream, 
-                    symetricEncryptionStream, 
-                    compressionStream, 
-                    getStreamData, 
-                    writableStream
-                  ).catch((error)=>console.log(error, 'Error in deflate pipeline'));
-                }  
-  
-              if (method === 'gzip') {
+              if(method === 'deflate'){
                 let startTime = Date.now();
-                let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
+                let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".zz");
                 let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
-                let compressionStream = new CompressionStream('gzip');
-                
-                let writableStream = fs.createWriteStream(
-                  `${pathToFile}/../../modified_files/${fileNameZipped}`
-                );
-
-                await pipeline(
-                  readableStream, 
-                  symetricEncryptionStream, 
-                  compressionStream, 
-                  getStreamData,
-                  writableStream
-                ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
-              }
-  
-              if (method === 'brotli') {
-                let startTime = Date.now();
-                let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".br");
-                let getStreamData = new GetBytesQuantity({compressionMethod: method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
-                let compressionStream = new CompressionStream('brotli');
+                let compressionStream = new CompressionStream('deflate');
 
                 let writableStream = fs.createWriteStream(
                   `${pathToFile}/../../modified_files/${fileNameZipped}`
                 );
-  
+// 16384 -> 21888 -> 16527 this is length of chunks before encryption -> after encryption -> after compression
                 await pipeline(
                   readableStream, 
                   symetricEncryptionStream, 
                   compressionStream, 
                   getStreamData, 
                   writableStream
-                ).catch((error)=>console.log(error, 'Error in brotli pipeline'));
-              }
+                ).catch((error)=>console.log(error, 'Error in deflate pipeline'));
+              }  
+
+            if (method === 'gzip') {
+              let startTime = Date.now();
+              let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
+              let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
+              let compressionStream = new CompressionStream('gzip');
+              
+              let writableStream = fs.createWriteStream(
+                `${pathToFile}/../../modified_files/${fileNameZipped}`
+              );
+
+              await pipeline(
+                readableStream, 
+                symetricEncryptionStream, 
+                compressionStream, 
+                getStreamData,
+                writableStream
+              ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
             }
 
-            return compressionInfo;
+            if (method === 'brotli') {
+              let startTime = Date.now();
+              let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".br");
+              let getStreamData = new GetBytesQuantity({compressionMethod: method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
+              let compressionStream = new CompressionStream('brotli');
 
-            } catch (error) {
-              console.log(error, 'Error catched in pipelineCompressor')
+              let writableStream = fs.createWriteStream(
+                `${pathToFile}/../../modified_files/${fileNameZipped}`
+              );
+
+              await pipeline(
+                readableStream, 
+                symetricEncryptionStream, 
+                compressionStream, 
+                getStreamData, 
+                writableStream
+              ).catch((error)=>console.log(error, 'Error in brotli pipeline'));
             }
+          }
+
+          return compressionInfo;
+
+          } catch (error) {
+            console.log(error, 'Error catched in pipelineCompressor')
+        }
       }
 
       let compressionInfoResult = await pipelineCompressor();
@@ -143,24 +143,24 @@ class TransformFile {
     }
   }
 
-  async decompress(readable, writable){
+  decompress(readable, writable){
     try {
       const currentFolderPath = __dirname;
-      let decompressionType = '';
+      let decompressionStream = null;
 
       let extensionName = this.fileName.split('.').reverse()[0];
 
-      if(extensionName === 'gz') decompressionType = 'gzip';
-      if(extensionName === 'br') decompressionType = 'brotli';
-      if(extensionName === 'zz') decompressionType = 'deflate';
+      if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
+      if(extensionName === 'br') decompressionStream = zlib.createDeflate();
+      if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
       // something wrong with decompression method
 
-      let decompresStream = new DecompressionStream(decompressionType);
+      // let decompresStream = new DecompressionStream(decompressionType);
       let decryptSymetric = new DecryptSymetricStream({key:this.password});
 
-      if(!decompresStream) return;
+      if(!decompressionStream) return;
 
-      await pipeline(readable, decompresStream, decryptSymetric, writable)
+      pipeline(readable, decompressionStream, decryptSymetric, writable) 
       .catch((error)=>console.log(error, 'Error in decompress pipeline'));
 
     } catch (error) {
