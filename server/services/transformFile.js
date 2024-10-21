@@ -62,7 +62,7 @@ async function transformFile(req, res, next) {
   }  
 
   if(decryption) {
-    let transformResult = transform.decryptSymmetric();
+    let transformResult = transform.decryptSymmetric(res);
     return res.status(200).json(transformResult);
   }
 

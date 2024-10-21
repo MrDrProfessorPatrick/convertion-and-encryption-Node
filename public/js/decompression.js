@@ -24,8 +24,6 @@ async function decompressFile(e) {
     
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
 
-    if (currentFileExtension === ".gz" || currentFileExtension === ".br" || currentFileExtension === ".zz") {
-
     await fetch('/sendfile', {
       method: 'POST',
       body: formData,
@@ -69,12 +67,6 @@ async function decompressFile(e) {
         fileLink.click();
         fileLink.remove();
       }) 
-    
-    } else {
-      throw new Error(
-        "We cannot decompress this file. File must have one of the following extensions as .gz, .br, .zz"
-      );
-    }
   } catch (error) {
     console.log(error);
   }

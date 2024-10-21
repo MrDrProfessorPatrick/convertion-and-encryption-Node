@@ -101,8 +101,8 @@ class TransformFile {
 
               await pipeline(
                 readableStream, 
-                symetricEncryptionStream, 
-                compressionStream, 
+                compressionStream,
+                symetricEncryptionStream,
                 getStreamData,
                 writableStream
               ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
@@ -121,7 +121,7 @@ class TransformFile {
               await pipeline(
                 readableStream, 
                 symetricEncryptionStream, 
-                compressionStream, 
+                compressionStream,
                 getStreamData, 
                 writableStream
               ).catch((error)=>console.log(error, 'Error in brotli pipeline'));
@@ -149,7 +149,7 @@ class TransformFile {
       let decompressionStream = null;
 
       let extensionName = this.fileName.split('.').reverse()[0];
-
+      
       if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
       if(extensionName === 'br') decompressionStream = zlib.createDeflate();
       if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
@@ -160,7 +160,7 @@ class TransformFile {
 
       if(!decompressionStream) return;
 
-      pipeline(readable, decompressionStream, decryptSymetric, writable) 
+      pipeline(readable, decryptSymetric, decompressionStream,  writable) 
       .catch((error)=>console.log(error, 'Error in decompress pipeline'));
 
     } catch (error) {
@@ -197,7 +197,7 @@ class TransformFile {
       let decryptSymetric = new DecryptSymetricStream({key:this.password});
       let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`);
       
-      await pipeline(readableStream, decryptSymetric, writableStream).catch((error)=>{
+      await pipeline(readableStream, decryptSymetric, writableDecryptionStream).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         return 'Error in pipeline';
       })
