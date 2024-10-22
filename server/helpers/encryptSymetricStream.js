@@ -12,7 +12,7 @@ class EncryptSymetricStream extends Transform {
   _transform(chunk, encoding, done) {
     console.log('encrytption chunk.length', chunk.length)
 
-   this.key ? this.push(encryptSymetricService(chunk.toString(), this.key)) : this.push(chunk);
+   this.key ? this.push(encryptSymetricService(chunk, this.key)) : this.push(chunk);
    done();
   }
 }
