@@ -10,7 +10,7 @@ class DecompressionStream extends Transform {
 
     _transform(chunk, encoding, done) {
         try {
-
+            console.log('chunk decompression', chunk)
             if(this.compressionType === 'gzip'){
                 let gzipDecompressed = zlib.gunzipSync(chunk);
                 this.push(gzipDecompressed);

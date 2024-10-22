@@ -4,17 +4,15 @@ function encryptSymetricService(textToEncrypt, key) {
   const keySalt = scryptSync(key, "salt", 24);
   const nonce = randomBytes(12);
 
-  const cipher = createCipheriv("aes-192-ccm", keySalt, nonce, {
-    authTagLength: 16,
-  });
+  const cipher = createCipheriv("aes192", keySalt, nonce);
 
   let ciphertext = cipher.update(textToEncrypt, "utf8", "base64");
   ciphertext += cipher.final("base64");
-  const tag = cipher.getAuthTag();
+  // const tag = cipher.getAuthTag();
   let nonceString = nonce.toString("base64");
-  let tagString = tag.toString("base64");
+  // let tagString = tag.toString("base64");
 
-  return Buffer.from(nonceString + tagString + ciphertext);
+  return Buffer.from(nonceString + ciphertext);
 }
 
 module.exports = encryptSymetricService;

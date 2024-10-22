@@ -10,19 +10,20 @@ function decryptSymetricService(cipher, key) {
     const keySalt = scryptSync(key, "salt", 24);
     // split by length 16-24-87384;
     let nonce = cipher.substring(0, 16);
-    let tag = cipher.substring(16, 40);
-    let cipherText = cipher.substring(40);
+    // let tag = cipher.substring(16, 40);
+    let cipherText = cipher.substring(16);
+    // propably you make cipher for tag and nonce and that's why it doesn't work
 
     console.log('nonce', nonce, 'tag', tag)
 
     // 16-24-65496 received
     const decipher = createDecipheriv(
-      "aes-192-ccm",
+      "aes192",
       keySalt,
-      Buffer.from(nonce, "base64"),
-      {
-        authTagLength: 16,
-      }
+      Buffer.from(nonce, "base64")
+      // {
+      //   authTagLength: 16,
+      // }
     );
 
     decipher.setAuthTag(Buffer.from(tag, "base64"));
