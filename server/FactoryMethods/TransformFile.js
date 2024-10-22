@@ -77,18 +77,15 @@ class TransformFile {
             let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
             let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
             let compressionStream = new CompressionStream('gzip');
-
-  
             
             let writableStream = fs.createWriteStream(
               `${pathToFile}/../../modified_files/${fileNameZipped}`
             );
 
-
             await pipeline(
               readableStream, 
               compressionStream,
-              createCipheriv('aes192', key, iv),
+              symetricEncryptionStream,
               getStreamData,
               writableStream
             ).catch((error)=>console.log(error, 'Error in gzip pipeline'));

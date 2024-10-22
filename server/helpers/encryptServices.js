@@ -1,16 +1,19 @@
 const { createCipheriv, randomBytes, scryptSync } = require("node:crypto");
 
-function encryptSymetricService(textToEncrypt, key) {
-  const keySalt = scryptSync(key, "salt", 24);
-  const nonce = randomBytes(12);
+function encryptSymetricService(textToEncrypt, password) {
+  const key = scryptSync(password, 'GfG', 24);
+  const iv = randomBytes(16);
 
-  const cipher = createCipheriv("aes192", keySalt, nonce);
+  const cipher = createCipheriv('aes192', key, iv);
 
   let ciphertext = cipher.update(textToEncrypt, "utf8", "base64");
   ciphertext += cipher.final("base64");
   // const tag = cipher.getAuthTag();
-  let nonceString = nonce.toString("base64");
+  let nonceString = iv.toString("base64");
+  console.log('iv', nonceString)
   // let tagString = tag.toString("base64");
+
+  //6gRuD+E3jEIHVmtnbYZGNw==
 
   return Buffer.from(nonceString + ciphertext);
 }
