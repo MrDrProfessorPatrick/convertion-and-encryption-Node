@@ -4,9 +4,9 @@ function encryptSymetricService(chunk, password) {
   const key = scryptSync(password, 'GfG', 24);
   const iv = randomBytes(16);
 
-  const cipher = createCipheriv('aes192', key, iv);
+  const cipher = createCipheriv('aes-192-cbc', key, iv);
 
-  let ciphertext = cipher.update(chunk, "utf8", "base64");
+  let ciphertext = cipher.update(chunk, "binary", "base64");
   ciphertext += cipher.final("base64");
   // const tag = cipher.getAuthTag();
   console.log('ciphertext.length encrypted', ciphertext.length)

@@ -84,8 +84,8 @@ class TransformFile {
 
             await pipeline(
               readableStream,
-              symetricEncryptionStream, 
               compressionStream,
+              symetricEncryptionStream, 
               getStreamData,
               writableStream
             ).catch((error)=>console.log(error, 'Error in gzip pipeline'));

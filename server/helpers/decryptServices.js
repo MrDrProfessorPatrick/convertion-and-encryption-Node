@@ -14,12 +14,12 @@ function decryptSymetricService(cipher, key) {
     // let cipherText = cipher.substring(33);
 
     let iv = cipher.subarray(0, 16);
-    let cipherText = cipher.subarray(17);
+    let cipherText = cipher.subarray(16);
     console.log('iv=', iv ,'iv length', iv.length, 'cipherText length', cipherText.length)
 
     // 16-24-65496 received
     const decipher = createDecipheriv(
-     'aes192',
+     'aes-192-cbc',
      keySalt,
       iv
       // {
@@ -28,10 +28,8 @@ function decryptSymetricService(cipher, key) {
     );
  // compressed and encrypted chunk.length 40
     // decipher.setAuthTag(Buffer.from(tag, "base64"));
-    console.log('createDecipheriv finished')
-    const decryptedPlaintext = decipher.update(cipherText, "base64", "hex");
-    console.log('decryptedPlaintext', decryptedPlaintext)
-    decipher.final("hex");
+    const decryptedPlaintext = decipher.update(cipherText, "binary", "base64");
+    decryptedPlaintext+=decipher.final("base64");
 
     return decryptedPlaintext;
 
