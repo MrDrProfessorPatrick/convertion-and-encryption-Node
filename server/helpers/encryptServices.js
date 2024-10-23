@@ -9,13 +9,11 @@ function encryptSymetricService(chunk, password) {
   let ciphertext = cipher.update(chunk, "utf8", "base64");
   ciphertext += cipher.final("base64");
   // const tag = cipher.getAuthTag();
-  let nonceString = iv.toString("base64");
-  console.log('iv', nonceString)
+  console.log('ciphertext.length encrypted', ciphertext.length)
   // let tagString = tag.toString("base64");
-
-  //
-
-  return Buffer.from(nonceString + ciphertext);
+  let result = Buffer.concat([iv, Buffer.from(ciphertext)]) 
+  console.log('encryption result', result)
+  return result;
 }
 
 module.exports = encryptSymetricService;
