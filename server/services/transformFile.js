@@ -52,7 +52,8 @@ async function transformFile(req, res, next) {
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
-      `${uploadsPath}/${fileName}`
+      `${uploadsPath}/${fileName}`,
+      { highWaterMark: 12432 }
     );
 
     let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);

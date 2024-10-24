@@ -62,7 +62,8 @@ class TransformFile {
         }
 
         const readableStream = new ReadableStream(
-          `${pathToFile}/../../uploads/${this.fileName}`
+          `${pathToFile}/../../uploads/${this.fileName}`,
+          { highWaterMark: 16384 }
         );
 
         const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
@@ -212,7 +213,7 @@ class TransformFile {
   async decryptSymmetric(writableStream){
     try {
       console.log('this.password decryptSymmetric',  this.password)
-      // encrypted size is higher then highWaterMark limit in encrypton, that's why highWaterMark should be increased here
+      // encrypted size is higher than highWaterMark limit in encrypton, that's why highWaterMark should be increased here
       let readableStream = fs.createReadStream(`${uploadsPath}/${this.fileName}`, { highWaterMark: 87424 });
       let decryptSymetric = new DecryptSymetricStream({key:this.password});
       let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`);

@@ -9,10 +9,10 @@ function encryptSymetricService(chunk, password) {
   let ciphertext = cipher.update(chunk, "binary", "hex");
   ciphertext += cipher.final("hex");
   // const tag = cipher.getAuthTag();
-  console.log('ciphertext.length encrypted', ciphertext, ciphertext.length)
+  console.log('ciphertext.length encrypted', ciphertext.length)
   // let tagString = tag.toString("base64");
   let result = Buffer.concat([iv, Buffer.from(ciphertext, 'hex')])
-  console.log('encryption result', result)
+  console.log('encryption result', result.length)
   return result;
 }
 
