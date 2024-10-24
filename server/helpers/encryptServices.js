@@ -6,12 +6,12 @@ function encryptSymetricService(chunk, password) {
 
   const cipher = createCipheriv('aes-192-cbc', key, iv);
 
-  let ciphertext = cipher.update(chunk, "binary", "base64");
-  ciphertext += cipher.final("base64");
+  let ciphertext = cipher.update(chunk, "binary", "hex");
+  ciphertext += cipher.final("hex");
   // const tag = cipher.getAuthTag();
-  console.log('ciphertext.length encrypted', ciphertext.length)
+  console.log('ciphertext.length encrypted', ciphertext, ciphertext.length)
   // let tagString = tag.toString("base64");
-  let result = Buffer.concat([iv, Buffer.from(ciphertext)]) 
+  let result = Buffer.concat([iv, Buffer.from(ciphertext, 'hex')])
   console.log('encryption result', result)
   return result;
 }
