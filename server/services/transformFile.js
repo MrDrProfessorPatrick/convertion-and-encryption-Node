@@ -53,7 +53,7 @@ async function transformFile(req, res, next) {
 
     let readableStreams = fs.createReadStream(
       `${uploadsPath}/${fileName}`,
-      { highWaterMark: 12432 }
+      // { highWaterMark: 12432 }
     );
 
     let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);

@@ -7,16 +7,16 @@ class GetBytesQuantity extends Transform {
       this.compressionInfo = options.compressionInfo;
       this.startTime = options.startTime;
       this.fileName = options.fileNameZipped;
-      this.compressedDataByteLength = 0;
     }
 
     _transform(chunk, encoding, done) {
-      this.compressedDataByteLength = this.compressedDataByteLength +=
-        Buffer.byteLength(chunk);
-      this.push(chunk);
+      console.log('chunk length', Buffer.byteLength(chunk))
+      let len = Buffer.from(Buffer.byteLength(chunk).toString());
+      let delim = Buffer.from('-')
+      this.push(Buffer.concat([len, delim, chunk]));
       done();
     }
-
+// add bytes quantity to the start of each chunk
     _flush(cb) {
       if (this.compressionMethod === "deflate") {
         this.compressionInfo.deflateCompressionSize =
@@ -27,7 +27,7 @@ class GetBytesQuantity extends Transform {
 
       if (this.compressionMethod === "gzip") {
         this.compressionInfo.gzipCompressionSize =
-          this.compressedDataByteLength.toString();
+          // this.compressedDataByteLength.toString();
           this.compressionInfo.gzipFileName = `gzip_compressed_${this.fileName}`;
           this.compressionInfo.gzipCompressionTime = Date.now() - this.startTime;
       }

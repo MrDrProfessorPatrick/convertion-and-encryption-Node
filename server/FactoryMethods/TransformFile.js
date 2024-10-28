@@ -63,17 +63,13 @@ class TransformFile {
 
         const readableStream = new ReadableStream(
           `${pathToFile}/../../uploads/${this.fileName}`,
-          { highWaterMark: 16384 }
+          // { highWaterMark: 16384 }
         );
 
         const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
           
         async function pipelineCompressor(){
           try {
-            // for await(let method of innerThis.compressionMethods){ 
-
-            // }
-
             let startTime = Date.now();
             let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
             let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
@@ -89,65 +85,7 @@ class TransformFile {
               symetricEncryptionStream, 
               getStreamData,
               writableStream
-            ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
-
-//               if(method === 'deflate'){
-//                 let startTime = Date.now();
-//                 let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".zz");
-//                 let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
-//                 let compressionStream = new CompressionStream('deflate');
-
-//                 let writableStream = fs.createWriteStream(
-//                   `${pathToFile}/../../modified_files/${fileNameZipped}`
-//                 );
-// // 16384 -> 21888 -> 16527 this is length of chunks before encryption -> after encryption -> after compression
-//                 await pipeline(
-//                   readableStream, 
-//                   symetricEncryptionStream, 
-//                   compressionStream, 
-//                   getStreamData, 
-//                   writableStream
-//                 ).catch((error)=>console.log(error, 'Error in deflate pipeline'));
-//               }  
-
-//             if (method === 'gzip') {
-//               let startTime = Date.now();
-//               let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
-//               let getStreamData = new GetBytesQuantity({compressionMethod:method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
-//               let compressionStream = new CompressionStream('gzip');
-              
-//               let writableStream = fs.createWriteStream(
-//                 `${pathToFile}/../../modified_files/${fileNameZipped}`
-//               );
-
-//               await pipeline(
-//                 readableStream, 
-//                 compressionStream,
-//                 symetricEncryptionStream,
-//                 getStreamData,
-//                 writableStream
-//               ).catch((error)=>console.log(error, 'Error in gzip pipeline'));
-//             }
-
-//             if (method === 'brotli') {
-//               let startTime = Date.now();
-//               let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".br");
-//               let getStreamData = new GetBytesQuantity({compressionMethod: method, compressionInfo, startTime, fileNameZipped:fileNameZipped});
-//               let compressionStream = new CompressionStream('brotli');
-
-//               let writableStream = fs.createWriteStream(
-//                 `${pathToFile}/../../modified_files/${fileNameZipped}`
-//               );
-
-//               await pipeline(
-//                 readableStream, 
-//                 symetricEncryptionStream, 
-//                 compressionStream,
-//                 getStreamData, 
-//                 writableStream
-//               ).catch((error)=>console.log(error, 'Error in brotli pipeline'));
-//             }
-          
+            ).catch((error)=>console.log(error, 'Error in gzip pipeline'));     
 
           return compressionInfo;
 
@@ -181,7 +119,7 @@ class TransformFile {
       
       if(!decompressionStream) return;
 
-      await pipeline(readable, decryptSymetric, decompresStream, writable) 
+      await pipeline(readable, decryptSymetric, decompresStream, writable)
       .catch((error)=>console.log(error, 'Error in decompress pipeline'));
 
     } catch (error) {
