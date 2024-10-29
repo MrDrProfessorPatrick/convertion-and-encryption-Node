@@ -13,7 +13,7 @@ class GetBytesQuantity extends Transform {
       console.log('chunk length', Buffer.byteLength(chunk))
       let len = Buffer.from(Buffer.byteLength(chunk).toString());
       let delim = Buffer.from('-')
-      this.push(Buffer.concat([len, delim, chunk]));
+      this.push(Buffer.concat([delim, len, delim, chunk]));
       done();
     }
 // add bytes quantity to the start of each chunk

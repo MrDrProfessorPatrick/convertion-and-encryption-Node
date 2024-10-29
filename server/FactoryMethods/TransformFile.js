@@ -61,6 +61,7 @@ class TransformFile {
           }
         }
 
+        // TODO use custom stream here
         const readableStream = new ReadableStream(
           `${pathToFile}/../../uploads/${this.fileName}`,
           // { highWaterMark: 16384 }
