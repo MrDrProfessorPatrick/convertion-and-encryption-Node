@@ -18,15 +18,22 @@ class ChunkDevide extends Transform {
   constructor(options){
     super(options)
     this.current = null;
+    this.next = null;
   }
 
   _transform(chunk, encoding, cb){
 
-    function chunkHandler(chunk, current){
+    function chunkHandler(chunk, current, next){
 
       if(chunk.length === 0) return; 
 
       let delimPos = chunk.indexOf("|");
+
+      if(next){
+       this.push(current);
+       current = next;
+       next = null
+      }
 
       if(!delimPos){
         current+=chunk;
@@ -56,8 +63,13 @@ class ChunkDevide extends Transform {
         this.push(current);
         current = null;
         let nextDelim = chunk.subarray(1).indexOf('|');
-        let newChunk = nextDelim ? chunk.subarray(1, nextDelim+1) : chunk.subarray(1);
-        return chunkHandler(newChunk, current);
+        if(nextDelim){
+         current = chunk.subarray(1, nextDelim+1) 
+         next = chunk.subarray(nextDelim);
+        } else {
+          current = chunk.subarray(1);
+          next = null;
+        }
       }
 
       if(delimPos === 0 && current != null){
