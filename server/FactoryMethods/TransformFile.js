@@ -6,10 +6,12 @@ const { createCipheriv, randomBytes, scryptSync } = require('crypto');
 const CompressionStream = require('../helpers/CompressionStream');
 const DecompressionStream = require('../helpers/DecompressionStream');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
+const ChunkSplitterStream = require('../helpers/ChunkSplitterStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const DecryptSymetricStream = require("../helpers/decryptSymetricStream");
 const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
+const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 
 class TransformFile {
 
@@ -83,7 +85,7 @@ class TransformFile {
             await pipeline(
               readableStream,
               compressionStream,
-              symetricEncryptionStream, 
+              symetricEncryptionStream,
               getStreamData,
               writableStream
             ).catch((error)=>console.log(error, 'Error in gzip pipeline'));     
@@ -115,12 +117,14 @@ class TransformFile {
       if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
       // something wrong with decompression method
 
+      let chunkSplitter = new ChunkSplitterStream();
       let decompresStream = new DecompressionStream('gzip');
       let decryptSymetric = new DecryptSymetricStream({key:this.password});
+      let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password})
       
       if(!decompressionStream) return;
 
-      await pipeline(readable, decryptSymetric, decompresStream, writable)
+      await pipeline(readable, decryptSymetricSplitted, decompresStream, writable)
       .catch((error)=>console.log(error, 'Error in decompress pipeline'));
 
     } catch (error) {

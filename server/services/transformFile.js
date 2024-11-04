@@ -67,7 +67,7 @@ async function transformFile(req, res, next) {
     return res.status(200).json(transformResult);
   }
 
-  if(req.body.gzip === 'true'  || req.body.deflate === 'true' || req.body.brotli === 'true') {
+  if(req.body.gzip === 'true' || req.body.deflate === 'true' || req.body.brotli === 'true') {
     let compressionResult = await transform.compress();
     return res.status(200).json(compressionResult);
   }

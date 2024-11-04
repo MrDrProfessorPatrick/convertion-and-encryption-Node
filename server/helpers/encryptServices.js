@@ -9,7 +9,9 @@ function encryptSymetricService(chunk, password, iv, count) {
   // const tag = cipher.getAuthTag();
   console.log('ciphertext.length encrypted', ciphertext.length)
   // let tagString = tag.toString("base64");
-  let result = count === 0 ? Buffer.concat([iv, Buffer.from(ciphertext, 'hex')]) : Buffer.from(ciphertext, 'hex');
+  console.log('iv ciphered', iv.toString('hex'))
+  let delim = Buffer.from('|');
+  let result = count === 0 ? Buffer.concat([iv, delim, Buffer.from(ciphertext, 'hex')]) : Buffer.from(ciphertext, 'hex');
   console.log('encryption result', result.length)
   return result;
 }
