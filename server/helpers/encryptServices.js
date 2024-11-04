@@ -18,9 +18,5 @@ function encryptSymetricService(chunk, password, iv, count) {
 
 module.exports = encryptSymetricService;
 
-// 65536 firstChunk before encryption
-// 26145 secondChunk before encryption 
-// 87384 - 87424 firstChunk ENCRYPTED middleLong2.txt
-// 34860 secondChunk ENCRYPTED middleLong2.txt
 
 

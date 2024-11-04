@@ -38,25 +38,31 @@ class DecryptSymetricSplittedStream extends Transform {
             }
 
             if(delimPos === 0){
-              let nextChunk = chunk.subarray(1) // |sadfsadfsdf|safsaf
+              let nextChunk = chunk.subarray(1) // sadfsadfsdf|safsaf
               if(current){
                 chunksToPush.push(current);
+                console.log('chunk', current.length)
                 current = null;
+                return findChunkByDelimiter(nextChunk, chunksToPush);
+              } else {
                 return findChunkByDelimiter(nextChunk, chunksToPush);
               }
             }
       
             if(delimPos > 0 && delimPos < chunk.length-1){
               let prevChunk = chunk.subarray(0, delimPos);
-              let nextChunk = chunk.subarray(delimPos+1)
+              let nextChunk = chunk.subarray(delimPos+1) //doesn't include |
 
               if(current){
                 let fullChunk = Buffer.concat([current, prevChunk]);
                 chunksToPush.push(fullChunk);
+                console.log('chunk', fullChunk.length)
                 current = null;
               } else {
                 chunksToPush.push(prevChunk);
+                console.log('chunk', prevChunk.length)
               }
+
               return findChunkByDelimiter(nextChunk, chunksToPush)
             }
       
@@ -65,9 +71,12 @@ class DecryptSymetricSplittedStream extends Transform {
 
               if(current){
                 chunksToPush.push(Buffer.concat([current, nextChunk]))
+                console.log('chunk', Buffer.concat([current, nextChunk]).length)
                 current = null;
               } else {
                 chunksToPush.push(nextChunk)
+                console.log('chunk', nextChunk.length)
+
               }
               // self.push(Buffer.from(self.chunksToPush))
               // done()
@@ -85,8 +94,8 @@ class DecryptSymetricSplittedStream extends Transform {
           this.iv = this.chunksToPush[0];
           this.chunksToPush = this.chunksToPush.slice(1);
         }
-console.log('this.chunksToPush', this.chunksToPush)
         this.chunksToPush.forEach((chunk)=>{
+          console.log('chunk foreach', chunk.length)
           let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv)
           console.log('decrypted', decrypted.toString('hex'))
           this.decryptedArr.push(decrypted);

@@ -12,7 +12,6 @@ function decryptSymetricService(cipher, key, iv) {
     // let nonce = cipher.substring(0, 33);
     // let tag = cipher.substring(16, 40);
     // let cipherText = cipher.substring(33);
-   console.log('iv in decryptSymetric', iv.toString('hex'))
     // 16-24-65496 received
     const decipher = createDecipheriv('aes-192-cbc', keySalt, iv);
     // compressed and encrypted chunk.length 40
@@ -31,3 +30,4 @@ module.exports = decryptSymetricService;
 
 // iv ciphered 4a3c5a884842133507855472b6537937
 // iv in decryptSymetric 4a3c5a884842133507855472b65379377c
+// 113 - 112 - 112 - 96 - 96 -96 - 96 - 112 - 96 - 112 - 96 - 80

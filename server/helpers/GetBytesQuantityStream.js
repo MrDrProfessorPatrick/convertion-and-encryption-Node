@@ -12,6 +12,7 @@ class GetBytesQuantity extends Transform {
     _transform(chunk, encoding, done) {
       console.log('chunk length', Buffer.byteLength(chunk))
       let delim = Buffer.from('|');
+      // adding two delimiter issue???
       this.push(Buffer.concat([chunk, delim]));
       done();
     }
