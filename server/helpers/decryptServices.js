@@ -28,6 +28,6 @@ function decryptSymetricService(cipher, key, iv) {
 
 module.exports = decryptSymetricService;
 
-// iv ciphered 4a3c5a884842133507855472b6537937
-// iv in decryptSymetric 4a3c5a884842133507855472b65379377c
-// 113 - 112 - 112 - 96 - 96 -96 - 96 - 112 - 96 - 112 - 96 - 80
+// iv ciphered b48eee81bf1288d6c5b38fc4b1977720
+// 
+// 

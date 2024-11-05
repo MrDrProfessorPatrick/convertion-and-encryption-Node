@@ -19,18 +19,18 @@ class DecryptSymetricSplittedStream extends Transform {
       try {
         if(!this.key) throw new Error('No key provided')  
 
-        function chunkHandler(chunk, current){
+        function chunkHandler(chunk){
           if(chunk.length === 0) return; 
 
-          function findChunkByDelimiter(chunk, chunksToPush){
+          function findChunkByDelimiter(chunk){
 
             let delimPos = chunk.indexOf("|");
-    console.log('delimPos', delimPos, chunk.length-1)
+
             if(delimPos === -1){
-              if(current){
-                current = Buffer.concat([current, chunk])
+              if(self.current){
+                self.current = Buffer.concat([self.current, chunk])
               } else {
-                current = chunk;
+                self.current = chunk;
               }
               console.log('delimPos = -1', chunk.toString())
               // done()
@@ -39,61 +39,56 @@ class DecryptSymetricSplittedStream extends Transform {
 
             if(delimPos === 0){
               let nextChunk = chunk.subarray(1) // sadfsadfsdf|safsaf
-              if(current){
-                chunksToPush.push(current);
-                console.log('chunk', current.length)
-                current = null;
-                return findChunkByDelimiter(nextChunk, chunksToPush);
+              if(self.current){
+                self.chunksToPush.push(self.current);
+                console.log('chunk delim = 0', self.current.length)
+                self.current = null;
+                return findChunkByDelimiter(nextChunk);
               } else {
-                return findChunkByDelimiter(nextChunk, chunksToPush);
+                return findChunkByDelimiter(nextChunk);
               }
             }
       
             if(delimPos > 0 && delimPos < chunk.length-1){
               let prevChunk = chunk.subarray(0, delimPos);
               let nextChunk = chunk.subarray(delimPos+1) //doesn't include |
-
-              if(current){
-                let fullChunk = Buffer.concat([current, prevChunk]);
-                chunksToPush.push(fullChunk);
-                console.log('chunk', fullChunk.length)
-                current = null;
+              console.log('prevChunk=', prevChunk.length, 'nextChunk=', nextChunk.length)
+              if(self.current){
+                let fullChunk = Buffer.concat([self.current, prevChunk]);
+                self.chunksToPush.push(fullChunk);
+                console.log('fullChunk.length', fullChunk.length)
+                self.current = null;
               } else {
-                chunksToPush.push(prevChunk);
-                console.log('chunk', prevChunk.length)
+                self.chunksToPush.push(prevChunk);
+                console.log('prevChunk.length', prevChunk.length)
               }
-
-              return findChunkByDelimiter(nextChunk, chunksToPush)
+              return findChunkByDelimiter(nextChunk)
             }
       
             if(delimPos === chunk.length-1){
               let nextChunk = chunk.subarray(0, chunk.length-1);
 
-              if(current){
-                chunksToPush.push(Buffer.concat([current, nextChunk]))
-                console.log('chunk', Buffer.concat([current, nextChunk]).length)
-                current = null;
+              if(self.current){
+                self.chunksToPush.push(Buffer.concat([self.current, nextChunk]))
+                self.current = null;
               } else {
-                chunksToPush.push(nextChunk)
-                console.log('chunk', nextChunk.length)
-
+                self.chunksToPush.push(nextChunk)
+                console.log('nextChunk.length', nextChunk.length)
               }
-              // self.push(Buffer.from(self.chunksToPush))
-              // done()
               return
             }
           }
-
-          findChunkByDelimiter(chunk, self.chunksToPush)
+          findChunkByDelimiter(chunk)
         }
         
-        chunkHandler(chunk, this.current)
+        chunkHandler(chunk)
 
        if(this.chunksToPush.length){
         if(this.iv === null) {
           this.iv = this.chunksToPush[0];
           this.chunksToPush = this.chunksToPush.slice(1);
         }
+
         this.chunksToPush.forEach((chunk)=>{
           console.log('chunk foreach', chunk.length)
           let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv)
@@ -118,3 +113,5 @@ class DecryptSymetricSplittedStream extends Transform {
 }
 
 module.exports = DecryptSymetricSplittedStream;
+
+// 16 - 128 - 128 - 127 - 112

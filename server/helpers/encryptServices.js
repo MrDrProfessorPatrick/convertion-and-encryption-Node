@@ -1,18 +1,29 @@
-const { createCipheriv, scryptSync } = require("node:crypto");
+const { createCipheriv, randomBytes, scryptSync } = require("node:crypto");
 
-function encryptSymetricService(chunk, password, iv, count) {
+function encryptSymetricService(chunk, password, ivObj) {
+  let result;
+  let firstIv = false
+  if(ivObj.iv === null){
+    ivObj.iv = randomBytes(16);
+    firstIv = true;
+  }
+
   const key = scryptSync(password, 'GfG', 24);
-  const cipher = createCipheriv('aes-192-cbc', key, iv);
+  const cipher = createCipheriv('aes-192-cbc', key, ivObj.iv);
 
   let ciphertext = cipher.update(chunk, "binary", "hex");
   ciphertext += cipher.final("hex");
   // const tag = cipher.getAuthTag();
   console.log('ciphertext.length encrypted', ciphertext.length)
   // let tagString = tag.toString("base64");
-  console.log('iv ciphered', iv.toString('hex'))
   let delim = Buffer.from('|');
-  let result = count === 0 ? Buffer.concat([iv, delim, Buffer.from(ciphertext, 'hex')]) : Buffer.from(ciphertext, 'hex');
-  console.log('encryption result', result.length)
+
+  if(firstIv){
+  console.log('iv ciphered', ivObj.iv.toString('hex'))
+    result = Buffer.concat([ivObj.iv, delim, Buffer.from(ciphertext, 'hex')])
+  } else {
+    result = Buffer.from(ciphertext, 'hex')
+  }
   return result;
 }
 
