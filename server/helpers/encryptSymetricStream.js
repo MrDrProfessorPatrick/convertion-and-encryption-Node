@@ -10,13 +10,18 @@ class EncryptSymetricStream extends Transform {
   }
 // TODO have only one encryption method thats why only one service;
   _transform(chunk, encoding, done) {
-    if(this.key){
-      let encryptedChunk = encryptSymetricService(chunk, this.key, this.ivObj);
-      this.push(encryptedChunk)
-    } else {
-      this.push(chunk)
+    try {
+      if(this.key){
+        let encryptedChunk = encryptSymetricService(chunk, this.key, this.ivObj);
+        this.push(encryptedChunk)
+      } else {
+        this.push(chunk)
+      }
+      done();
+    } catch (error) {
+      console.log('Error catched in EncryptSymetricStream', error)
     }
-    done();
+
   }
 }
 

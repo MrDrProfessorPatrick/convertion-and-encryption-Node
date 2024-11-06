@@ -23,7 +23,7 @@ class DecryptSymetricSplittedStream extends Transform {
 
           function findChunkByDelimiter(chunk){
 
-            let delimPos = chunk.indexOf("7c", 0, 'hex');
+            let delimPos = chunk.indexOf("5b7c5d", 0, 'hex');
 
             if(delimPos === -1){
               if(self.current){
@@ -35,7 +35,7 @@ class DecryptSymetricSplittedStream extends Transform {
             }
 
             if(delimPos === 0){
-              let nextChunk = chunk.subarray(1) // sadfsadfsdf|safsaf
+              let nextChunk = chunk.subarray(3) // sadfsadfsdf|safsaf
               if(self.current){
                 self.chunksToPush.push(self.current);
                 self.current = null;
@@ -45,9 +45,9 @@ class DecryptSymetricSplittedStream extends Transform {
               }
             }
       
-            if(delimPos > 0 && delimPos < chunk.length-1){
+            if(delimPos > 0 && delimPos < chunk.length-3){
               let prevChunk = chunk.subarray(0, delimPos);
-              let nextChunk = chunk.subarray(delimPos+1) //doesn't include |
+              let nextChunk = chunk.subarray(delimPos+3) //doesn't include ||
 
               if(self.current){
                 let fullChunk = Buffer.concat([self.current, prevChunk]);
@@ -59,8 +59,8 @@ class DecryptSymetricSplittedStream extends Transform {
               return findChunkByDelimiter(nextChunk)
             }
       
-            if(delimPos === chunk.length-1){
-              let nextChunk = chunk.subarray(0, chunk.length-1);
+            if(delimPos === chunk.length-3){
+              let nextChunk = chunk.subarray(0, chunk.length-3);
 
               if(self.current){
                 self.chunksToPush.push(Buffer.concat([self.current, nextChunk]))
@@ -79,6 +79,7 @@ class DecryptSymetricSplittedStream extends Transform {
        if(this.chunksToPush.length){
         if(this.iv === null) {
           this.iv = this.chunksToPush[0];
+          console.log('iv', this.iv.toString('hex'), this.iv.length)
           this.chunksToPush = this.chunksToPush.slice(1);
         }
 

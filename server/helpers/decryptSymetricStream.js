@@ -13,7 +13,6 @@ class DecryptSymetricStream extends Transform {
       try {
         let {iv, decrypted} = this.key ? decryptSymetricService(chunk, this.key) : null;
         this.currentIv = iv;
-        console.log('decryptedString', decrypted);
         decrypted ? this.push(decrypted) : this.push(chunk.toString());
         done();
       } catch (error) {
