@@ -14,12 +14,10 @@ function encryptSymetricService(chunk, password, ivObj) {
   let ciphertext = cipher.update(chunk, "binary", "hex");
   ciphertext += cipher.final("hex");
   // const tag = cipher.getAuthTag();
-  console.log('ciphertext.length encrypted', ciphertext.length)
   // let tagString = tag.toString("base64");
-  let delim = Buffer.from('|');
+  let delim = Buffer.from('7c', 'hex');
 
   if(firstIv){
-  console.log('iv ciphered', ivObj.iv.toString('hex'))
     result = Buffer.concat([ivObj.iv, delim, Buffer.from(ciphertext, 'hex')])
   } else {
     result = Buffer.from(ciphertext, 'hex')

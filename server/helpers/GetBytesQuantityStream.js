@@ -11,8 +11,8 @@ class GetBytesQuantity extends Transform {
 
     _transform(chunk, encoding, done) {
       console.log('chunk length', Buffer.byteLength(chunk))
-      let delim = Buffer.from('|');
-      console.log('GetBytesQuantity', Buffer.concat([chunk, delim]).indexOf('|'))
+      let delim = Buffer.from('7c', 'hex');
+      console.log('chunk-', chunk.length, 'chunk with delim-', Buffer.concat([chunk, delim]).length)
       this.push(Buffer.concat([chunk, delim]));
       done();
     }

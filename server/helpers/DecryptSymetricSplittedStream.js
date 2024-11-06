@@ -8,14 +8,13 @@ class DecryptSymetricSplittedStream extends Transform {
     this.current = null;
     this.iv = null;
     this.chunksToPush = [];
-    this.decryptedArr = []
-    this.chunkNumber = 0;
+    this.decryptedArr = [];
     this.encryptionMethod = options.encryptionMethod;
   }
   
   _transform(chunk, encoding, done) {
     let self = this;
-    console.log('transform chunk length', chunk.length)
+    
       try {
         if(!this.key) throw new Error('No key provided')  
 
@@ -24,7 +23,7 @@ class DecryptSymetricSplittedStream extends Transform {
 
           function findChunkByDelimiter(chunk){
 
-            let delimPos = chunk.indexOf("|");
+            let delimPos = chunk.indexOf("7c", 0, 'hex');
 
             if(delimPos === -1){
               if(self.current){
@@ -32,8 +31,6 @@ class DecryptSymetricSplittedStream extends Transform {
               } else {
                 self.current = chunk;
               }
-              console.log('delimPos = -1', chunk.toString())
-              // done()
               return;
             }
 
@@ -41,7 +38,6 @@ class DecryptSymetricSplittedStream extends Transform {
               let nextChunk = chunk.subarray(1) // sadfsadfsdf|safsaf
               if(self.current){
                 self.chunksToPush.push(self.current);
-                console.log('chunk delim = 0', self.current.length)
                 self.current = null;
                 return findChunkByDelimiter(nextChunk);
               } else {
@@ -52,15 +48,13 @@ class DecryptSymetricSplittedStream extends Transform {
             if(delimPos > 0 && delimPos < chunk.length-1){
               let prevChunk = chunk.subarray(0, delimPos);
               let nextChunk = chunk.subarray(delimPos+1) //doesn't include |
-              console.log('prevChunk=', prevChunk.length, 'nextChunk=', nextChunk.length)
+
               if(self.current){
                 let fullChunk = Buffer.concat([self.current, prevChunk]);
                 self.chunksToPush.push(fullChunk);
-                console.log('fullChunk.length', fullChunk.length)
                 self.current = null;
               } else {
                 self.chunksToPush.push(prevChunk);
-                console.log('prevChunk.length', prevChunk.length)
               }
               return findChunkByDelimiter(nextChunk)
             }
@@ -73,7 +67,6 @@ class DecryptSymetricSplittedStream extends Transform {
                 self.current = null;
               } else {
                 self.chunksToPush.push(nextChunk)
-                console.log('nextChunk.length', nextChunk.length)
               }
               return
             }
@@ -90,14 +83,10 @@ class DecryptSymetricSplittedStream extends Transform {
         }
 
         this.chunksToPush.forEach((chunk)=>{
-          console.log('chunk foreach', chunk.length)
           let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv)
-          console.log('decrypted', decrypted.toString('hex'))
           this.decryptedArr.push(decrypted);
         })
        }
-       console.log('this.decryptedArr.length', this.decryptedArr.length)
-       console.log('BUFFER CONCAT', Buffer.concat(this.decryptedArr).toString())
         this.decryptedArr.length ? this.push(Buffer.concat(this.decryptedArr)) : done();
       } catch (error) {
           console.log(error, 'Error catch in DecryptSymetricStream')
@@ -113,5 +102,3 @@ class DecryptSymetricSplittedStream extends Transform {
 }
 
 module.exports = DecryptSymetricSplittedStream;
-
-// 16 - 128 - 128 - 127 - 112
