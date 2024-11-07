@@ -7,11 +7,13 @@ class GetBytesQuantity extends Transform {
       this.compressionInfo = options.compressionInfo;
       this.startTime = options.startTime;
       this.fileName = options.fileNameZipped;
+      this.compressedDataByteLength = 0;
     }
 
     _transform(chunk, encoding, done) {
       let delim = Buffer.from('5b7c5d', 'hex');
       this.push(Buffer.concat([chunk, delim]));
+      this.compressedDataByteLength += chunk.length;
       done();
     }
 

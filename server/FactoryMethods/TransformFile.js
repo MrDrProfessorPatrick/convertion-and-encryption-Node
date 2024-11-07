@@ -44,30 +44,7 @@ class TransformFile {
           encryptedFileName:"",
         };
 
-
-        class ReadableStream extends Readable {
-          constructor(options) {
-            super(options);
-            this.data = fs.readFileSync(options, (err, data) => {
-              return data;
-            });
-            this.start = 0;
-            this.chunks = [];
-          }
-          
-          _read(size, enc, done) {
-            const end = this.start + size;
-            const chunk = this.data.slice(this.start, end);
-            this.start = end;
-            this.push(chunk.length ? chunk : null);
-          }
-        }
-
-        // TODO use custom stream here
-        const readableStream = new ReadableStream(
-          `${pathToFile}/../../uploads/${this.fileName}`,
-          // { highWaterMark: 16384 }
-        );
+        const readableStream = fs.createReadStream(`${pathToFile}/../../uploads/${this.fileName}`)
 
         const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
           
