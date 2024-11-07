@@ -16,7 +16,7 @@ async function downloadCompressedFiles(req, res, next) {
     res.setHeader("Content-type", "multipart/form-data");
 
     let readableStreams = fs.createReadStream(
-      `${__dirname}/../modified_files/${fileToDownload}`
+      `${__dirname}/../../modified_files/${fileToDownload}`
     );
 
     pipeline(readableStreams, res, (error) => {

@@ -21,21 +21,21 @@ class GetBytesQuantity extends Transform {
       if (this.compressionMethod === "deflate") {
         this.compressionInfo.deflateCompressionSize =
           this.compressedDataByteLength.toString();
-          this.compressionInfo.deflateFileName = `deflate_compressed_${this.fileName}`;
+          this.compressionInfo.deflateFileName = `${this.fileName}`;
           this.compressionInfo.deflateCompressionTime = Date.now() - this.startTime;
       }
 
       if (this.compressionMethod === "gzip") {
         this.compressionInfo.gzipCompressionSize =
           this.compressedDataByteLength.toString();
-          this.compressionInfo.gzipFileName = `gzip_compressed_${this.fileName}`;
+          this.compressionInfo.gzipFileName = `${this.fileName}`;
           this.compressionInfo.gzipCompressionTime = Date.now() - this.startTime;
       }
 
       if (this.compressionMethod === "brotli") {
         this.compressionInfo.brotliCompressionSize =
           this.compressedDataByteLength.toString();
-          this.compressionInfo.brotliFileName = `brotli_compressed_${this.fileName}`;
+          this.compressionInfo.brotliFileName = `${this.fileName}`;
           this.compressionInfo.brotliCompressionTime = Date.now() - this.startTime;
       }
       cb();
