@@ -1,7 +1,5 @@
-const { Readable } = require("readable-stream");
 const fs = require("node:fs");
 const zlib = require('node:zlib'); 
-const { createCipheriv, randomBytes, scryptSync } = require('crypto'); 
 
 const CompressionStream = require('../helpers/CompressionStream');
 const DecompressionStream = require('../helpers/DecompressionStream');
@@ -95,15 +93,14 @@ class TransformFile {
       if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
       if(extensionName === 'br') decompressionStream = zlib.createDeflate();
       if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
-      // something wrong with decompression method
 
       let decompresStream = new DecompressionStream('gzip');
-      let decryptSymetric = new DecryptSymetricStream({key:this.password});
+      // let decryptSymetric = new DecryptSymetricStream({key:this.password});
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
       
       if(!decompressionStream) return;
 
-      await pipeline(readable, decryptSymetricSplitted, decompresStream, writable)
+      pipeline(readable, decryptSymetricSplitted, decompresStream, writable).then((result)=>console.log('decompression pipeline result', result))
       .catch((error)=>console.log(error, 'Error in decompress pipeline'));
 
     } catch (error) {

@@ -79,7 +79,6 @@ class DecryptSymetricSplittedStream extends Transform {
        if(this.chunksToPush.length){
         if(this.iv === null) {
           this.iv = this.chunksToPush[0];
-          console.log('iv', this.iv.toString('hex'), this.iv.length)
           this.chunksToPush = this.chunksToPush.slice(1);
         }
 

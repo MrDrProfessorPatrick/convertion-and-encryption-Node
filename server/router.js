@@ -9,8 +9,8 @@ const {
 } = require("./services/symetricEncription");
 
 const {
-  downloadCompressedFiles,
-} = require("./services/downloadCompressedFiles");
+  downloadFileRequest,
+} = require("./services/downloadFileRequest");
 
 const router = new Router();
 
@@ -32,7 +32,7 @@ var upload = multer({ storage });
 // const encryptionUpload = multer({ dest: "up" });
 
 router.post("/sendfile", upload.single("file"), transformFile);
-router.post("/downloadfiles", downloadCompressedFiles);
+router.post("/downloadfiles", downloadFileRequest);
 router.post("/encryptsymetric", upload.single("file"), encryptSymetric);
 router.post("/decryptsymetric", decryptSymetric);
 

@@ -58,11 +58,19 @@ async function transformFile(req, res, next) {
 
     let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);
 
-    await transform.decompress(readableStreams, res);
+    res.setHeader(
+      "Content-disposition",
+      `attachment; filename="${fileNameTxt}"`
+    );
+  
+    res.setHeader("Content-type", "multipart/form-data");
+
+    return transform.decompress(readableStreams, writableStream);
     // return res.status(200).json('DECOMPRESSED')
-  }  
+  }
 
   if(decryption) {
+    // TODO change logic for if statements decryption/encryption/ compression/decompression
     let transformResult = await transform.decryptSymmetric(res);
     return res.status(200).json(transformResult);
   }

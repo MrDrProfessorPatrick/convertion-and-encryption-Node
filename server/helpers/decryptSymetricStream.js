@@ -11,6 +11,7 @@ class DecryptSymetricStream extends Transform {
   
   _transform(chunk, encoding, done) {
       try {
+        // TODO change decryptSymetricService as it returns only decrypted
         let {iv, decrypted} = this.key ? decryptSymetricService(chunk, this.key) : null;
         this.currentIv = iv;
         decrypted ? this.push(decrypted) : this.push(chunk.toString());
