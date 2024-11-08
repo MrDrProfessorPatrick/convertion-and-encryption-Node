@@ -81,23 +81,24 @@ class DecryptSymetricSplittedStream extends Transform {
           this.iv = this.chunksToPush[0];
           this.chunksToPush = this.chunksToPush.slice(1);
         }
-
         this.chunksToPush.forEach((chunk)=>{
           let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv)
           this.decryptedArr.push(decrypted);
         })
        }
-        this.decryptedArr.length ? this.push(Buffer.concat(this.decryptedArr)) : done();
+        this.push(Buffer.concat(this.decryptedArr));
+        done();
       } catch (error) {
           console.log(error, 'Error catch in DecryptSymetricStream')
       }
     }
 
-    _flush(){
+    _flush(cb){
       if(this.current){
         let { decrypted } =  decryptSymetricService(this.current, this.key, this.iv)
         this.push(decrypted);
       }
+      cb()
     }
 }
 

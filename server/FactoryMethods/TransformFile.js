@@ -85,6 +85,9 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
+
+
+
       const currentFolderPath = __dirname;
       let decompressionStream = null;
 
@@ -99,10 +102,7 @@ class TransformFile {
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
       
       if(!decompressionStream) return;
-
-      pipeline(readable, decryptSymetricSplitted, decompresStream, writable).then((result)=>console.log('decompression pipeline result', result))
-      .catch((error)=>console.log(error, 'Error in decompress pipeline'));
-
+      await pipeline(readable, decryptSymetricSplitted, decompresStream, writable);
     } catch (error) {
       console.log(error, 'Error catched in decompress');
     }
