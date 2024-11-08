@@ -65,8 +65,8 @@ async function transformFile(req, res, next) {
   
     res.setHeader("Content-type", "multipart/form-data");
 
-    return transform.decompress(readableStreams, writableStream);
-    // return res.status(200).json('DECOMPRESSED')
+    transform.decompress(readableStreams, res).catch((error)=>console.log('Error catched transform.decompress', error));
+    return
   }
 
   if(decryption) {

@@ -18,65 +18,65 @@ class TransformFile {
     this.password = password;
     this.originalFileSize = originalFileSize;
     this.fileName = fileName;
-    this.filePath = filePath
+    this.filePath = filePath;
   }
 
   async compress(){
     try {
-        let innerThis = this;
+      let innerThis = this;
 
-        const pathToFile = __dirname;
+      const pathToFile = __dirname;
 
-        const compressionInfo = {
-          originalSize: this.originalFileSize.toString(),
-          gzipCompressionSize: "",
-          deflateCompressionSize: "",
-          brotliCompressionSize: "",
-          gzipFileName: "",
-          deflateFileName: "",
-          brotliFileName: "",
-          gzipCompressionTime: "",
-          deflateCompressionTime: "",
-          brotliCompressionTime: "",
-          encryptedFileName:"",
-        };
+      const compressionInfo = {
+        originalSize: this.originalFileSize.toString(),
+        gzipCompressionSize: "",
+        deflateCompressionSize: "",
+        brotliCompressionSize: "",
+        gzipFileName: "",
+        deflateFileName: "",
+        brotliFileName: "",
+        gzipCompressionTime: "",
+        deflateCompressionTime: "",
+        brotliCompressionTime: "",
+        encryptedFileName:"",
+      };
 
-        const readableStream = fs.createReadStream(`${pathToFile}/../../uploads/${this.fileName}`)
+      const readableStream = fs.createReadStream(`${pathToFile}/../../uploads/${this.fileName}`)
 
-        const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
+      const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
+        
+      async function pipelineCompressor(){
+        try {
+          let startTime = Date.now();
+          let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
+          let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
+          let compressionStream = new CompressionStream('gzip');
+
+          if(!fs.existsSync(`${__dirname}/../../modified_files`)){
+            fs.mkdirSync(`${__dirname}/../../modified_files`)
+          }
           
-        async function pipelineCompressor(){
-          try {
-            let startTime = Date.now();
-            let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
-            let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
-            let compressionStream = new CompressionStream('gzip');
+          let writableStream = fs.createWriteStream(
+            `${pathToFile}/../../modified_files/${fileNameZipped}`
+          );
 
-            if(!fs.existsSync(`${__dirname}/../../modified_files`)){
-              fs.mkdirSync(`${__dirname}/../../modified_files`)
-            }
-            
-            let writableStream = fs.createWriteStream(
-              `${pathToFile}/../../modified_files/${fileNameZipped}`
-            );
+          await pipeline(
+            readableStream,
+            compressionStream,
+            symetricEncryptionStream,
+            getStreamData,
+            writableStream
+          ).catch((error)=>console.log(error, 'Error in gzip pipeline'));     
 
-            await pipeline(
-              readableStream,
-              compressionStream,
-              symetricEncryptionStream,
-              getStreamData,
-              writableStream
-            ).catch((error)=>console.log(error, 'Error in gzip pipeline'));     
+        return compressionInfo;
 
-          return compressionInfo;
-
-          } catch (error) {
-            console.log(error, 'Error catched in pipelineCompressor')
-        }
+        } catch (error) {
+          console.log(error, 'Error catched in pipelineCompressor')
       }
+    }
 
-      let compressionInfoResult = await pipelineCompressor();
-      return compressionInfoResult;
+    let compressionInfoResult = await pipelineCompressor();
+    return compressionInfoResult;
         
     } catch (error) {
       console.log("error catched", error);
@@ -99,10 +99,7 @@ class TransformFile {
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
       
       if(!decompressionStream) return;
-
-      pipeline(readable, decryptSymetricSplitted, decompresStream, writable).then((result)=>console.log('decompression pipeline result', result))
-      .catch((error)=>console.log(error, 'Error in decompress pipeline'));
-
+      await pipeline(readable, decryptSymetricSplitted, decompresStream, writable);
     } catch (error) {
       console.log(error, 'Error catched in decompress');
     }
