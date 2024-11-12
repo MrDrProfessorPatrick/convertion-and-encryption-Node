@@ -1,7 +1,8 @@
 const Router = require("express");
 var multer = require("multer");
 
-const { transformFile } = require("./services/transformFile");
+const compress = require('./services/compress');
+const decompress = require('./services/decompress');
 
 const {
   encryptSymetric,
@@ -27,11 +28,16 @@ const storage = multer.diskStorage({
   },
 });
 
-var upload = multer({ storage });
+var upload = multer({ storage:storage });
+var memoryStorage = multer.memoryStorage();
+var memoryUpload = multer({storage:memoryStorage})
 
 // const encryptionUpload = multer({ dest: "up" });
 
-router.post("/sendfile", upload.single("file"), transformFile);
+// router.post("/sendfile", upload.single("file"), transformFile);
+router.post('/compress', upload.single("file"), compress);
+router.post('/decompress', memoryUpload.single("file"), decompress);
+
 router.post("/downloadfiles", downloadFileRequest);
 router.post("/encryptsymetric", upload.single("file"), encryptSymetric);
 router.post("/decryptsymetric", decryptSymetric);

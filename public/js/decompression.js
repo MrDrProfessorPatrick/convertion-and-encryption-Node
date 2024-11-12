@@ -24,7 +24,7 @@ async function decompressFile(e) {
     
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
 
-    await fetch('/sendfile', {
+    await fetch('/decompress', {
       method: 'POST',
       body: formData,
     })
