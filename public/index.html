@@ -102,85 +102,83 @@
 
     <!-- DECOMPRESSION SECTION -->
     <div class="decompression-container-hidden">
-      <fieldset>
-        <legend>Choose type of the file you want to decompress:</legend>
-
-        <div>
-          <input
-            type="radio"
-            id="noDecompression"
-            name="decompression"
-            checked
-          />
-          <label for="textDecompress">No decompression</label>
-        </div>
-
-        <div>
-          <input
-            type="radio"
-            id="textDecompress"
-            name="decompression"
-          />
-          <label for="textDecompress">Text</label>
-        </div>
-
-        <div>
-          <input
-            type="radio"
-            id="imageDecompress"
-            name="decompression"
-          />
-          <label for="imageDecompress">Image</label>
-        </div>
-      </fieldset>
-
-  <fieldset>
-    <div>
-      <label for="decrypt">No decryption</label>
-      <input
-        type="radio"
-        id="noDecryptionRadio"
-        name="decryption"
-        checked
-    />
-  </div>
-
-  <div>
-    <label for="decrypt">Decrypt</label>
-      <input
-        type="radio"
-        id="decryptionRadio"
-        name="decryption"
-        
-    />
-  </div>
-  
-  <div class="password-input-hidden" id="decryptPasswordInputContainer">
-  <label for="password">Password</label>
-    <input
-      type="password"
-      id="decryptionPassword"
-      name="password"
-    />
-  </div>  
-  </fieldset>
-
 
       <form
         id="decompressionForm"
       >
         <div class="decompression-container">
-          <label for="inputFileDecompression" class="chose-file-button">Chose file</label>
-          <span class="file-availability" id="fileNameDecompression">No file chosen</span>
+          <!-- <label for="inputFileDecompression" class="chose-file-button">Chose file</label> -->
+          <!-- <span class="file-availability" id="fileNameDecompression">No file chosen</span> -->
           <input
             type="file"
             name="file"
             id="inputFileDecompression"
-            style="display:none"
           />
           <button class="file-manager-button" id="decompressionUpload" type="submit">
             Download
           </button>
+          <fieldset>
+            <legend>Choose type of the file you want to decompress:</legend>
+    
+            <div>
+              <input
+                type="radio"
+                id="noDecompression"
+                name="decompression"
+                checked
+              />
+              <label for="textDecompress">No decompression</label>
+            </div>
+    
+            <div>
+              <input
+                type="radio"
+                id="textDecompress"
+                name="decompression"
+              />
+              <label for="textDecompress">Text</label>
+            </div>
+    
+            <div>
+              <input
+                type="radio"
+                id="imageDecompress"
+                name="decompression"
+              />
+              <label for="imageDecompress">Image</label>
+            </div>
+          </fieldset>
+    
+      <fieldset>
+        <div>
+          <label for="decrypt">No decryption</label>
+          <input
+            type="radio"
+            id="noDecryptionRadio"
+            name="decryption"
+            checked
+        />
+      </div>
+    
+      <div>
+        <label for="decrypt">Decrypt</label>
+          <input
+            type="radio"
+            id="decryptionRadio"
+            name="decryption"
+            
+        />
+      </div>
+      
+      <div class="password-input-hidden" id="decryptPasswordInputContainer">
+      <label for="password">Password</label>
+        <input
+          type="password"
+          id="decryptionPassword"
+          name="password"
+        />
+      </div>  
+      </fieldset>
         </div>
       </form>
     </div>

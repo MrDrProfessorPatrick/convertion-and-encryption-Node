@@ -29,14 +29,10 @@ const storage = multer.diskStorage({
 });
 
 var upload = multer({ storage:storage });
-var memoryStorage = multer.memoryStorage();
-var memoryUpload = multer({storage:memoryStorage})
-
-// const encryptionUpload = multer({ dest: "up" });
 
 // router.post("/sendfile", upload.single("file"), transformFile);
 router.post('/compress', upload.single("file"), compress);
-router.post('/decompress', memoryUpload.single("file"), decompress);
+router.post('/decompress', decompress);
 
 router.post("/downloadfiles", downloadFileRequest);
 router.post("/encryptsymetric", upload.single("file"), encryptSymetric);

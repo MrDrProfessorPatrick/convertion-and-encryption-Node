@@ -15,9 +15,9 @@ class DecryptSymetricSplittedStream extends Transform {
   _transform(chunk, encoding, done) {
     let self = this;
     
-      try {
-        if(!this.key) throw new Error('No key provided')  
-
+    try {
+      console.log('this.key', this.key)
+      if(this.key){
         function chunkHandler(chunk){
           if(chunk.length === 0) return; 
 
@@ -88,10 +88,16 @@ class DecryptSymetricSplittedStream extends Transform {
        }
         this.push(Buffer.concat(this.decryptedArr));
         done();
-      } catch (error) {
-          console.log(error, 'Error catch in DecryptSymetricStream')
+      } else {
+        console.log('chunk', chunk)
+        this.push(chunk);
+        done();
       }
+
+    } catch (error) {
+        console.log(error, 'Error catch in DecryptSymetricStream')
     }
+  }
 
     _flush(cb){
       if(this.current){

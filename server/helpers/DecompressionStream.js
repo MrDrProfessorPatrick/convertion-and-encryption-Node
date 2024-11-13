@@ -12,6 +12,7 @@ class DecompressionStream extends Transform {
             if(this.compressionType === 'gzip'){
                 let gzipDecompressed = zlib.gunzipSync(chunk);
                 this.push(gzipDecompressed);
+                // this.push(chunk)
             }
 
             if(this.compressionType === 'brotli'){
