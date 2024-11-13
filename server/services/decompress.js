@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const DecompressionStream = require('../helpers/DecompressionStream');
 const { pipeline } = require("node:stream/promises");
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
+const uploadsPath = require('../../uploads/uploadsFolderPath');
 
 async function decompress(req, res, next){
     if (!req.file) {
@@ -27,13 +28,13 @@ async function decompress(req, res, next){
         
         if(!decompressionStream) return;
 
-        // let readableStreams = fs.createReadStream(
-        //     `${uploadsPath}/${fileName}`,
-        //     // { highWaterMark: 12432 }
-        //   );
+        let readableStreams = fs.createReadStream(
+            `${uploadsPath}/${fileName}`,
+            // { highWaterMark: 12432 }
+          );
 
 
-        await pipeline(req, decryptSymetricSplitted, decompresStream, res);
+        await pipeline(readableStreams, decryptSymetricSplitted, decompresStream, res);
       } catch (error) {
         console.log(error, 'Error catched in decompress');
       }
