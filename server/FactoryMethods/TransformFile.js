@@ -80,6 +80,7 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
+      console.log('decompress TransformFile')
       const currentFolderPath = __dirname;
       let decompressionStream = null;
 
@@ -121,15 +122,11 @@ class TransformFile {
     }
   }
 
-  async decryptSymmetric(writableStream){
+  async decryptSymmetric(readable, writable){
     try {
-      console.log('this.password decryptSymmetric',  this.password)
-      // encrypted size is higher than highWaterMark limit in encrypton, that's why highWaterMark should be increased here
-      let readableStream = fs.createReadStream(`${uploadsPath}/${this.fileName}`, { highWaterMark: 87424 });
       let decryptSymetric = new DecryptSymetricStream({key:this.password});
-      let writableDecryptionStream = fs.createWriteStream(`${__dirname}/../../decrypted_files/${this.fileName}`);
       
-      await pipeline(readableStream, decryptSymetric, writableDecryptionStream).catch((error)=>{
+      await pipeline(readable, decryptSymetric, writable).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         return 'Error in pipeline';
       })

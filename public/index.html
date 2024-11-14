@@ -54,7 +54,10 @@
       </fieldset>
 
       <h2>Chose your file</h2>
-      <form id="send-file-form">
+      <form 
+      id="send-file-form" 
+      enctype="multipart/form-data"
+      >
         <div class="upload-download-panel">
           <div class="upload-container">
             <label for="inputFile" class="chose-file-button">Chose file</label>
@@ -105,8 +108,10 @@
 
       <form
         id="decompressionForm"
+        enctype="multipart/form-data"
+
       >
-        <div class="decompression-container">
+        <!-- <div class="decompression-container"> -->
           <!-- <label for="inputFileDecompression" class="chose-file-button">Chose file</label> -->
           <!-- <span class="file-availability" id="fileNameDecompression">No file chosen</span> -->
           <input
@@ -179,7 +184,7 @@
         />
       </div>  
       </fieldset>
-        </div>
+        <!-- </div> -->
       </form>
     </div>
 
@@ -243,22 +248,22 @@
         decryptPasswordContainer.classList.remove('password-input-hidden');
       })
 
-      sendFileForm.onsubmit = async (e) => {
-        e.preventDefault();
+      // sendFileForm.onsubmit = async (e) => {
+      //   e.preventDefault();
 
-      let formData = new FormData(sendFileForm);
+      // let formData = new FormData(sendFileForm);
 
-      formData.append("gzip", gzipCheckPoint.checked);
-      formData.append("deflate", deflateCheckPoint.checked);
-      formData.append("brotli", brotliCheckPoint.checked);
+      // formData.append("gzip", gzipCheckPoint.checked);
+      // formData.append("deflate", deflateCheckPoint.checked);
+      // formData.append("brotli", brotliCheckPoint.checked);
 
-      console.log(noDecryptionInput, decryptionInput)
+      // console.log(noDecryptionInput, decryptionInput)
 
-      await fetch("/encryptsymetric", {
-        method: "POST",
-        body: formData,
-      });
-    };
+      // await fetch("/encryptsymetric", {
+      //   method: "POST",
+      //   body: formData,
+      // });
+    // };
     </script>
 
   </body>

@@ -11,10 +11,10 @@ async function transformFile(req, res, next) {
   // regarding req options call CompressionFactory or any other
   try {
     let encryptionMethod = false;
-
+    console.log('req.body', req.body)
     const decryption = req.body.decryption;
     const encryption = req.body.encryption;
-    const compression = req.body.compression;
+    const compressionMethods = [];
     const decompression = req.body.decompression;
 
     const fileSize = req.file.size;
@@ -22,7 +22,6 @@ async function transformFile(req, res, next) {
     const filePath = req.file.path;
     const password = req.body.password;
 
-    let compressionMethods = [];
 // TODO change for different type of encryption;
     if(req.body.symetricEncryption || req.body.asymetricEncryption) encryptionMethod = 'symetricEncryption';
 
@@ -48,7 +47,7 @@ async function transformFile(req, res, next) {
     );
 
   if(decompression){
-
+    console.log('decompression transformFile')
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
@@ -70,15 +69,16 @@ async function transformFile(req, res, next) {
   }
 
   if(decryption) {
-    // TODO change logic for if statements decryption/encryption/ compression/decompression
-    let transformResult = await transform.decryptSymmetric(res);
-    return res.status(200).json(transformResult);
+    // encrypted size is higher than highWaterMark limit in encrypton, that's why highWaterMark should be increased here
+    let readableStream = fs.createReadStream(`${uploadsPath}/${fileName}`, { highWaterMark: 87424 });
+    let transformResult = await transform.decryptSymmetric(readableStream, res);
+    return;
   }
 
-  if(req.body.gzip === 'true' || req.body.deflate === 'true' || req.body.brotli === 'true') {
-    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${this.fileName}`)
+  if(compressionMethods.length) {
+    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${fileName}`)
     let writableStream = fs.createWriteStream(
-      `${__dirname}/../../modified_files/${fileNameZipped}`
+      `${__dirname}/../../modified_files/${fileName}`
     );
     let compressionResult = await transform.compress(readableStream, writableStream);
     return res.status(200).json(compressionResult);

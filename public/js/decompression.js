@@ -11,7 +11,7 @@ const decryptionPassword = document.getElementById('decryptionPassword');
 
 
 function changeFile(e) {
-  // fileNameDecompression.innerHTML = e.target.files[0].name;
+  fileNameDecompression.innerHTML = e.target.files[0].name;
 }
 
 async function decompressFile(e) {
@@ -21,12 +21,11 @@ async function decompressFile(e) {
     formData.append('decryption', true);
     formData.append('password', decryptionPassword.value);
     textDecompress.checked && formData.append('decompression', true);
-    console.log('fileNameDecompression', fileDecompression.files[0])
-    formData.append('file', fileDecompression.files[0])
+    formData.append('filedecompress', fileDecompression.files[0])
     
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
 
-    await fetch('/decompress', {
+    await fetch('/sendfile', {
       method: 'POST',
       body: formData,
     })
@@ -74,5 +73,5 @@ async function decompressFile(e) {
   }
 }
 
-// fileDecompression.addEventListener("change", changeFile);
+fileDecompression.addEventListener("change", changeFile);
 decompressionForm.addEventListener("submit", decompressFile);

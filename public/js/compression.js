@@ -184,7 +184,7 @@ function submintFile(e) {
   async function getFileSizes() {
     let collectedData = "";
 
-  let response = await fetch('/compress', {
+  let response = await fetch('/sendfile', {
       method:"POST",
       body: formData,
     })

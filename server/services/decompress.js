@@ -8,7 +8,7 @@ const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplitte
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 
 async function decompress(req, res, next){
-  const bb = busboy({ headers: req.headers });
+  // const bb = busboy({ headers: req.headers });
   let formData = new Map();
   let externalFile = null
     // if (!req.file) {
