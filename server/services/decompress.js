@@ -19,23 +19,10 @@ async function decompress(req, res, next){
       const password = req.body.password;
       console.log('password', password)
     try {
-        // let readableStreams = fs.createReadStream(
-        //     `${uploadsPath}/${fileName}`,
-        //     // { highWaterMark: 12432 }
-        //   );
-        // await pipeline(req, decryptSymetricSplitted, decompresStream, res);
-        bb.on('field', (name, val, info) => {
-          console.log('fiels added')
-          formData.set(name, val);
-        })
-
-        
-        bb.on('file', (name, file, info) => {
 
           let decompressionStream = null;
           if(!externalFile) externalFile = file;
 
-          const {filename} = info;
           let extensionName = filename.split('.').reverse()[0];
           console.log('formData', formData)
           console.log('info', info)

@@ -76,7 +76,11 @@ async function transformFile(req, res, next) {
   }
 
   if(req.body.gzip === 'true' || req.body.deflate === 'true' || req.body.brotli === 'true') {
-    let compressionResult = await transform.compress();
+    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${this.fileName}`)
+    let writableStream = fs.createWriteStream(
+      `${__dirname}/../../modified_files/${fileNameZipped}`
+    );
+    let compressionResult = await transform.compress(readableStream, writableStream);
     return res.status(200).json(compressionResult);
   }
     

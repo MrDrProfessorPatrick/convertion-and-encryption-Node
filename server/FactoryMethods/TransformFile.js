@@ -21,11 +21,9 @@ class TransformFile {
     this.filePath = filePath;
   }
 
-  async compress(){
+  async compress(readable, writable){
     try {
       let innerThis = this;
-
-      const pathToFile = __dirname;
 
       const compressionInfo = {
         originalSize: this.originalFileSize.toString(),
@@ -41,7 +39,6 @@ class TransformFile {
         encryptedFileName:"",
       };
 
-      const readableStream = fs.createReadStream(`${pathToFile}/../../uploads/${this.fileName}`)
 
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
         
@@ -56,16 +53,14 @@ class TransformFile {
             fs.mkdirSync(`${__dirname}/../../modified_files`)
           }
           
-          let writableStream = fs.createWriteStream(
-            `${pathToFile}/../../modified_files/${fileNameZipped}`
-          );
+
 
           await pipeline(
-            readableStream,
+            readable,
             compressionStream,
             symetricEncryptionStream,
             getStreamData,
-            writableStream
+            writable
           ).catch((error)=>console.log(error, 'Error in gzip pipeline'));     
 
         return compressionInfo;
