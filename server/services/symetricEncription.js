@@ -14,10 +14,10 @@ async function encryptSymetric(req, res, next) {
   //   return res.status(400).json("No text for encryption was received");
   // }
 
-  let { encryptionPassword, text } = req.body;
+  let { encryptionPassword } = req.body;
 
   if (req.file) {
-    
+    console.log('req.file.path', req.file.path)
     let readableStream = fs.createReadStream(req.file.path);
     let encryptSymetric = new EncryptSymetricStream(encryptionPassword);
     let writableEncryptionStream = fs.createWriteStream(

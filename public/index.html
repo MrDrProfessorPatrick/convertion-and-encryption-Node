@@ -245,27 +245,22 @@
         decryptPasswordContainer.classList.remove('password-input-hidden');
       })
 
-      // sendFileForm.onsubmit = async (e) => {
-      //   e.preventDefault();
+      sendFileForm.onsubmit = async (e) => {
+        e.preventDefault();
 
-      // let formData = new FormData(sendFileForm);
+      let formData = new FormData(sendFileForm);
 
-      // formData.append("gzip", gzipCheckPoint.checked);
-      // formData.append("deflate", deflateCheckPoint.checked);
-      // formData.append("brotli", brotliCheckPoint.checked);
+      formData.append("gzip", gzipCheckPoint.checked);
+      formData.append("deflate", deflateCheckPoint.checked);
+      formData.append("brotli", brotliCheckPoint.checked);
 
-      // console.log(noDecryptionInput, decryptionInput)
+      console.log(noDecryptionInput, decryptionInput)
 
-      // await fetch('/sendfile', {
-      //   method:"POST",
-      //   body: formData,
-      // })
-
-      // await fetch("/encryptsymetric", {
-      //   method: "POST",
-      //   body: formData,
-      // });
-    // };
+      await fetch("/encryptsymetric", {
+        method: "POST",
+        body: formData,
+      });
+    };
     </script>
 
   </body>

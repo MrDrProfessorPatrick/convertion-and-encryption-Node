@@ -35,9 +35,8 @@ var upload = multer({ storage:storage });
 // router.post("/sendfile", upload.single("file"), transformFile);
 router.post('/compress', upload.single("file"), compress);
 router.post('/decompress', upload.single("file"), decompress);
-
-router.post("/downloadfiles", downloadFileRequest);
 router.post("/encryptsymetric", upload.single("file"), encryptSymetric);
 router.post("/decryptsymetric", decryptSymetric);
+router.post("/downloadfiles", downloadFileRequest);
 
 module.exports = router;
