@@ -5,6 +5,7 @@ const busboy = require('busboy');
 const DecompressionStream = require('../helpers/DecompressionStream');
 const { pipeline } = require("node:stream/promises");
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
+const uploadsPath = require('../../uploads/uploadsFolderPath');
 
 async function decompress(req, res, next){
   const bb = busboy({ headers: req.headers });
@@ -47,24 +48,13 @@ async function decompress(req, res, next){
           
           if(!decompressionStream) return;
 
-        });
-
-        // bb.on('close', () => {
-        //   console.log('formData', formData)
-        //   // pipeline(file, decryptSymetricSplitted, decompresStream, res);
-        // res.end();
-
-        // })
+        let readableStreams = fs.createReadStream(
+            `${uploadsPath}/${fileName}`,
+            // { highWaterMark: 12432 }
+          );
 
 
-        bb.on('close', () => {
-          pipeline(externalFile, decryptSymetricSplitted, decompresStream, res)
-
-          res.writeHead(200, { 'Connection': 'close' });
-          res.end(`That's all folks!`);
-        });
-
-        req.pipe(bb);
+        await pipeline(readableStreams, decryptSymetricSplitted, decompresStream, res);
       } catch (error) {
         console.log(error, 'Error catched in decompress');
         res.writeHead(404);
