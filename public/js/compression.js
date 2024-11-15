@@ -15,7 +15,6 @@ const encryptionPassword = document.getElementById("passwordInput");
 
 let downloadedFileName = "";
 
-
 function renderInitialScale(containerToInsert, sizeObj) {
   const isInitialScaleExists = document.getElementById("initialScale");
   const isInitialSizeExists = document.getElementById("initialSize");
@@ -180,6 +179,15 @@ function submintFile(e) {
   formData.append("brotli", brotliCheckPoint.checked);
   formData.append('symetricEncryption', symetricEncryptionInput.checked);
   formData.append('asymetricEncryption', asymetricEncryptionInput.checked);
+
+  if(!gzipCheckPoint.checked && !deflateCheckPoint.checked && !brotliCheckPoint.checked && !symetricEncryptionInput.checked && !asymetricEncryptionInput.checked){
+    alert('Choose compression and decryption options');
+    return
+  }
+  if(!file.files[0]){
+    alert("Chose the file")
+    return;
+  }
 
   async function getFileSizes() {
     let collectedData = "";

@@ -65,6 +65,7 @@ class TransformFile {
 
         } catch (error) {
           console.log(error, 'Error catched in pipelineCompressor')
+          throw new Error('Error on compressing file')
       }
     }
 
