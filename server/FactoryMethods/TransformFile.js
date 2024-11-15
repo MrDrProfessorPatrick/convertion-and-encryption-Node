@@ -59,7 +59,10 @@ class TransformFile {
             symetricEncryptionStream,
             getStreamData,
             writable
-          ).catch((error)=>console.log(error, 'Error in gzip pipeline'));     
+          ).catch((error)=>{
+            console.log(error, 'Error in gzip pipeline');
+            throw new Error('Error in compress pipeline', error) 
+          });     
 
         return compressionInfo;
 
@@ -74,6 +77,7 @@ class TransformFile {
         
     } catch (error) {
       console.log("error catched", error);
+      throw new Error(error)
     }
   }
 
