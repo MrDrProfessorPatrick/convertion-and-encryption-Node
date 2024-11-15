@@ -190,23 +190,30 @@ function submintFile(e) {
   }
 
   async function getFileSizes() {
-    let collectedData = "";
+    try {
+      let collectedData = "";
+      let response = await fetch('/sendfile', {
+          method:"POST",
+          body: formData,
+        });
+      
+        if(response.status >= 400 && response.status <= 500){
+          throw new Error()
+        }
 
-  let response = await fetch('/sendfile', {
-      method:"POST",
-      body: formData,
-    })
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf8");
-    const readerRes = await reader.read();
-
-    return decoder.decode(readerRes.value);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf8");
+        const readerRes = await reader.read();
+    
+        return decoder.decode(readerRes.value);
+    } catch (error) {
+      console.log('error catched in getFileSizes')
+      throw new Error(error);
+    }
   }
 
   getFileSizes().then((result) => {
     const sizeObj = JSON.parse(result);
-
 
   renderInitialScale(originalSizeContainer, sizeObj);
 
@@ -247,5 +254,9 @@ function submintFile(e) {
       console.log('sizeObj for encryptedFileName')
       renderCompressedFileName(sizeObj.encryptedFileName);
     }
-  });
+  })
+  .catch((error)=>{
+    console.log('Error in catch of GetFilesSizes')
+    alert(error)});
+  ;
 }

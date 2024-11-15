@@ -76,8 +76,7 @@ class TransformFile {
     return compressionInfoResult;
         
     } catch (error) {
-      console.log("error catched", error);
-      throw new Error(error)
+      throw new Error('Error thrown by TransformFile.compress',error)
     }
   }
 

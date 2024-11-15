@@ -14,8 +14,8 @@ async function transformFile(req, res, next) {
     console.log('req.body', req.body)
     const decryption = req.body.decryption;
     const encryption = req.body.encryption;
-    const compressionMethods = [];
     const decompression = req.body.decompression;
+    const compressionMethods = [];
 
     const fileSize = req.file.size;
     const fileName = req.file.filename;
