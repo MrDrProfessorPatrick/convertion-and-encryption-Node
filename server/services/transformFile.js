@@ -47,15 +47,12 @@ async function transformFile(req, res, next) {
     );
 
   if(decompression){
-    console.log('decompression transformFile')
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
       `${uploadsPath}/${fileName}`,
       // { highWaterMark: 12432 }
     );
-
-    let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);
 
     res.setHeader(
       "Content-disposition",

@@ -17,13 +17,11 @@ function changeFile(e) {
 async function decompressFile(e) {
   try {
     e.preventDefault();
-    const formData = new FormData(decompressionForm);
-    formData.append('decryption', true);
-    formData.append('password', decryptionPassword.value);
-    textDecompress.checked && formData.append('decompression', true);
-    formData.append('filedecompress', fileDecompression.files[0])
+    console.log('decryptionPassword.value', decryptionPassword.value)
+    const formData = new FormData(e.currentTarget);
     
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
+    console.log('formData', formData)
 
     await fetch('/sendfile', {
       method: 'POST',

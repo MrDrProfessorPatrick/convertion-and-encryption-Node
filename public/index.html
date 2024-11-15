@@ -54,9 +54,10 @@
       </fieldset>
 
       <h2>Chose your file</h2>
+      
       <form 
-      id="send-file-form" 
-      enctype="multipart/form-data"
+        id="send-file-form" 
+        enctype="multipart/form-data"
       >
         <div class="upload-download-panel">
           <div class="upload-container">
@@ -111,13 +112,15 @@
         enctype="multipart/form-data"
 
       >
-        <!-- <div class="decompression-container"> -->
-          <!-- <label for="inputFileDecompression" class="chose-file-button">Chose file</label> -->
-          <!-- <span class="file-availability" id="fileNameDecompression">No file chosen</span> -->
+        <div class="decompression-container">
+          <label for="inputFileDecompression" class="chose-file-button">Chose file</label>
+          <span class="file-availability" id="fileNameDecompression">No file chosen</span>
           <input
             type="file"
             name="file"
             id="inputFileDecompression"
+            style="display: none"
+
           />
           <button class="file-manager-button" id="decompressionUpload" type="submit">
             Download
@@ -129,7 +132,7 @@
               <input
                 type="radio"
                 id="noDecompression"
-                name="decompression"
+                name="nodecompression"
                 checked
               />
               <label for="textDecompress">No decompression</label>
@@ -160,7 +163,7 @@
           <input
             type="radio"
             id="noDecryptionRadio"
-            name="decryption"
+            name="nodecryption"
             checked
         />
       </div>
@@ -184,7 +187,7 @@
         />
       </div>  
       </fieldset>
-        <!-- </div> -->
+        </div>
       </form>
     </div>
 
