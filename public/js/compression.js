@@ -196,9 +196,9 @@ function submintFile(e) {
           method:"POST",
           body: formData,
         });
-      
         if(response.status >= 400 && response.status <= 500){
-          throw new Error()
+          let errorMessage = await response.json()
+          throw new Error(errorMessage)
         }
 
         const reader = response.body.getReader();
@@ -207,7 +207,6 @@ function submintFile(e) {
     
         return decoder.decode(readerRes.value);
     } catch (error) {
-      console.log('error catched in getFileSizes')
       throw new Error(error);
     }
   }
@@ -251,12 +250,9 @@ function submintFile(e) {
     }
 
     if(sizeObj.encryptedFileName){
-      console.log('sizeObj for encryptedFileName')
       renderCompressedFileName(sizeObj.encryptedFileName);
     }
   })
   .catch((error)=>{
-    console.log('Error in catch of GetFilesSizes')
     alert(error)});
-  ;
 }

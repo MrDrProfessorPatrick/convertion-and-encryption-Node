@@ -73,7 +73,7 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethods.length) {
-    const readableStream = fs.createReadStream(`${__dirname}_WRONG/../../uploads/${fileName}`);
+    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${fileName}`);
     const writableStream = fs.createWriteStream(
       `${__dirname}/../../modified_files/${fileName}`
     );
