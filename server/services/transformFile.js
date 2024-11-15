@@ -47,15 +47,12 @@ async function transformFile(req, res, next) {
     );
 
   if(decompression){
-    console.log('decompression transformFile')
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
       `${uploadsPath}/${fileName}`,
       // { highWaterMark: 12432 }
     );
-
-    let writableStream = fs.createWriteStream(`${__dirname}/../../decompressed_files/${fileNameTxt}`);
 
     res.setHeader(
       "Content-disposition",
@@ -76,11 +73,11 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethods.length) {
-    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${fileName}`)
-    let writableStream = fs.createWriteStream(
+    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${fileName}`);
+    const writableStream = fs.createWriteStream(
       `${__dirname}/../../modified_files/${fileName}`
     );
-    let compressionResult = await transform.compress(readableStream, writableStream);
+    const compressionResult = await transform.compress(readableStream, writableStream);
     return res.status(200).json(compressionResult);
   }
     
@@ -92,8 +89,8 @@ async function transformFile(req, res, next) {
   return res.status(200).json('No options were chosen');
   
   } catch (error) {
-      console.log(error, 'Error occured on decompression');
-      return res.status(400).json('Error occured on decompression');
+      console.log(error, 'Error occured on file transformation');
+      return res.status(400).json('Error occured on file transformation');
   }
 }
 

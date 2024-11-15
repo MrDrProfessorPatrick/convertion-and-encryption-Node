@@ -51,9 +51,7 @@ class TransformFile {
 
           if(!fs.existsSync(`${__dirname}/../../modified_files`)){
             fs.mkdirSync(`${__dirname}/../../modified_files`)
-          }
-          
-
+          }     
 
           await pipeline(
             readable,
@@ -80,7 +78,6 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
-      console.log('decompress TransformFile')
       const currentFolderPath = __dirname;
       let decompressionStream = null;
 

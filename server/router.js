@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 var upload = multer({ storage });
 
 router.post("/sendfile", upload.single("file"), transformFile);
-router.post("/encryptsymetric", upload.single("file"), encryptSymetric);
+// router.post("/encryptsymetric", upload.single("file"), encryptSymetric);
 router.post("/decryptsymetric", decryptSymetric);
 router.post("/downloadfiles", downloadFileRequest);
 
