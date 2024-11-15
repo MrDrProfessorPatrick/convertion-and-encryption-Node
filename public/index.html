@@ -132,7 +132,8 @@
               <input
                 type="radio"
                 id="noDecompression"
-                name="nodecompression"
+                name="decompression"
+                value="false"
                 checked
               />
               <label for="textDecompress">No decompression</label>
@@ -143,6 +144,7 @@
                 type="radio"
                 id="textDecompress"
                 name="decompression"
+                value="text"
               />
               <label for="textDecompress">Text</label>
             </div>
@@ -150,8 +152,9 @@
             <div>
               <input
                 type="radio"
-                id="imageDecompress"
+                id="imageDecompression"
                 name="decompression"
+                value="image"
               />
               <label for="imageDecompress">Image</label>
             </div>
@@ -159,22 +162,23 @@
     
       <fieldset>
         <div>
-          <label for="decrypt">No decryption</label>
+          <label for="nodecryption">No decryption</label>
           <input
             type="radio"
             id="noDecryptionRadio"
-            name="nodecryption"
+            name="decryption"
+            value="false"
             checked
         />
       </div>
     
       <div>
-        <label for="decrypt">Decrypt</label>
+        <label for="decryption">Decrypt</label>
           <input
             type="radio"
             id="decryptionRadio"
             name="decryption"
-            
+            value="true"
         />
       </div>
       

@@ -5,7 +5,6 @@ const CompressionStream = require('../helpers/CompressionStream');
 const DecompressionStream = require('../helpers/DecompressionStream');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
-const DecryptSymetricStream = require("../helpers/decryptSymetricStream");
 const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
@@ -67,7 +66,6 @@ class TransformFile {
         return compressionInfo;
 
         } catch (error) {
-          console.log(error, 'Error catched in pipelineCompressor')
           throw new Error('Error on compressing file')
       }
     }
@@ -92,7 +90,6 @@ class TransformFile {
       if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
 
       let decompresStream = new DecompressionStream('gzip');
-      // let decryptSymetric = new DecryptSymetricStream({key:this.password});
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
       
       if(!decompressionStream) return;
@@ -106,10 +103,16 @@ class TransformFile {
     try {
       let readableStream = fs.createReadStream(this.filePath);
       let encryptSymetric = new EncryptSymetricStream({password:this.password});
-      let writableEncryptionStream = fs.createWriteStream(
-        `${__dirname}/../../modified_files/${this.fileName}`
-      );
       let encryptedFileName = `encrypted${this.fileName}`;
+
+      if(!fs.existsSync(`${__dirname}/../../modified_files`)){
+        fs.mkdirSync(`${__dirname}/../../modified_files`)
+      } 
+
+      let writableEncryptionStream = fs.createWriteStream(
+        `${__dirname}/../../modified_files/${encryptedFileName}`
+      );
+
 
       await pipeline(
         readableStream,
@@ -127,13 +130,11 @@ class TransformFile {
     try {
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
       
-      
       await pipeline(readable, decryptSymetricSplitted, writable).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         return 'Error in pipeline';
       })
 
-      return "Succesfully decrypted";
     } catch (error) {
       console.log(error, "Error catched in decryptSymmetric")
       return "Error during Symmetric decryption"

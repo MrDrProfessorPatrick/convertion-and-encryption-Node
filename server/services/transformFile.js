@@ -68,7 +68,15 @@ async function transformFile(req, res, next) {
   if(decryption) {
     // encrypted size is higher than highWaterMark limit in encrypton, that's why highWaterMark should be increased here
     let readableStream = fs.createReadStream(`${uploadsPath}/${fileName}`, { highWaterMark: 87424 });
-    let transformResult = await transform.decryptSymmetric(readableStream, res);
+
+    res.setHeader(
+      "Content-disposition",
+      `attachment; filename="${fileName}"`
+    );
+  
+    res.setHeader("Content-type", "multipart/form-data");
+
+    await transform.decryptSymmetric(readableStream, res).catch((error)=>console.log('Error catched transform.decryption', error));
     return;
   }
 
