@@ -16,7 +16,6 @@ class DecryptSymetricSplittedStream extends Transform {
     let self = this;
     
     try {
-      console.log('this.key', this.key)
       if(this.key){
         function chunkHandler(chunk){
           if(chunk.length === 0) return; 

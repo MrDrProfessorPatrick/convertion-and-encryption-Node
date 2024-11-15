@@ -125,9 +125,10 @@ class TransformFile {
 
   async decryptSymmetric(readable, writable){
     try {
-      let decryptSymetric = new DecryptSymetricStream({key:this.password});
+      let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
       
-      await pipeline(readable, decryptSymetric, writable).catch((error)=>{
+      
+      await pipeline(readable, decryptSymetricSplitted, writable).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         return 'Error in pipeline';
       })
