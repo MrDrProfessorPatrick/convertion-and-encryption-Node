@@ -46,7 +46,7 @@ async function transformFile(req, res, next) {
       filePath
     );
 
-  if(decompression){
+  if(decompression === 'true'){
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
@@ -65,7 +65,7 @@ async function transformFile(req, res, next) {
     return
   }
 
-  if(decryption) {
+  if(decryption === 'true') {
     // encrypted size is higher than highWaterMark limit in encrypton, that's why highWaterMark should be increased here
     let readableStream = fs.createReadStream(`${uploadsPath}/${fileName}`, { highWaterMark: 87424 });
 
@@ -81,7 +81,6 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethods.length) {
-
     const compressionResult = await transform.compress();
     return res.status(200).json(compressionResult);
   }
