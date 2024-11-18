@@ -76,16 +76,13 @@ async function transformFile(req, res, next) {
   
     res.setHeader("Content-type", "multipart/form-data");
 
-    await transform.decryptSymmetric(readableStream, res).catch((error)=>console.log('Error catched transform.decryption', error));
+    transform.decryptSymmetric(readableStream, res).catch((error)=>console.log('Error catched transform.decryption', error));
     return;
   }
 
   if(compressionMethods.length) {
-    const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${fileName}`);
-    const writableStream = fs.createWriteStream(
-      `${__dirname}/../../modified_files/${fileName}`
-    );
-    const compressionResult = await transform.compress(readableStream, writableStream);
+
+    const compressionResult = await transform.compress();
     return res.status(200).json(compressionResult);
   }
     

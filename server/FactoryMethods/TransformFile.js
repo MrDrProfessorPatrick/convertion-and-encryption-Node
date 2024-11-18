@@ -20,7 +20,7 @@ class TransformFile {
     this.filePath = filePath;
   }
 
-  async compress(readable, writable){
+  async compress(){
     try {
       let innerThis = this;
 
@@ -48,16 +48,21 @@ class TransformFile {
           let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
           let compressionStream = new CompressionStream('gzip');
 
+          const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${innerThis.fileName}`);
+          const writableStream = fs.createWriteStream(
+            `${__dirname}/../../modified_files/${fileNameZipped}`
+          );
+
           if(!fs.existsSync(`${__dirname}/../../modified_files`)){
             fs.mkdirSync(`${__dirname}/../../modified_files`)
           }     
 
           await pipeline(
-            readable,
+            readableStream,
             compressionStream,
             symetricEncryptionStream,
             getStreamData,
-            writable
+            writableStream
           ).catch((error)=>{
             console.log(error, 'Error in gzip pipeline');
             throw new Error('Error in compress pipeline', error) 
@@ -132,7 +137,7 @@ class TransformFile {
       
       await pipeline(readable, decryptSymetricSplitted, writable).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
-        return 'Error in pipeline';
+        throw new Error(error);
       })
 
     } catch (error) {
