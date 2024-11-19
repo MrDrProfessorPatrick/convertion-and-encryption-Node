@@ -17,17 +17,19 @@ function changeFile(e) {
 async function decompressFile(e) {
   try {
     e.preventDefault();
-    console.log('decryptionPassword.value', decryptionPassword.value)
     const formData = new FormData(e.currentTarget);
-    
-    let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
-    console.log('formData', formData)
 
+    let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
+    var fileName;
     await fetch('/sendfile', {
       method: 'POST',
       body: formData,
     })
-    .then((response) => {
+      .then((response) => {
+        console.log('response', response.headers.get('content-disposition'))
+        let fileNameHeader = response.headers.get('content-disposition');
+        fileName = fileNameHeader ? fileNameHeader.match(/"\w.+"/g)[0] : 'decompressed/decryptedFile.txt'
+        fileName = fileName.substring(1, fileName.length - 1)
         return response.body;
       })
       .then((rb) => {
@@ -61,11 +63,11 @@ async function decompressFile(e) {
         let fileUrl = URL.createObjectURL(blob);
         const fileLink = document.createElement("a");
         fileLink.href = fileUrl;
-        fileLink.setAttribute("download", `DECOMPRESSED_FILE.txt`); // change extension
+        fileLink.setAttribute("download", fileName); // change extension
         document.body.appendChild(fileLink);
         fileLink.click();
         fileLink.remove();
-      }) 
+      })
   } catch (error) {
     console.log(error);
   }

@@ -17,36 +17,34 @@ async function decompress(req, res, next){
 
       // const fileName = req.file.originalname;
       const password = req.body.password;
-      console.log('password', password)
     try {
 
-          let decompressionStream = null;
-          if(!externalFile) externalFile = file;
+        let decompressionStream = null;
+        if(!externalFile) externalFile = file;
 
-          let extensionName = filename.split('.').reverse()[0];
-          console.log('formData', formData)
-          console.log('info', info)
-          if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
-          if(extensionName === 'br') decompressionStream = zlib.createDeflate();
-          if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
-    
-          let decompresStream = new DecompressionStream('gzip');
-          let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:password});
-          
-          if(!decompressionStream) return;
+        let extensionName = filename.split('.').reverse()[0];
+        
+        if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
+        if(extensionName === 'br') decompressionStream = zlib.createDeflate();
+        if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
+  
+        let decompresStream = new DecompressionStream('gzip');
+        let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:password});
+        
+        if(!decompressionStream) return;
 
-        let readableStreams = fs.createReadStream(
-            `${uploadsPath}/${fileName}`,
-            // { highWaterMark: 12432 }
-          );
+      let readableStreams = fs.createReadStream(
+          `${uploadsPath}/${fileName}`,
+          // { highWaterMark: 12432 }
+        );
 
 
-        await pipeline(readableStreams, decryptSymetricSplitted, decompresStream, res);
-      } catch (error) {
-        console.log(error, 'Error catched in decompress');
-        res.writeHead(404);
-        res.end();
-      }
+      await pipeline(readableStreams, decryptSymetricSplitted, decompresStream, res);
+    } catch (error) {
+      console.log(error, 'Error catched in decompress');
+      res.writeHead(404);
+      res.end();
+    }
 }
 
 module.exports = decompress;
