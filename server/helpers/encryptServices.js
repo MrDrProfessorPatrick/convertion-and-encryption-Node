@@ -20,7 +20,6 @@ function encryptSymetricService(chunk, password, ivObj) {
     throw new Error('[|] delimiter was found in ciphered text/ integrity of chunk was damaged')
   }
 
-
   if(firstIv){
     result = Buffer.concat([ivObj.iv, delim, Buffer.from(ciphertext, 'hex')])
   } else {

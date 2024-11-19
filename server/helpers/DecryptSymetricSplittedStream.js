@@ -88,6 +88,7 @@ class DecryptSymetricSplittedStream extends Transform {
         this.push(Buffer.concat(this.decryptedArr));
         done();
       } else {
+        console.log('this.push(chunk)', chunk)
         this.push(chunk);
         done();
       }

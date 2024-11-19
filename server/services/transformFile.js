@@ -1,6 +1,6 @@
 const fs = require("node:fs");
 
-const TransformFile = require('../FactoryMethods/TransformFile');
+const TransformFile = require('../TransformMethods/TransformFile');
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 
 async function transformFile(req, res, next) {
@@ -46,7 +46,7 @@ async function transformFile(req, res, next) {
       filePath
     );
 
-  if(decompression === 'true'){
+  if(decompression === 'text'){
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
