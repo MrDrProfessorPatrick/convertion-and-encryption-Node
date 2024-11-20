@@ -23,6 +23,7 @@ class DecryptSymetricSplittedStream extends Transform {
           function findChunkByDelimiter(chunk){
 
             let delimPos = chunk.indexOf("5b7c5d", 0, 'hex');
+            console.log(chunk.length,'delimPos=', delimPos)
 
             if(delimPos === -1){
               if(self.current){
@@ -46,7 +47,7 @@ class DecryptSymetricSplittedStream extends Transform {
       
             if(delimPos > 0 && delimPos < chunk.length-3){
               let prevChunk = chunk.subarray(0, delimPos);
-              let nextChunk = chunk.subarray(delimPos+3) //doesn't include ||
+              let nextChunk = chunk.subarray(delimPos+3) //doesn't include DELIMITER
 
               if(self.current){
                 let fullChunk = Buffer.concat([self.current, prevChunk]);
@@ -81,6 +82,8 @@ class DecryptSymetricSplittedStream extends Transform {
           this.chunksToPush = this.chunksToPush.slice(1);
         }
         this.chunksToPush.forEach((chunk)=>{
+          console.log('DELIMITER', chunk.length, chunk.indexOf("5b7c5d", 0, 'hex'));
+
           let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv)
           this.decryptedArr.push(decrypted);
         })

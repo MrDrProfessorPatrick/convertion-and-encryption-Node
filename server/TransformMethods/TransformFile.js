@@ -46,7 +46,8 @@ class TransformFile {
           let startTime = Date.now();
           let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
           let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
-          let compressionStream = new CompressionStream('gzip');
+          // let compressionStream = new CompressionStream('gzip');
+          let compressionStream = zlib.createGzip();
 
           const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${innerThis.fileName}`);
           const writableStream = fs.createWriteStream(
@@ -99,9 +100,8 @@ class TransformFile {
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
         await pipeline(readable, decryptSymetricSplitted, decompresStream, writable);
       } else {
-        console.log('createGzip decompressing')
         let gzipDecompression = zlib.createGunzip()
-        await pipeline(readable, decompresStream, writable);
+        await pipeline(readable, gzipDecompression, writable);
       }
       
     } catch (error) {
@@ -140,7 +140,6 @@ class TransformFile {
     try {
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
 
-      
       await pipeline(readable, DecryptSymetricSplittedStream, writable).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         throw new Error(error);

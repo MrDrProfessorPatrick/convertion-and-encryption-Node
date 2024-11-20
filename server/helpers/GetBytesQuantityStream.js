@@ -11,9 +11,9 @@ class GetBytesQuantity extends Transform {
     }
 
     _transform(chunk, encoding, done) {
-      let delim = Buffer.from('5b7c5d', 'hex');
-      this.push(Buffer.concat([chunk, delim]));
+
       this.compressedDataByteLength += chunk.length;
+      this.push(chunk)
       done();
     }
 

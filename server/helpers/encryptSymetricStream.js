@@ -13,7 +13,8 @@ class EncryptSymetricStream extends Transform {
     try {
       if(this.key){
         let encryptedChunk = encryptSymetricService(chunk, this.key, this.ivObj);
-        this.push(encryptedChunk)
+        let delim = Buffer.from('5b7c5d', 'hex');
+        this.push(Buffer.concat([encryptedChunk, delim]));
       } else {
         this.push(chunk)
       }
