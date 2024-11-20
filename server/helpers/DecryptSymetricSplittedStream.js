@@ -88,11 +88,8 @@ class DecryptSymetricSplittedStream extends Transform {
         this.push(Buffer.concat(this.decryptedArr));
         done();
       } else {
-        console.log('this.push(chunk)', chunk)
-        this.push(chunk);
-        done();
+        throw new Error('No key for decryption')
       }
-
     } catch (error) {
         console.log(error, 'Error catch in DecryptSymetricStream')
     }
@@ -100,8 +97,13 @@ class DecryptSymetricSplittedStream extends Transform {
 
     _flush(cb){
       if(this.current){
+      try {
         let { decrypted } =  decryptSymetricService(this.current, this.key, this.iv)
         this.push(decrypted);
+      } catch (error) {
+        throw new Error(error)
+      }
+
       }
       cb()
     }

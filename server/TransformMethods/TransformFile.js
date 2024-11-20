@@ -94,9 +94,16 @@ class TransformFile {
       // if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
 
       let decompresStream = new DecompressionStream('gzip');
-      let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
+
+      if(this.password){
+        let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
+        await pipeline(readable, decryptSymetricSplitted, decompresStream, writable);
+      } else {
+        console.log('createGzip decompressing')
+        let gzipDecompression = zlib.createGunzip()
+        await pipeline(readable, decompresStream, writable);
+      }
       
-      await pipeline(readable, decryptSymetricSplitted, decompresStream, writable);
     } catch (error) {
       console.log(error, 'Error catched in decompress');
     }
@@ -132,8 +139,9 @@ class TransformFile {
   async decryptSymmetric(readable, writable){
     try {
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
+
       
-      await pipeline(readable, decryptSymetricSplitted, writable).catch((error)=>{
+      await pipeline(readable, DecryptSymetricSplittedStream, writable).catch((error)=>{
         console.log(error, 'Error in decryptSymmetric pipeline');
         throw new Error(error);
       })
