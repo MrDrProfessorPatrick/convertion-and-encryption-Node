@@ -14,7 +14,6 @@ class DecryptSymetricSplittedStream extends Transform {
   
   _transform(chunk, encoding, done) {
     let self = this;
-    
     try {
       if(this.key){
         function chunkHandler(chunk){
@@ -23,10 +22,10 @@ class DecryptSymetricSplittedStream extends Transform {
           function findChunkByDelimiter(chunk){
 
             let delimPos = chunk.indexOf("5b7c5d", 0, 'hex');
-            console.log(chunk.length,'delimPos=', delimPos)
            
             if(delimPos === -1){
               if(self.current){
+                console.log('CONCAT')
                 self.current = Buffer.concat([self.current, chunk])
               } else {
                 self.current = chunk;
@@ -74,8 +73,8 @@ class DecryptSymetricSplittedStream extends Transform {
           findChunkByDelimiter(chunk)
         }
         
-        chunkHandler(chunk)
-
+        chunkHandler(chunk);
+        
        if(this.chunksToPush.length){
         if(this.iv === null) {
           this.iv = this.chunksToPush[0];
@@ -87,6 +86,8 @@ class DecryptSymetricSplittedStream extends Transform {
         })
        }
         this.push(Buffer.concat(this.decryptedArr));
+        this.decryptedArr = [];
+        this.chunksToPush = [];
         done();
       } else {
         throw new Error('No key for decryption')
