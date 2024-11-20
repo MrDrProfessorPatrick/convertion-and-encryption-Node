@@ -46,6 +46,7 @@ class TransformFile {
           let startTime = Date.now();
           let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
           let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
+          // TODO add different types of compression
           // let compressionStream = new CompressionStream('gzip');
           let compressionStream = zlib.createGzip();
 
@@ -89,23 +90,24 @@ class TransformFile {
       const currentFolderPath = __dirname;
 
       let extensionName = this.fileName.split('.').reverse()[0];
-      
-      // if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
-      // if(extensionName === 'br') decompressionStream = zlib.createDeflate();
-      // if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
 
-      let decompresStream = new DecompressionStream('gzip');
+      let decompressionStream = null
+      
+      if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
+      if(extensionName === 'br') decompressionStream = zlib.createDeflate();
+      if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
+
+      if(decompressionStream === null) throw new Error('No type of decompression was chosen')
 
       if(this.password){
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-        await pipeline(readable, decryptSymetricSplitted, decompresStream, writable);
+        await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
       } else {
-        let gzipDecompression = zlib.createGunzip()
-        await pipeline(readable, gzipDecompression, writable);
+        await pipeline(readable, decompressionStream, writable);
       }
-      
     } catch (error) {
       console.log(error, 'Error catched in decompress');
+      throw new Error(error)
     }
   }
 
