@@ -26,7 +26,6 @@ async function decompressFile(e) {
       body: formData,
     })
       .then((response) => {
-        console.log('response', response.headers.get('content-disposition'))
         let fileNameHeader = response.headers.get('content-disposition');
         fileName = fileNameHeader ? fileNameHeader.match(/"\w.+"/g)[0] : 'decompressed/decryptedFile.txt'
         fileName = fileName.substring(1, fileName.length - 1)

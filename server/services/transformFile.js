@@ -14,8 +14,7 @@ async function transformFile(req, res, next) {
     console.log('req.body', req.body)
     const decryption = req.body.decryption;
     const encryption = req.body.encryption;
-    const decompression = req.body.decompression;
-    const compressionMethods = [];
+    let compressionMethod = '';
 
     const fileSize = req.file.size;
     const fileName = req.file.filename;
@@ -24,21 +23,17 @@ async function transformFile(req, res, next) {
 
 // TODO change for different type of encryption;
     if(req.body.symetricEncryption || req.body.asymetricEncryption) encryptionMethod = 'symetricEncryption';
-
-    if (req.body.gzip === "true") {
-      compressionMethods.push('gzip');
-    };
     
     if (req.body.deflate === "true") {
-      compressionMethods.push('deflate');
+      compressionMethod = 'deflate'
     };
 
     if (req.body.brotli === "true") {
-      compressionMethods.push('brotli');
+      compressionMethod = 'brotli'
     };
 
     let transform = new TransformFile(
-      compressionMethods,
+      compressionMethod,
       encryptionMethod,
       password,
       fileSize,
@@ -46,7 +41,9 @@ async function transformFile(req, res, next) {
       filePath
     );
 
-  if(decompression === 'text'){
+  let extensionName = fileName.split('.').reverse()[0];
+
+  if(extensionName === 'br' || extensionName === 'gz'){
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
     let readableStreams = fs.createReadStream(
@@ -80,7 +77,7 @@ async function transformFile(req, res, next) {
     return;
   }
 
-  if(compressionMethods.length) {
+  if(compressionMethod) {
     const compressionResult = await transform.compress();
     return res.status(200).json(compressionResult);
   }

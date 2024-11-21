@@ -3,7 +3,6 @@ const fileName = document.getElementById("fileName");
 const submitInput = document.getElementById("inputSubmit");
 const form = document.getElementById("send-file-form");
 const downloadButton = document.getElementById("download-button");
-const gzipCheckPoint = document.getElementById("gzip");
 const deflateCheckPoint = document.getElementById("deflate");
 const brotliCheckPoint = document.getElementById("brotli");
 const noEncryptionInput = document.getElementById("noEncryption");
@@ -174,13 +173,12 @@ function submintFile(e) {
   const form = e.currentTarget;
   const formData = new FormData(form);
 
-  formData.append("gzip", gzipCheckPoint.checked);
   formData.append("deflate", deflateCheckPoint.checked);
   formData.append("brotli", brotliCheckPoint.checked);
   formData.append('symetricEncryption', symetricEncryptionInput.checked);
   formData.append('asymetricEncryption', asymetricEncryptionInput.checked);
 
-  if(!gzipCheckPoint.checked && !deflateCheckPoint.checked && !brotliCheckPoint.checked && !symetricEncryptionInput.checked && !asymetricEncryptionInput.checked){
+  if(!deflateCheckPoint.checked && !brotliCheckPoint.checked && !symetricEncryptionInput.checked && !asymetricEncryptionInput.checked){
     alert('Choose compression and decryption options');
     return
   }
@@ -204,7 +202,6 @@ function submintFile(e) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf8");
         const readerRes = await reader.read();
-    
         return decoder.decode(readerRes.value);
     } catch (error) {
       throw new Error(error);
@@ -215,18 +212,7 @@ function submintFile(e) {
     const sizeObj = JSON.parse(result);
 
   renderInitialScale(originalSizeContainer, sizeObj);
-
-    if (sizeObj.gzipCompressionSize) {
-      renderCompressionScale(
-        zlibCompressionContainer,
-        sizeObj.originalSize,
-        sizeObj.gzipCompressionSize,
-        "compressScaleGzipId",
-        "comressSizeGzipId"
-      );
-      renderCompressedFileName(sizeObj.gzipFileName);
-    }
-
+  
     if (sizeObj.brotliCompressionSize) {
       renderCompressionScale(
         brotliCompressionContainer,

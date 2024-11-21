@@ -25,13 +25,6 @@ class GetBytesQuantity extends Transform {
           this.compressionInfo.deflateCompressionTime = Date.now() - this.startTime;
       }
 
-      if (this.compressionMethod === "gzip") {
-        this.compressionInfo.gzipCompressionSize =
-          this.compressedDataByteLength.toString();
-          this.compressionInfo.gzipFileName = `${this.fileName}`;
-          this.compressionInfo.gzipCompressionTime = Date.now() - this.startTime;
-      }
-
       if (this.compressionMethod === "brotli") {
         this.compressionInfo.brotliCompressionSize =
           this.compressedDataByteLength.toString();

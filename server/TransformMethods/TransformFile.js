@@ -11,8 +11,8 @@ const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplitte
 
 class TransformFile {
 
-  constructor(compressionMethods, encryptionMethod, password, originalFileSize, fileName, filePath){
-    this.compressionMethods = compressionMethods;
+  constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
+    this.compressionMethod = compressionMethod;
     this.encryptionMethod = encryptionMethod;
     this.password = password;
     this.originalFileSize = originalFileSize;
@@ -22,38 +22,41 @@ class TransformFile {
 
   async compress(){
     try {
-      let innerThis = this;
 
       const compressionInfo = {
         originalSize: this.originalFileSize.toString(),
-        gzipCompressionSize: "",
         deflateCompressionSize: "",
         brotliCompressionSize: "",
-        gzipFileName: "",
         deflateFileName: "",
         brotliFileName: "",
-        gzipCompressionTime: "",
         deflateCompressionTime: "",
         brotliCompressionTime: "",
         encryptedFileName:"",
       };
 
-
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
         
-      async function pipelineCompressor(){
-        try {
           let startTime = Date.now();
-          let fileNameZipped = innerThis.fileName.replace(/\.\w+/, ".gz");
-          let getStreamData = new GetBytesQuantity({compressionMethod:'gzip', compressionInfo, startTime, fileNameZipped:fileNameZipped});
-          // TODO add different types of compression
-          // let compressionStream = new CompressionStream('gzip');
-          let compressionStream = zlib.createGzip();
+          let fileNameZipped;
+          let compressionStream;
 
-          const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${innerThis.fileName}`);
+          if(this.compressionMethod){
+            if(this.compressionMethod === 'deflate'){
+              compressionStream = zlib.createGzip();
+              fileNameZipped = this.fileName.replace(/\.\w+/, ".gz");
+            }
+
+            if(this.compressionMethod === 'brotli'){
+              compressionStream = zlib.createBrotliCompress();
+              fileNameZipped = this.fileName.replace(/\.\w+/, ".br");
+            }
+          }
+
+          const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${this.fileName}`);
           const writableStream = fs.createWriteStream(
             `${__dirname}/../../modified_files/${fileNameZipped}`
           );
+          let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped});
 
           if(!fs.existsSync(`${__dirname}/../../modified_files`)){
             fs.mkdirSync(`${__dirname}/../../modified_files`)
@@ -71,31 +74,20 @@ class TransformFile {
           });     
 
         return compressionInfo;
-
-        } catch (error) {
-          throw new Error('Error on compressing file')
-      }
-    }
-
-    let compressionInfoResult = await pipelineCompressor();
-    return compressionInfoResult;
         
     } catch (error) {
-      throw new Error('Error thrown by TransformFile.compress',error)
+      throw new Error(error)
     }
   }
 
   async decompress(readable, writable){
     try {
-      const currentFolderPath = __dirname;
-
       let extensionName = this.fileName.split('.').reverse()[0];
 
       let decompressionStream = null
       
-      if(extensionName === 'gz') decompressionStream = zlib.createGunzip();
-      if(extensionName === 'br') decompressionStream = zlib.createDeflate();
-      if(extensionName === 'zz') decompressionStream = zlib.createBrotliDecompress();
+      if(extensionName === 'gz') decompressionStream = zlib.createDeflate();
+      if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
 
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
 
