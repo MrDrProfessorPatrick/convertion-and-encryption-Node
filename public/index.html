@@ -200,22 +200,27 @@
 
       noEncryptionInput.addEventListener('change', ()=>{
         passwordFormContainer.classList.add('password-input-hidden');
+        passwordFormContainer.classList.remove('password-input-container');
       })
 
       symetricEncryptionInput.addEventListener('change', ()=>{
         passwordFormContainer.classList.remove('password-input-hidden');
+        passwordFormContainer.classList.add('password-input-container');
       })
 
       asymetricEncryptionInput.addEventListener('change', ()=>{
         passwordFormContainer.classList.remove('password-input-hidden');
+        passwordFormContainer.classList.add('password-input-container');
       })
 
       noDecryptionInput.addEventListener('change', ()=>{
         decryptPasswordContainer.classList.add('password-input-hidden');
+        passwordFormContainer.classList.remove('password-input-container');
       })
 
       decryptionInput.addEventListener('change', ()=>{
         decryptPasswordContainer.classList.remove('password-input-hidden');
+        passwordFormContainer.classList.add('password-input-container');
       })
 
 

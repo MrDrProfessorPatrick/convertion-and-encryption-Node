@@ -127,6 +127,10 @@ form {
   background-color: rgb(48, 96, 228);
 }
 
+.password-input-container{
+  padding: 10px 0 10px 5px;
+}
+
 .password-input-hidden{
   display: none;
 }
