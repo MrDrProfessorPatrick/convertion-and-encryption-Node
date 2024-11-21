@@ -99,13 +99,12 @@ class DecryptSymetricSplittedStream extends Transform {
 
     _flush(cb){
       if(this.current){
-      try {
-        let { decrypted } =  decryptSymetricService(this.current, this.key, this.iv)
-        this.push(decrypted);
-      } catch (error) {
-        throw new Error(error)
-      }
-
+        try {
+          let { decrypted } =  decryptSymetricService(this.current, this.key, this.iv)
+          this.push(decrypted);
+        } catch (error) {
+          throw new Error(error)
+        }
       }
       cb()
     }

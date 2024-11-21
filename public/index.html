@@ -19,8 +19,8 @@
         </div>
 
         <div>
-          <input type="radio" id="gzip" name="compression" />
-          <label for="gzip">Gzip</label>
+          <input type="radio" id="deflate" name="compression" />
+          <label for="deflate">Deflate</label>
         </div>
 
         <div>
@@ -28,10 +28,7 @@
           <label for="brotli">Brotli</label>
         </div>
 
-        <div>
-          <input type="radio" id="deflate" name="compression" />
-          <label for="deflate">Deflate</label>
-        </div>
+
       </fieldset>
 
       <fieldset>
@@ -48,7 +45,7 @@
         </div>
 
         <div>
-          <input type="radio" id="asymetricEncryption" value="asymetricEncryption" name="encryption" />
+          <input type="radio" id="asymetricEncryption" value="asymetricEncryption" name="encryption" disabled />
           <label for="asymetric">Asymetric</label>
         </div>
       </fieldset>
@@ -74,11 +71,11 @@
               <label for="password">Enter password</label>
             </div>
 
-            <input class="file-manager-button" type="submit" />
+            <input class="file-manager-button-submit" type="submit" />
           </div>
           <div class="download-container">
             <div class="download-files"></div>
-            <button class="file-manager-button" id="download-button">
+            <button class="download-compressed" id="download-button">
               Download
             </button>
           </div>
@@ -89,18 +86,15 @@
         <div class="original-size">
           <h3>Original size</h3>
         </div>
-        <div class="zlib-compression">
-          <h3>Gzip compression</h3>
-          <div class="zlib-scale-container"></div>
+        <div class="deflate-compression">
+          <h3>Deflate compression</h3>
+          <div class="deflate-scale-container"></div>
         </div>
         <div class="brotli-compression">
           <h3>Brotli compression</h3>
           <div class="brotli-scale-container"></div>
         </div>
-        <div class="deflate-compression">
-          <h3>Deflate compression</h3>
-          <div class="deflate-scale-container"></div>
-        </div>
+
       </div>
     </div>
 
@@ -125,40 +119,9 @@
           <button class="file-manager-button" id="decompressionUpload" type="submit">
             Download
           </button>
-          <fieldset>
-            <legend>Choose type of the file you want to decompress:</legend>
-    
-            <div>
-              <input
-                type="radio"
-                id="noDecompression"
-                name="decompression"
-                value="false"
-                checked
-              />
-              <label for="textDecompress">No decompression</label>
-            </div>
-    
-            <div>
-              <input
-                type="radio"
-                id="textDecompress"
-                name="decompression"
-                value="text"
-              />
-              <label for="textDecompress">Text</label>
-            </div>
-    
-            <div>
-              <input
-                type="radio"
-                id="imageDecompression"
-                name="decompression"
-                value="image"
-              />
-              <label for="imageDecompress">Image</label>
-            </div>
-          </fieldset>
+          <div class="decompression-message">
+            You can decompress files with .gz or .br extensions
+          </div>        
     
       <fieldset>
         <div>
