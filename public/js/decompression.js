@@ -21,11 +21,18 @@ async function decompressFile(e) {
 
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
     var fileName;
-    await fetch('/sendfile', {
+
+    fetch('/sendfile', {
       method: 'POST',
       body: formData,
     })
       .then((response) => {
+        if(response.status>=400) {
+          let errorMessage = response.json();
+          return new Promise((resolve, reject)=>{
+            reject(errorMessage);
+          })
+        }
         let fileNameHeader = response.headers.get('content-disposition');
         fileName = fileNameHeader ? fileNameHeader.match(/"\w.+"/g)[0] : 'decompressed/decryptedFile.txt'
         fileName = fileName.substring(1, fileName.length - 1)
@@ -67,8 +74,13 @@ async function decompressFile(e) {
         fileLink.click();
         fileLink.remove();
       })
+      .catch((error)=>{
+        error.then((errorMessage)=>{
+          alert(errorMessage)
+        })
+      })
   } catch (error) {
-    console.log(error);
+      alert(error)
   }
 }
 

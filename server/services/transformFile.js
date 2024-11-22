@@ -43,6 +43,10 @@ async function transformFile(req, res, next) {
 
   let extensionName = fileName.split('.').reverse()[0];
 
+  if(extensionName === 'txt' && decryption === 'false'){
+    return res.status(400).json('Choose the decryption method or file with extension like .br or .gz to decompress');
+  }
+
   if(extensionName === 'br' || extensionName === 'gz'){
     let fileNameTxt = fileName.replace(/\.\w+/, ".txt");
 
@@ -73,7 +77,7 @@ async function transformFile(req, res, next) {
   
     res.setHeader("Content-type", "multipart/form-data");
 
-    transform.decryptSymmetric(readableStream, res).catch((error)=>console.log('Error catched transform.decryption', error));
+    transform.decryptSymmetric(readableStream, res);
     return;
   }
 
@@ -87,7 +91,7 @@ async function transformFile(req, res, next) {
     return res.status(200).json(encryptionResult);
   } 
         
-  return res.status(200).json('No options were chosen');
+  // return res.status(400).json('No options were chosen');
   
   } catch (error) {
       console.log(error, 'Error occured on file transformation');

@@ -195,8 +195,8 @@ function submintFile(e) {
           body: formData,
         });
         if(response.status >= 400 && response.status <= 500){
-          let errorMessage = await response.json()
-          throw new Error(errorMessage)
+          let errorMessage = await response.json();
+          throw new Error(errorMessage);
         }
 
         const reader = response.body.getReader();
