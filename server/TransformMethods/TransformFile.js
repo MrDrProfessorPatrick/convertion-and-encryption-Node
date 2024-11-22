@@ -127,6 +127,7 @@ class TransformFile {
       return {encryptedFileName, originalSize: this.originalFileSize}
     } catch (error) {
       console.log(error, 'Error catched in ecryptSymetric')
+      throw new Error(error)
     }
   }
 
@@ -141,7 +142,7 @@ class TransformFile {
 
     } catch (error) {
       console.log(error, "Error catched in decryptSymmetric")
-      return "Error during Symmetric decryption"
+      throw new Error(error)
     }
   }
 }
