@@ -1,0 +1,136 @@
+body {
+  background-color: rgb(214, 214, 214);
+}
+
+form {
+  display: flex;
+}
+
+.upload-download-panel {
+  display: flex;
+  
+}
+
+.compressions-container {
+  margin-top: 50px;
+  width: 60%;
+  height: 20px;
+}
+
+.compressions-container-hidden {
+  display: none;
+}
+
+.decompression-container {
+  display: flex;
+  border: 1px solid black;
+}
+
+.decompression-message{
+  padding: 20px;
+}
+
+.decompression-container-hidden {
+  display: none;
+}
+
+.zlib-not-compressed-scale {
+  width: 100%;
+  height: 10px;
+  background-color: green;
+  border: 2px solid white;
+  border-radius: 5px;
+}
+
+.upload-container {
+  width: 300px;
+  background-color: rgb(255, 255, 255);
+}
+
+.download-container {
+  display: flex;
+  width: 300px;
+  background-color: bisque;
+  margin-left: 40px;
+}
+
+.download-files {
+  min-width: 300px;
+}
+
+.chose-file-button {
+  display: inline-block;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 4px;
+  width: 80px;
+  height: 30px;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 30px;
+  padding-left: 5px;
+  margin: 20px;
+}
+
+.file-availability{
+  padding: 20px;
+}
+
+.chose-file-button:hover {
+  background-color: rgb(146, 212, 115);
+}
+
+.file-manager-button {
+  background-color: rgb(33, 75, 192);
+  color: white;
+  font-weight: 600;
+  border: none;
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.file-manager-button-submit{
+  background-color: rgb(33, 75, 192);
+  color: white;
+  font-weight: 600;
+  border: none;
+  width: 100%;
+  height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.file-manager-button-submit:hover{
+  background-color: rgb(48, 96, 228);
+}
+
+.download-compressed{
+  background-color: rgb(33, 75, 192);
+  color: white;
+  font-weight: 600;
+  border: none;
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.download-compressed:hover{
+  background-color: rgb(48, 96, 228);
+}
+
+.file-manager-button:hover {
+  background-color: rgb(48, 96, 228);
+}
+
+.password-input-container{
+  padding: 10px 0 10px 5px;
+}
+
+.password-input-hidden{
+  display: none;
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="setCompressionButton">Compression</button>
+    <button id="setDecompressionButton">Decompression</button>
+    <div class="compression-container">
+      <fieldset>
+        <legend>Choose compress algorithms you want to use:</legend>
+
+        <div>
+          <input type="radio" id="nocompression" name="compression" checked />
+          <label for="nocompression">No compression</label>
+        </div>
+
+        <div>
+          <input type="radio" id="deflate" name="compression" />
+          <label for="deflate">Deflate</label>
+        </div>
+
+        <div>
+          <input type="radio" id="brotli" name="compression" />
+          <label for="brotli">Brotli</label>
+        </div>
+
+
+      </fieldset>
+
+      <fieldset>
+        <legend>Choose encryption you want to use:</legend>
+
+        <div>
+          <input type="radio" id="noEncryption" name="encryption" value="noencryption" checked />
+          <label for="noencryption">No encryption</label>
+        </div>
+
+        <div>
+          <input type="radio" id="symetricEncryption" value="symetricEncryption" name="encryption" />
+          <label for="symetric">Symetric</label>
+        </div>
+
+        <div>
+          <input type="radio" id="asymetricEncryption" value="asymetricEncryption" name="encryption" disabled />
+          <label for="asymetric">Asymetric</label>
+        </div>
+      </fieldset>
+
+      <h2>Chose your file</h2>
+      
+      <form 
+        id="send-file-form" 
+        enctype="multipart/form-data"
+      >
+        <div class="upload-download-panel">
+          <div class="upload-container">
+            <label for="inputFile" class="chose-file-button">Chose file</label>
+            <span class="file-availability" id="fileName">No file chosen</span>
+            <input
+              type="file"
+              name="file"
+              id="inputFile"
+              style="display: none"
+            />
+            <div id="passwordInputContainer" class="password-input-hidden">
+              <input id="passwordInput" type="text" name="password">
+              <label for="password">Enter password</label>
+            </div>
+
+            <input class="file-manager-button-submit" type="submit" />
+          </div>
+          <div class="download-container">
+            <div class="download-files"></div>
+            <button class="download-compressed" id="download-button">
+              Download
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="compressions-container-measurement">
+        <div class="original-size">
+          <h3>Original size</h3>
+        </div>
+        <div class="deflate-compression">
+          <h3>Deflate compression</h3>
+          <div class="deflate-scale-container"></div>
+        </div>
+        <div class="brotli-compression">
+          <h3>Brotli compression</h3>
+          <div class="brotli-scale-container"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DECOMPRESSION SECTION -->
+    <div class="decompression-container-hidden">
+
+      <form
+        id="decompressionForm"
+        enctype="multipart/form-data"
+
+      >
+        <div class="decompression-container">
+          <label for="inputFileDecompression" class="chose-file-button">Chose file</label>
+          <span class="file-availability" id="fileNameDecompression">No file chosen</span>
+          <input
+            type="file"
+            name="file"
+            id="inputFileDecompression"
+            style="display: none"
+
+          />
+          <button class="file-manager-button" id="decompressionUpload" type="submit">
+            Download
+          </button>
+          <div class="decompression-message">
+            You can decompress files with .gz or .br extensions
+          </div>        
+    
+      <fieldset>
+        <div>
+          <label for="nodecryption">No decryption</label>
+          <input
+            type="radio"
+            id="noDecryptionRadio"
+            name="decryption"
+            value="false"
+            checked
+        />
+      </div>
+    
+      <div>
+        <label for="decryption">Decrypt</label>
+          <input
+            type="radio"
+            id="decryptionRadio"
+            name="decryption"
+            value="true"
+        />
+      </div>
+      
+      <div class="password-input-hidden" id="decryptPasswordInputContainer">
+      <label for="password">Password</label>
+        <input
+          type="password"
+          id="decryptionPassword"
+          name="password"
+        />
+      </div>  
+      </fieldset>
+        </div>
+      </form>
+    </div>
+
+    <script type="text/javascript" src="/js/compression.js"></script>
+    <script type="text/javascript" src="/js/decompression.js"></script>
+
+    <script>
+      // SWITCHER COMPRESSION-DECOMPRESSION
+      let compressionButton = document.getElementById("setCompressionButton");
+      let decompressionButton = document.getElementById(
+        "setDecompressionButton"
+      );
+      let compressionContainer = document.querySelector(
+        ".compression-container"
+      );
+      let decompressionContainer = document.querySelector(
+        ".decompression-container-hidden"
+      );
+      let sendFileForm = document.getElementById("send-file-form");
+
+      compressionButton.addEventListener("click", () => {
+        decompressionContainer.classList.add("decompression-container-hidden");
+        decompressionContainer.classList.remove("decompression-container");
+
+        compressionContainer.classList.add("compressions-container");
+        compressionContainer.classList.remove("compressions-container-hidden");
+      });
+      decompressionButton.addEventListener("click", () => {
+        compressionContainer.classList.add("compressions-container-hidden");
+        compressionContainer.classList.remove("compressions-container");
+
+        decompressionContainer.classList.add("decompression-container");
+        decompressionContainer.classList.remove(
+          "decompression-container-hidden"
+        );
+      });
+    </script>
+
+    <script>
+
+      const passwordFormContainer = document.getElementById("passwordInputContainer");
+      const decryptPasswordContainer = document.getElementById("decryptPasswordInputContainer");
+
+      noEncryptionInput.addEventListener('change', ()=>{
+        passwordFormContainer.classList.add('password-input-hidden');
+        passwordFormContainer.classList.remove('password-input-container');
+      })
+
+      symetricEncryptionInput.addEventListener('change', ()=>{
+        passwordFormContainer.classList.remove('password-input-hidden');
+        passwordFormContainer.classList.add('password-input-container');
+      })
+
+      asymetricEncryptionInput.addEventListener('change', ()=>{
+        passwordFormContainer.classList.remove('password-input-hidden');
+        passwordFormContainer.classList.add('password-input-container');
+      })
+
+      noDecryptionInput.addEventListener('change', ()=>{
+        decryptPasswordContainer.classList.add('password-input-hidden');
+        passwordFormContainer.classList.remove('password-input-container');
+      })
+
+      decryptionInput.addEventListener('change', ()=>{
+        decryptPasswordContainer.classList.remove('password-input-hidden');
+        passwordFormContainer.classList.add('password-input-container');
+      })
+
+
+    </script>
+
+  </body>
+</html>
