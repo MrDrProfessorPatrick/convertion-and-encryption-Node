@@ -8,10 +8,11 @@ class GetBytesQuantity extends Transform {
       this.startTime = options.startTime;
       this.fileName = options.fileNameZipped;
       this.compressedDataByteLength = 0;
+      this.bitesCounter = options.bitesCounter;
     }
 
     _transform(chunk, encoding, done) {
-
+      this.bitesCounter.emit('chunkread', 'CUSTOM CHUNK READ')
       this.compressedDataByteLength += chunk.length;
       this.push(chunk)
       done();

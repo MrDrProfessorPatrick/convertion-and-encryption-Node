@@ -8,6 +8,7 @@ const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
+const { EventEmitter } = require("events");
 
 class TransformFile {
 
@@ -34,6 +35,11 @@ class TransformFile {
         encryptedFileName:"",
       };
 
+      const BitesCounter = new EventEmitter();
+      BitesCounter.on('chunkread',(arg)=>{
+        console.log(`on${arg}`)
+      })
+
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
         
           let startTime = Date.now();
@@ -56,7 +62,7 @@ class TransformFile {
           const writableStream = fs.createWriteStream(
             `${__dirname}/../../modified_files/${fileNameZipped}`
           );
-          let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped});
+          let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
 
           if(!fs.existsSync(`${__dirname}/../../modified_files`)){
             fs.mkdirSync(`${__dirname}/../../modified_files`)
