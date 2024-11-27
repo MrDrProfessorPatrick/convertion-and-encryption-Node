@@ -21,7 +21,7 @@ class TransformFile {
     this.filePath = filePath;
   }
 
-  async compress(){
+  async compress(res){
     try {
 
       const compressionInfo = {
@@ -36,8 +36,14 @@ class TransformFile {
       };
 
       const BitesCounter = new EventEmitter();
-      BitesCounter.on('chunkread',(arg)=>{
-        console.log(`on${arg}`)
+      BitesCounter
+      .on('chunkread',(arg)=>{
+        console.log(`on ${arg}`)
+        res.write(JSON.stringify(arg))
+      })
+      .on('chunkreadend',(arg)=>{
+        console.log(`on ${arg}`)
+        res.end()
       })
 
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
@@ -79,7 +85,7 @@ class TransformFile {
             throw new Error('Error in compress pipeline', error) 
           });     
 
-        return compressionInfo;
+        // return compressionInfo;
         
     } catch (error) {
       throw new Error(error)

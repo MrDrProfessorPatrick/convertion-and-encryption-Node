@@ -200,17 +200,43 @@ function submintFile(e) {
         }
 
         const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf8");
-        const readerRes = await reader.read();
-        return decoder.decode(readerRes.value);
+
+
+        return new ReadableStream({
+          start(controller) {
+            return pump();
+    
+            function pump() {
+              return reader.read().then(({ done, value }) => {
+                // When no more data needs to be consumed, close the stream
+                if (done) {
+                  controller.close();
+                  return;
+                }
+
+                const decoder = new TextDecoder("utf8");
+                let valueDecoded = decoder.decode(value);
+                console.log('valueDecoded', valueDecoded)
+    
+                // Enqueue the next data chunk into our target stream
+                controller.enqueue(valueDecoded);
+                return pump();
+              });
+            }
+          },
+        });
+      
+
+
     } catch (error) {
       throw new Error(error);
     }
   }
 
   getFileSizes().then((result) => {
+    console.log('result = ', result)
     const sizeObj = JSON.parse(result);
-
+    console.log('sizeObj', sizeObj)
   renderInitialScale(originalSizeContainer, sizeObj);
   
     if (sizeObj.brotliCompressionSize) {
@@ -240,5 +266,7 @@ function submintFile(e) {
     }
   })
   .catch((error)=>{
+    console.log('compression error catched', error)
+
     alert(error)});
 }

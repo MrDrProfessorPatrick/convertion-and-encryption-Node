@@ -19,6 +19,7 @@ class GetBytesQuantity extends Transform {
     }
 
     _flush(cb) {
+      this.bitesCounter.emit('chunkreadend', 'CHUNK READ END')
       if (this.compressionMethod === "deflate") {
         this.compressionInfo.deflateCompressionSize =
           this.compressedDataByteLength.toString();
