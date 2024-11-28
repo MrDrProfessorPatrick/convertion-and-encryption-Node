@@ -71,7 +71,6 @@ function renderCompressionScale(
 
 function renderCompressedFileName(fileName) {
   const compressedFilesContainer = document.querySelector(".download-files");
-
   const isCompressedFileNameExists = document.getElementById(fileName);
 
   if (isCompressedFileNameExists) isCompressedFileNameExists.remove();
@@ -201,7 +200,6 @@ function submintFile(e) {
 
         const reader = response.body.getReader();
 
-
         return new ReadableStream({
           start(controller) {
             return pump();
@@ -215,11 +213,42 @@ function submintFile(e) {
                 }
 
                 const decoder = new TextDecoder("utf8");
-                let valueDecoded = decoder.decode(value);
-                console.log('valueDecoded', valueDecoded)
+                let sizeObjDecoded = decoder.decode(value);
+                console.log('sizeObjDecoded', sizeObjDecoded)
+                // let sizeObj = JSON.parse(sizeObjDecoded); 
+                // console.log('sizeObj', sizeObj)
+
+                // renderInitialScale(originalSizeContainer, sizeObj);
+
+                // if (sizeObj.brotliCompressionSize) {
+                //   renderCompressionScale(
+                //     brotliCompressionContainer,
+                //     sizeObj.originalSize,
+                //     sizeObj.brotliCompressionSize,
+                //     "compressScaleBrotliId",
+                //     "compressSizeBrotliId"
+                //   );
+                //   renderCompressedFileName(sizeObj.brotliFileName);
+                // }
+
+                // if (sizeObj.deflateCompressionSize) {
+                //   renderCompressionScale(
+                //     deflateCompressionContainer,
+                //     sizeObj.originalSize,
+                //     sizeObj.deflateCompressionSize,
+                //     "compressScaleDeflateId",
+                //     "compressSizeDeflateId"
+                //   );
+                //   renderCompressedFileName(sizeObj.deflateFileName);
+                // }
+
+                // if(sizeObj.encryptedFileName){
+                //   renderCompressedFileName(sizeObj.encryptedFileName);
+                // }
+
     
                 // Enqueue the next data chunk into our target stream
-                controller.enqueue(valueDecoded);
+                controller.enqueue(sizeObjDecoded);
                 return pump();
               });
             }
@@ -233,40 +262,42 @@ function submintFile(e) {
     }
   }
 
-  getFileSizes().then((result) => {
-    console.log('result = ', result)
-    const sizeObj = JSON.parse(result);
-    console.log('sizeObj', sizeObj)
-  renderInitialScale(originalSizeContainer, sizeObj);
+  getFileSizes()
   
-    if (sizeObj.brotliCompressionSize) {
-      renderCompressionScale(
-        brotliCompressionContainer,
-        sizeObj.originalSize,
-        sizeObj.brotliCompressionSize,
-        "compressScaleBrotliId",
-        "compressSizeBrotliId"
-      );
-      renderCompressedFileName(sizeObj.brotliFileName);
-    }
+  // .then((result) => {
+  //   console.log('result = ', result)
+  //   const sizeObj = JSON.parse(result);
+  //   console.log('sizeObj', sizeObj)
+  // renderInitialScale(originalSizeContainer, sizeObj);
+  
+  //   if (sizeObj.brotliCompressionSize) {
+  //     renderCompressionScale(
+  //       brotliCompressionContainer,
+  //       sizeObj.originalSize,
+  //       sizeObj.brotliCompressionSize,
+  //       "compressScaleBrotliId",
+  //       "compressSizeBrotliId"
+  //     );
+  //     renderCompressedFileName(sizeObj.brotliFileName);
+  //   }
 
-    if (sizeObj.deflateCompressionSize) {
-      renderCompressionScale(
-        deflateCompressionContainer,
-        sizeObj.originalSize,
-        sizeObj.deflateCompressionSize,
-        "compressScaleDeflateId",
-        "compressSizeDeflateId"
-      );
-      renderCompressedFileName(sizeObj.deflateFileName);
-    }
+  //   if (sizeObj.deflateCompressionSize) {
+  //     renderCompressionScale(
+  //       deflateCompressionContainer,
+  //       sizeObj.originalSize,
+  //       sizeObj.deflateCompressionSize,
+  //       "compressScaleDeflateId",
+  //       "compressSizeDeflateId"
+  //     );
+  //     renderCompressedFileName(sizeObj.deflateFileName);
+  //   }
 
-    if(sizeObj.encryptedFileName){
-      renderCompressedFileName(sizeObj.encryptedFileName);
-    }
-  })
-  .catch((error)=>{
-    console.log('compression error catched', error)
+  //   if(sizeObj.encryptedFileName){
+  //     renderCompressedFileName(sizeObj.encryptedFileName);
+  //   }
+  // })
+  // .catch((error)=>{
+  //   console.log('compression error catched', error)
 
-    alert(error)});
+  //   alert(error)});
 }

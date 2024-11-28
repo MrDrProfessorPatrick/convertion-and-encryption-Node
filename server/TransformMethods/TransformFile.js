@@ -36,15 +36,17 @@ class TransformFile {
       };
 
       const BitesCounter = new EventEmitter();
+
       BitesCounter
-      .on('chunkread',(arg)=>{
-        console.log(`on ${arg}`)
-        res.write(JSON.stringify(arg))
-      })
-      .on('chunkreadend',(arg)=>{
-        console.log(`on ${arg}`)
-        res.end()
-      })
+        .on('chunkread',(arg)=>{
+          console.log(`on ${JSON.stringify(arg)}`)
+          res.write(JSON.stringify(arg))
+        })
+        .on('chunkreadend',(arg)=>{
+          console.log(`END ${JSON.stringify(arg)}`)
+          res.write(JSON.stringify(compressionInfo))
+          res.end()
+        })
 
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
         
