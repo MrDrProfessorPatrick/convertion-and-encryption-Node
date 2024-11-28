@@ -213,42 +213,41 @@ function submintFile(e) {
                 }
 
                 const decoder = new TextDecoder("utf8");
-                let sizeObjDecoded = decoder.decode(value);
-                console.log('sizeObjDecoded', sizeObjDecoded)
-                // let sizeObj = JSON.parse(sizeObjDecoded); 
-                // console.log('sizeObj', sizeObj)
+                let sizeObjDecoded = decoder.decode(value).trim();
+                let sizeObjArr = sizeObjDecoded.split('}');
+                let sizeObj = JSON.parse(sizeObjArr[sizeObjArr.length - 2]+"}")
 
-                // renderInitialScale(originalSizeContainer, sizeObj);
+                renderInitialScale(originalSizeContainer, sizeObj);
 
-                // if (sizeObj.brotliCompressionSize) {
-                //   renderCompressionScale(
-                //     brotliCompressionContainer,
-                //     sizeObj.originalSize,
-                //     sizeObj.brotliCompressionSize,
-                //     "compressScaleBrotliId",
-                //     "compressSizeBrotliId"
-                //   );
-                //   renderCompressedFileName(sizeObj.brotliFileName);
-                // }
+                if (sizeObj.brotliCompressionSize) {
+                  renderCompressionScale(
+                    brotliCompressionContainer,
+                    sizeObj.originalSize,
+                    sizeObj.brotliCompressionSize,
+                    "compressScaleBrotliId",
+                    "compressSizeBrotliId"
+                  );
+                  renderCompressedFileName(sizeObj.brotliFileName);
+                }
 
-                // if (sizeObj.deflateCompressionSize) {
-                //   renderCompressionScale(
-                //     deflateCompressionContainer,
-                //     sizeObj.originalSize,
-                //     sizeObj.deflateCompressionSize,
-                //     "compressScaleDeflateId",
-                //     "compressSizeDeflateId"
-                //   );
-                //   renderCompressedFileName(sizeObj.deflateFileName);
-                // }
+                if (sizeObj.deflateCompressionSize) {
+                  renderCompressionScale(
+                    deflateCompressionContainer,
+                    sizeObj.originalSize,
+                    sizeObj.deflateCompressionSize,
+                    "compressScaleDeflateId",
+                    "compressSizeDeflateId"
+                  );
+                  renderCompressedFileName(sizeObj.deflateFileName);
+                }
 
-                // if(sizeObj.encryptedFileName){
-                //   renderCompressedFileName(sizeObj.encryptedFileName);
-                // }
+                if(sizeObj.encryptedFileName){
+                  renderCompressedFileName(sizeObj.encryptedFileName);
+                }
 
     
                 // Enqueue the next data chunk into our target stream
-                controller.enqueue(sizeObjDecoded);
+                controller.enqueue(sizeObj);
                 return pump();
               });
             }

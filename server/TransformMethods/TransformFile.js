@@ -39,11 +39,9 @@ class TransformFile {
 
       BitesCounter
         .on('chunkread',(arg)=>{
-          console.log(`on ${JSON.stringify(arg)}`)
           res.write(JSON.stringify(arg))
         })
         .on('chunkreadend',(arg)=>{
-          console.log(`END ${JSON.stringify(arg)}`)
           res.write(JSON.stringify(compressionInfo))
           res.end()
         })
@@ -87,8 +85,6 @@ class TransformFile {
             throw new Error('Error in compress pipeline', error) 
           });     
 
-        // return compressionInfo;
-        
     } catch (error) {
       throw new Error(error)
     }

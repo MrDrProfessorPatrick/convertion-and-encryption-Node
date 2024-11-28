@@ -81,8 +81,7 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethod) {
-    const compressionResult = await transform.compress(res);
-    // return res.status(200).json(compressionResult);
+    transform.compress(res);
   }
     
   if(password) {
