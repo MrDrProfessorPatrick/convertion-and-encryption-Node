@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 
 var upload = multer({ storage });
 
-router.post("/sendfile", upload.single("file"), transformFile);
+router.post("/sendfile", transformFile);
 router.post("/downloadfiles", downloadFileRequest);
 
 module.exports = router;

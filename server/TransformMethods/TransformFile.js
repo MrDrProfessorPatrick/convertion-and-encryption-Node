@@ -9,6 +9,7 @@ const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const { EventEmitter } = require("events");
+const busboy = require('busboy');
 
 class TransformFile {
 
@@ -21,9 +22,9 @@ class TransformFile {
     this.filePath = filePath;
   }
 
-  async compress(res){
+  async compress(req,res){
     try {
-
+      console.log('compress')
       const compressionInfo = {
         originalSize: this.originalFileSize.toString(),
         deflateCompressionSize: "",
@@ -64,26 +65,32 @@ class TransformFile {
             }
           }
 
-          const readableStream = fs.createReadStream(`${__dirname}/../../uploads/${this.fileName}`);
-          const writableStream = fs.createWriteStream(
-            `${__dirname}/../../modified_files/${fileNameZipped}`
-          );
-          let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
+          const bb = busboy({ headers: req.headers });
 
-          if(!fs.existsSync(`${__dirname}/../../modified_files`)){
-            fs.mkdirSync(`${__dirname}/../../modified_files`)
-          }     
+          bb.on('file', (name, file, info) => {
+            const { filename, encoding, mimeType } = info;
+            const writableStream = fs.createWriteStream(
+              `${__dirname}/../../modified_files/${fileNameZipped}`
+            );
+            let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
+  
+            if(!fs.existsSync(`${__dirname}/../../modified_files`)){
+              fs.mkdirSync(`${__dirname}/../../modified_files`)
+            }     
+  
+            pipeline(
+              file,
+              compressionStream,
+              symetricEncryptionStream,
+              getStreamData,
+              writableStream
+            ).catch((error)=>{
+              console.log(error, 'Error in gzip pipeline');
+              throw new Error('Error in compress pipeline', error) 
+            });    
 
-          await pipeline(
-            readableStream,
-            compressionStream,
-            symetricEncryptionStream,
-            getStreamData,
-            writableStream
-          ).catch((error)=>{
-            console.log(error, 'Error in gzip pipeline');
-            throw new Error('Error in compress pipeline', error) 
-          });     
+          })
+          req.pipe(bb)
 
     } catch (error) {
       throw new Error(error)

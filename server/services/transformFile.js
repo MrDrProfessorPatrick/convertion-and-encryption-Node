@@ -5,31 +5,32 @@ const uploadsPath = require('../../uploads/uploadsFolderPath');
 
 async function transformFile(req, res, next) {
 
-  if (!req.file) {
-    return res.status(400).json("No File was received");
-  }
+  // if (!req.file) {
+  //   return res.status(400).json("No File was received");
+  // }
   // regarding req options call CompressionFactory or any other
   try {
     let encryptionMethod = false;
-    const decryption = req.body.decryption;
-    const encryption = req.body.encryption;
-    let compressionMethod = '';
+    const decryption = false;
+    const encryption = false;
+    let compressionMethod = 'deflate';
 
-    const fileSize = req.file.size;
-    const fileName = req.file.filename;
-    const filePath = req.file.path;
-    const password = req.body.password;
+    const fileSize = 1000;
+    const fileName = 'test_filename.txt';
+    const filePath = 'test_file_path';
+    const password = '';
 
-// TODO change for different type of encryption;
-    if(req.body.symetricEncryption || req.body.asymetricEncryption) encryptionMethod = 'symetricEncryption';
+//TODO change for different type of encryption;
+    // if(req.body.symetricEncryption || req.body.asymetricEncryption) 
+      encryptionMethod = 'symetricEncryption';
     
-    if (req.body.deflate === "true") {
-      compressionMethod = 'deflate'
-    };
+    // if (req.body.deflate === "true") {
+    //   compressionMethod = 'deflate'
+    // };
 
-    if (req.body.brotli === "true") {
-      compressionMethod = 'brotli'
-    };
+    // if (req.body.brotli === "true") {
+    //   compressionMethod = 'brotli'
+    // };
 
     let transform = new TransformFile(
       compressionMethod,
@@ -81,7 +82,7 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethod) {
-    transform.compress(res);
+    transform.compress(req, res);
   }
     
   if(password) {
