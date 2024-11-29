@@ -171,7 +171,6 @@ function submintFile(e) {
   e.preventDefault();
   const form = e.currentTarget;
   const formData = new FormData(form);
-
   formData.append("deflate", deflateCheckPoint.checked);
   formData.append("brotli", brotliCheckPoint.checked);
   formData.append('symetricEncryption', symetricEncryptionInput.checked);
@@ -191,6 +190,7 @@ function submintFile(e) {
       let collectedData = "";
       let response = await fetch('/sendfile', {
           method:"POST",
+          headers: { "Content-Type": "multipart/form-data" },
           body: formData,
         });
         if(response.status >= 400 && response.status <= 500){

@@ -1,6 +1,6 @@
 const busboy = require('busboy');
 
-function busboyWrapper(wrappedMethod) {
+function busboyWrapper(wrappedMethod, res) {
     const bb = busboy({ headers: req.headers });
 
     bb.on('file', (name, file, info) => {
@@ -8,7 +8,7 @@ function busboyWrapper(wrappedMethod) {
       let startTime = Date.now();
       let compressionStream;
       let fileNameZipped;
-      wrappedMethod();
+      wrappedMethod(file, res);
     })
     req.pipe(bb)
 }

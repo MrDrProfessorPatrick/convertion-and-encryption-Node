@@ -11,6 +11,7 @@ async function transformFile(req, res, next) {
   // }
   // regarding req options call CompressionFactory or any other
   try {
+
     let encryptionMethod = false;
     const decryption = false;
     const encryption = false;
@@ -83,7 +84,7 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethod) {
-    busboyWrapper(transform.compress, req, res)
+    busboyWrapper(transform.compress, req, res);
   }
     
   if(password) {
