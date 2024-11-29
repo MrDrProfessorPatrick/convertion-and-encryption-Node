@@ -22,9 +22,8 @@ class TransformFile {
     this.filePath = filePath;
   }
 
-  async compress(req,res){
+  async compress(req, res){
     try {
-      console.log('compress')
       const compressionInfo = {
         originalSize: this.originalFileSize.toString(),
         deflateCompressionSize: "",
@@ -48,49 +47,42 @@ class TransformFile {
         })
 
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
-        
-          let startTime = Date.now();
-          let fileNameZipped;
-          let compressionStream;
 
-          if(this.compressionMethod){
-            if(this.compressionMethod === 'deflate'){
-              compressionStream = zlib.createGzip();
-              fileNameZipped = this.fileName.replace(/\.\w+/, ".gz");
-            }
-
-            if(this.compressionMethod === 'brotli'){
-              compressionStream = zlib.createBrotliCompress();
-              fileNameZipped = this.fileName.replace(/\.\w+/, ".br");
-            }
+      let compressionStream;
+      
+        if(this.compressionMethod){
+          if(this.compressionMethod === 'deflate'){
+            compressionStream = zlib.createGzip();
+            fileNameZipped = filename.replace(/\.\w+/, ".gz");
           }
 
-          const bb = busboy({ headers: req.headers });
+          if(this.compressionMethod === 'brotli'){
+            compressionStream = zlib.createBrotliCompress();
+            fileNameZipped = filename.replace(/\.\w+/, ".br");
+          }
+        }
 
-          bb.on('file', (name, file, info) => {
-            const { filename, encoding, mimeType } = info;
-            const writableStream = fs.createWriteStream(
-              `${__dirname}/../../modified_files/${fileNameZipped}`
-            );
-            let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
-  
-            if(!fs.existsSync(`${__dirname}/../../modified_files`)){
-              fs.mkdirSync(`${__dirname}/../../modified_files`)
-            }     
-  
-            pipeline(
-              file,
-              compressionStream,
-              symetricEncryptionStream,
-              getStreamData,
-              writableStream
-            ).catch((error)=>{
-              console.log(error, 'Error in gzip pipeline');
-              throw new Error('Error in compress pipeline', error) 
-            });    
+        const writableStream = fs.createWriteStream(
+          `${__dirname}/../../modified_files/${fileNameZipped}`
+        );
 
-          })
-          req.pipe(bb)
+        let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
+
+        if(!fs.existsSync(`${__dirname}/../../modified_files`)){
+          fs.mkdirSync(`${__dirname}/../../modified_files`)
+        }     
+
+        pipeline(
+          file,
+          compressionStream,
+          symetricEncryptionStream,
+          getStreamData,
+          writableStream
+        ).catch((error)=>{
+          console.log(error, 'Error in gzip pipeline');
+          throw new Error('Error in compress pipeline', error) 
+        });    
+
 
     } catch (error) {
       throw new Error(error)

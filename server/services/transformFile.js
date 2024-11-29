@@ -2,6 +2,7 @@ const fs = require("node:fs");
 
 const TransformFile = require('../TransformMethods/TransformFile');
 const uploadsPath = require('../../uploads/uploadsFolderPath');
+const busboyWrapper = require("../helpers/busboyWrapper");
 
 async function transformFile(req, res, next) {
 
@@ -82,7 +83,7 @@ async function transformFile(req, res, next) {
   }
 
   if(compressionMethod) {
-    transform.compress(req, res);
+    busboyWrapper(transform.compress, req, res)
   }
     
   if(password) {
