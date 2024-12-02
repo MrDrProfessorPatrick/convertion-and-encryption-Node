@@ -22,7 +22,7 @@ class TransformFile {
     this.filePath = filePath;
   }
 
-  async compress(req, res){
+  async compress(readableStream, res){
     try {
       const compressionInfo = {
         originalSize: this.originalFileSize.toString(),
@@ -49,16 +49,17 @@ class TransformFile {
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
 
       let compressionStream;
+      let fileNameZipped;
       
         if(this.compressionMethod){
           if(this.compressionMethod === 'deflate'){
             compressionStream = zlib.createGzip();
-            fileNameZipped = filename.replace(/\.\w+/, ".gz");
+            fileNameZipped = this.fileName.replace(/\.\w+/, ".gz");
           }
 
           if(this.compressionMethod === 'brotli'){
             compressionStream = zlib.createBrotliCompress();
-            fileNameZipped = filename.replace(/\.\w+/, ".br");
+            fileNameZipped = this.fileName.replace(/\.\w+/, ".br");
           }
         }
 
@@ -66,6 +67,7 @@ class TransformFile {
           `${__dirname}/../../modified_files/${fileNameZipped}`
         );
 
+        let startTime = Date.now();
         let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
 
         if(!fs.existsSync(`${__dirname}/../../modified_files`)){
@@ -73,7 +75,7 @@ class TransformFile {
         }     
 
         pipeline(
-          file,
+          readableStream,
           compressionStream,
           symetricEncryptionStream,
           getStreamData,
@@ -82,7 +84,6 @@ class TransformFile {
           console.log(error, 'Error in gzip pipeline');
           throw new Error('Error in compress pipeline', error) 
         });    
-
 
     } catch (error) {
       throw new Error(error)

@@ -10,6 +10,10 @@
     <button id="setCompressionButton">Compression</button>
     <button id="setDecompressionButton">Decompression</button>
     <div class="compression-container">
+
+
+      <h2>Chose your file</h2>
+
       <fieldset>
         <legend>Choose compress algorithms you want to use:</legend>
 
@@ -50,36 +54,36 @@
         </div>
       </fieldset>
 
-      <h2>Chose your file</h2>
+      <div id="passwordInputContainer" class="password-input-hidden">
+        <input id="passwordInput" type="text" name="password">
+        <label for="password">Enter password</label>
+      </div>
+
+      <div class="upload-download-panel">
+        <div class="upload-container">
+          <label for="inputFile" class="chose-file-button">Chose file</label>
+          <span class="file-availability" id="fileName">No file chosen</span>
+          <input
+            type="file"
+            name="file"
+            id="inputFile"
+            style="display: none"
+          />
+          <input id="file-manager-button-submit" class="file-manager-button-submit" type="submit" />
+        </div>
+        <div class="download-container">
+          <div class="download-files"></div>
+          <button class="download-compressed" id="download-button">
+            Download
+          </button>
+        </div>
+      </div>
       
       <form 
         id="send-file-form" 
         enctype="multipart/form-data"
       >
-        <div class="upload-download-panel">
-          <div class="upload-container">
-            <label for="inputFile" class="chose-file-button">Chose file</label>
-            <span class="file-availability" id="fileName">No file chosen</span>
-            <input
-              type="file"
-              name="file"
-              id="inputFile"
-              style="display: none"
-            />
-            <div id="passwordInputContainer" class="password-input-hidden">
-              <input id="passwordInput" type="text" name="password">
-              <label for="password">Enter password</label>
-            </div>
 
-            <input class="file-manager-button-submit" type="submit" />
-          </div>
-          <div class="download-container">
-            <div class="download-files"></div>
-            <button class="download-compressed" id="download-button">
-              Download
-            </button>
-          </div>
-        </div>
       </form>
 
       <div class="compressions-container-measurement">

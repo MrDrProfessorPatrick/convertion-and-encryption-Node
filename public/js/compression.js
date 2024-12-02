@@ -11,6 +11,7 @@ const asymetricEncryptionInput = document.getElementById("asymetricEncryption");
 const noDecryptionInput = document.getElementById("noDecryptionRadio");
 const decryptionInput = document.getElementById("decryptionRadio");
 const encryptionPassword = document.getElementById("passwordInput");
+const submitCompression = document.getElementById("file-manager-button-submit");
 
 let downloadedFileName = "";
 
@@ -96,7 +97,7 @@ const deflateCompressionContainer = document.body.querySelector(
   ".deflate-scale-container"
 );
 
-form.addEventListener("submit", submintFile);
+submitCompression.addEventListener("click", submintFile);
 file.addEventListener("change", changeFile);
 
 downloadButton.addEventListener("click", downloadFiles);
@@ -170,11 +171,12 @@ async function downloadFiles(e) {
 function submintFile(e) {
   e.preventDefault();
   const form = e.currentTarget;
-  const formData = new FormData(form);
+  const formData = new FormData();
   formData.append("deflate", deflateCheckPoint.checked);
   formData.append("brotli", brotliCheckPoint.checked);
   formData.append('symetricEncryption', symetricEncryptionInput.checked);
   formData.append('asymetricEncryption', asymetricEncryptionInput.checked);
+  formData.append('file', file.files[0])
 
   if(!deflateCheckPoint.checked && !brotliCheckPoint.checked && !symetricEncryptionInput.checked && !asymetricEncryptionInput.checked){
     alert('Choose compression and decryption options');
