@@ -113,9 +113,8 @@ class TransformFile {
     }
   }
 
-  async encryptSymmetric(){
+  async encryptSymmetric(readableStream){
     try {
-      let readableStream = fs.createReadStream(this.filePath);
       let encryptSymetric = new EncryptSymetricStream({password:this.password});
       let encryptedFileName = `encrypted${this.fileName}`;
 

@@ -6,11 +6,7 @@ const uploadsPath = require('../../uploads/uploadsFolderPath');
 const busboyWrapper = require("../helpers/busboyWrapper");
 
 async function transformFile(req, res, next) {
-  console.log('req.file', req.file)
 
-  // if (!req.file) {
-  //   return res.status(400).json("No File was received");
-  // }
   // regarding req options call CompressionFactory or any other
   try {
 
@@ -25,26 +21,39 @@ async function transformFile(req, res, next) {
     bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
       console.log('info', info)
+      console.log('fields', fields)
+      let extensionName = filename.split('.').reverse()[0];
       let compressionMethod = 'deflate';
       let encryptionMethod = false;
       let password = '';
       let fileSize = req.headers['content-length'];
-      let filePath = ''
-      let fileName = filename;
+      let filePath = '';
+
+    if(extensionName === 'txt' && fields.decryption === 'false'){
+      // TODO 
+      req.unpipe(bb);
+      return res.status(400).json('Choose the decryption method or file with extension like .br or .gz to decompress');
+      }
 
       let transform = new TransformFile(
         compressionMethod,
         encryptionMethod,
         password,
         fileSize,
-        fileName,
+        filename,
         filePath
       );
 
-      if(compressionMethod) {
-        transform.compress(file, res)
+    if(compressionMethod) {
+      transform.compress(file, res)
     }
-    })
+
+    if(password) {
+      let encryptionResult = transform.encryptSymmetric(file);
+      return res.status(200).json(encryptionResult);
+    } 
+
+  })
 
     bb.on('close', () => {
       console.log('Done parsing form!');
