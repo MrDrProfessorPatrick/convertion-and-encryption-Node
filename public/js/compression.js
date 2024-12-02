@@ -190,9 +190,9 @@ function submintFile(e) {
       let collectedData = "";
       let response = await fetch('/sendfile', {
           method:"POST",
-          headers: { "Content-Type": "multipart/form-data" },
           body: formData,
         });
+        
         if(response.status >= 400 && response.status <= 500){
           let errorMessage = await response.json();
           throw new Error(errorMessage);
