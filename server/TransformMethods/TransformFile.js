@@ -40,7 +40,7 @@ class TransformFile {
       
         if(this.compressionMethod){
           if(this.compressionMethod === 'deflate'){
-            compressionStream = zlib.createGzip();
+            compressionStream = zlib.createDeflate();
             fileNameZipped = this.fileName.replace(/\.\w+/, ".gz");
           }
 
@@ -85,9 +85,8 @@ class TransformFile {
 
       let decompressionStream = null
       
-      if(extensionName === 'gz') decompressionStream = zlib.createDeflate();
+      if(extensionName === 'gz') decompressionStream = zlib.createInflate();
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
-
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
@@ -103,7 +102,6 @@ class TransformFile {
 
   async encryptSymmetric(readableStream, res){
     try {
-
       const compressionInfo = {
         originalSize: this.originalFileSize.toString(),
         deflateCompressionSize: "",
