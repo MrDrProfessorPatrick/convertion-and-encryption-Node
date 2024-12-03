@@ -72,7 +72,9 @@ class TransformFile {
 
         if(!fs.existsSync(`${__dirname}/../../modified_files`)){
           fs.mkdirSync(`${__dirname}/../../modified_files`)
-        }     
+        }
+
+        bitesCounter.removeAllListeners
 
         pipeline(
           readableStream,
