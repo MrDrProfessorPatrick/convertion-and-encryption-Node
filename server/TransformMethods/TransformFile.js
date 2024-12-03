@@ -8,9 +8,7 @@ const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
-const { EventEmitter } = require("events");
-const busboy = require('busboy');
-
+const bitesCounter = require('../helpers/bitesCounter');
 class TransformFile {
 
   constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
@@ -35,17 +33,6 @@ class TransformFile {
         encryptedFileName:"",
       };
 
-      const bitesCounter = new EventEmitter();
-
-      bitesCounter
-        .on('chunkread',(arg)=>{
-          res.write(JSON.stringify(arg))
-        })
-        .on('chunkreadend',(arg)=>{
-          res.write(JSON.stringify(compressionInfo))
-          res.end()
-        })
-
       const symetricEncryptionStream = new EncryptSymetricStream({password: this.password, encryptionMethod: this.encryptionMethod});
 
       let compressionStream;
@@ -68,13 +55,13 @@ class TransformFile {
         );
 
         let startTime = Date.now();
-        let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter});
+        let getStreamData = new GetBytesQuantity({compressionMethod:this.compressionMethod, compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter});
 
         if(!fs.existsSync(`${__dirname}/../../modified_files`)){
           fs.mkdirSync(`${__dirname}/../../modified_files`)
         }
 
-        bitesCounter.removeAllListeners
+        bitesCounter.removeAllListeners()
 
         pipeline(
           readableStream,
@@ -117,12 +104,26 @@ class TransformFile {
 
   async encryptSymmetric(readableStream){
     try {
+
+      const compressionInfo = {
+        originalSize: this.originalFileSize.toString(),
+        deflateCompressionSize: "",
+        brotliCompressionSize: "",
+        deflateFileName: "",
+        brotliFileName: "",
+        deflateCompressionTime: "",
+        brotliCompressionTime: "",
+        encryptedFileName:"",
+      };
+
       let encryptSymetric = new EncryptSymetricStream({password:this.password});
       let encryptedFileName = `encrypted${this.fileName}`;
 
       if(!fs.existsSync(`${__dirname}/../../modified_files`)){
         fs.mkdirSync(`${__dirname}/../../modified_files`)
       } 
+      let startTime = Date.now();
+      let getStreamData = new GetBytesQuantity({compressionMethod:this.compressionMethod, compressionInfo, startTime, fileNameZipped:this.fileName, bitesCounter});
 
       let writableEncryptionStream = fs.createWriteStream(
         `${__dirname}/../../modified_files/${encryptedFileName}`
@@ -131,6 +132,7 @@ class TransformFile {
       await pipeline(
         readableStream,
         encryptSymetric,
+        getStreamData,
         writableEncryptionStream,
       ).catch((err)=> console.log(err, 'Error in pipeline in encryptSymetric'));
   
