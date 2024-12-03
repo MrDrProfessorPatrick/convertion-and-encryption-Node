@@ -170,12 +170,12 @@ async function downloadFiles(e) {
 
 function submintFile(e) {
   e.preventDefault();
-  const form = e.currentTarget;
   const formData = new FormData();
   formData.append("deflate", deflateCheckPoint.checked);
   formData.append("brotli", brotliCheckPoint.checked);
   formData.append('symetricEncryption', symetricEncryptionInput.checked);
   formData.append('asymetricEncryption', asymetricEncryptionInput.checked);
+  formData.append('password', encryptionPassword.value)
   formData.append('file', file.files[0])
 
   if(!deflateCheckPoint.checked && !brotliCheckPoint.checked && !symetricEncryptionInput.checked && !asymetricEncryptionInput.checked){

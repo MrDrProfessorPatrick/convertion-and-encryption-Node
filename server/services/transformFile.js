@@ -23,17 +23,22 @@ async function transformFile(req, res, next) {
       console.log('info', info)
       console.log('fields', fields)
       let extensionName = filename.split('.').reverse()[0];
-      let compressionMethod = 'deflate';
-      let encryptionMethod = false;
-      let password = '';
+      let compressionMethod = '';
+      let encryptionMethod = '';
+      if(fields.deflate === 'true') compressionMethod = 'deflate';
+      if(fields.brotli === 'true') compressionMethod = 'brotili';
+      if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
+      if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
+      let password = fields.password;
       let fileSize = req.headers['content-length'];
       let filePath = '';
 
-    if(extensionName === 'txt' && fields.decryption === 'false'){
+    if(extensionName === 'txt' && compressionMethod){
       // TODO 
+      console.log('UNPIPE')
       req.unpipe(bb);
-      return res.status(400).json('Choose the decryption method or file with extension like .br or .gz to decompress');
-      }
+      return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
+    }
 
       let transform = new TransformFile(
         compressionMethod,
@@ -43,7 +48,7 @@ async function transformFile(req, res, next) {
         filename,
         filePath
       );
-
+console.log('COMPRESSION', compressionMethod, 'PASSWORD', password)
     if(compressionMethod) {
       transform.compress(file, res)
     }
@@ -51,8 +56,7 @@ async function transformFile(req, res, next) {
     if(password) {
       let encryptionResult = transform.encryptSymmetric(file);
       return res.status(200).json(encryptionResult);
-    } 
-
+    }
   })
 
     bb.on('close', () => {

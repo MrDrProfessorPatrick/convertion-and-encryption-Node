@@ -35,9 +35,9 @@ class TransformFile {
         encryptedFileName:"",
       };
 
-      const BitesCounter = new EventEmitter();
+      const bitesCounter = new EventEmitter();
 
-      BitesCounter
+      bitesCounter
         .on('chunkread',(arg)=>{
           res.write(JSON.stringify(arg))
         })
@@ -68,7 +68,7 @@ class TransformFile {
         );
 
         let startTime = Date.now();
-        let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter:BitesCounter});
+        let getStreamData = new GetBytesQuantity({compressionMethod:'deflate', compressionInfo, startTime, fileNameZipped:fileNameZipped, bitesCounter});
 
         if(!fs.existsSync(`${__dirname}/../../modified_files`)){
           fs.mkdirSync(`${__dirname}/../../modified_files`)
@@ -125,7 +125,6 @@ class TransformFile {
       let writableEncryptionStream = fs.createWriteStream(
         `${__dirname}/../../modified_files/${encryptedFileName}`
       );
-
 
       await pipeline(
         readableStream,
