@@ -8,7 +8,7 @@ const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
-const bitesCounter = require('../helpers/bitesCounter');
+const createBitesCounter = require('../helpers/createBitesCounter');
 class TransformFile {
 
   constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
@@ -50,6 +50,8 @@ class TransformFile {
           }
         }
 
+        let bitesCounter = createBitesCounter(res, compressionInfo);
+
         const writableStream = fs.createWriteStream(
           `${__dirname}/../../modified_files/${fileNameZipped}`
         );
@@ -60,8 +62,6 @@ class TransformFile {
         if(!fs.existsSync(`${__dirname}/../../modified_files`)){
           fs.mkdirSync(`${__dirname}/../../modified_files`)
         }
-
-        bitesCounter.removeAllListeners()
 
         pipeline(
           readableStream,
@@ -102,7 +102,7 @@ class TransformFile {
     }
   }
 
-  async encryptSymmetric(readableStream){
+  async encryptSymmetric(readableStream, res){
     try {
 
       const compressionInfo = {
@@ -122,6 +122,7 @@ class TransformFile {
       if(!fs.existsSync(`${__dirname}/../../modified_files`)){
         fs.mkdirSync(`${__dirname}/../../modified_files`)
       } 
+      let bitesCounter = createBitesCounter(res, compressionInfo);
       let startTime = Date.now();
       let getStreamData = new GetBytesQuantity({compressionMethod:this.compressionMethod, compressionInfo, startTime, fileNameZipped:this.fileName, bitesCounter});
 
@@ -136,7 +137,7 @@ class TransformFile {
         writableEncryptionStream,
       ).catch((err)=> console.log(err, 'Error in pipeline in encryptSymetric'));
   
-      return {encryptedFileName, originalSize: this.originalFileSize}
+      // return {encryptedFileName, originalSize: this.originalFileSize}
     } catch (error) {
       console.log(error, 'Error catched in ecryptSymetric')
       throw new Error(error)

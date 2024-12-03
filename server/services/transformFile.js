@@ -33,7 +33,7 @@ async function transformFile(req, res, next) {
       let fileSize = req.headers['content-length'];
       let filePath = '';
 
-    if(extensionName === 'txt' && compressionMethod){
+    if(extensionName === 'txt' && !compressionMethod && !encryptionMethod){
       // TODO 
       console.log('UNPIPE')
       req.unpipe(bb);
@@ -54,8 +54,7 @@ console.log('COMPRESSION', compressionMethod, 'PASSWORD', password)
     }
 
     if(password) {
-      let encryptionResult = transform.encryptSymmetric(file);
-      return res.status(200).json(encryptionResult);
+      transform.encryptSymmetric(file, res);
     }
   })
 
