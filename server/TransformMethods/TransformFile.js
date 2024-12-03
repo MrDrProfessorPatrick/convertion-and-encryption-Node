@@ -89,7 +89,6 @@ class TransformFile {
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
 
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
-
       if(this.password){
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
         await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);

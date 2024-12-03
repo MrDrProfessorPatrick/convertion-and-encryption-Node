@@ -49,6 +49,21 @@ async function transformFile(req, res, next) {
         filePath
       );
 console.log('COMPRESSION', compressionMethod, 'PASSWORD', password)
+
+    if(extensionName === 'br' || extensionName === 'gz'){
+      let fileNameTxt = filename.replace(/\.\w+/, ".txt");
+
+      // res.setHeader(
+      //   "Content-disposition",
+      //   `attachment; filename="${fileNameTxt}"`
+      // );
+    
+      // res.setHeader("Content-type", "multipart/form-data");
+
+      transform.decompress(file, res);
+    }
+
+
     if(compressionMethod) {
       transform.compress(file, res)
     }
