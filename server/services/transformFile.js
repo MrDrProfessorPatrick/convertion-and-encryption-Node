@@ -55,14 +55,17 @@ async function transformFile(req, res, next) {
         `attachment; filename="${fileNameTxt}"`
       );
       transform.decompress(file, res);
+      return;
     }
 
     if(compressionMethod) {
-      transform.compress(file, res)
+      transform.compress(file, res);
+      return
     }
 
     if(password) {
       transform.encryptSymmetric(file, res);
+      return
     }
   })
 

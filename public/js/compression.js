@@ -218,7 +218,7 @@ function submintFile(e) {
                 let sizeObjDecoded = decoder.decode(value).trim();
                 let sizeObjArr = sizeObjDecoded.split('}');
                 let sizeObj = JSON.parse(sizeObjArr[sizeObjArr.length - 2]+"}")
-
+                
                 renderInitialScale(originalSizeContainer, sizeObj);
 
                 if (sizeObj.brotliCompressionSize) {

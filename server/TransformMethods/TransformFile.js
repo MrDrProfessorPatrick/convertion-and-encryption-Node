@@ -49,7 +49,7 @@ class TransformFile {
             fileNameZipped = this.fileName.replace(/\.\w+/, ".br");
           }
         }
-        console.log('compressionStream', compressionStream)
+        
         let bitesCounter = createBitesCounter(res, compressionInfo);
 
         const writableStream = fs.createWriteStream(
