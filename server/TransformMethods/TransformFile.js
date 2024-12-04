@@ -49,7 +49,7 @@ class TransformFile {
             fileNameZipped = this.fileName.replace(/\.\w+/, ".br");
           }
         }
-
+        console.log('compressionStream', compressionStream)
         let bitesCounter = createBitesCounter(res, compressionInfo);
 
         const writableStream = fs.createWriteStream(
@@ -92,7 +92,7 @@ class TransformFile {
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
         await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
       } else {
-        await pipeline(readable, decompressionStream, writable);
+        await pipeline(readable, writable);
       }
     } catch (error) {
       console.log(error, 'Error catched in decompress');
@@ -118,7 +118,8 @@ class TransformFile {
 
       if(!fs.existsSync(`${__dirname}/../../modified_files`)){
         fs.mkdirSync(`${__dirname}/../../modified_files`)
-      } 
+      };
+
       let bitesCounter = createBitesCounter(res, compressionInfo);
       let startTime = Date.now();
       let getStreamData = new GetBytesQuantity({compressionMethod:this.compressionMethod, compressionInfo, startTime, fileNameZipped:this.fileName, bitesCounter});
@@ -134,7 +135,6 @@ class TransformFile {
         writableEncryptionStream,
       ).catch((err)=> console.log(err, 'Error in pipeline in encryptSymetric'));
   
-      // return {encryptedFileName, originalSize: this.originalFileSize}
     } catch (error) {
       console.log(error, 'Error catched in ecryptSymetric')
       throw new Error(error)

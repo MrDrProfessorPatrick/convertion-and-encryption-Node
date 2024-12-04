@@ -26,7 +26,7 @@ async function transformFile(req, res, next) {
       let compressionMethod = '';
       let encryptionMethod = '';
       if(fields.deflate === 'true') compressionMethod = 'deflate';
-      if(fields.brotli === 'true') compressionMethod = 'brotili';
+      if(fields.brotli === 'true') compressionMethod = 'brotli';
       if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
       if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
       let password = fields.password;
@@ -48,18 +48,14 @@ async function transformFile(req, res, next) {
         filename,
         filePath
       );
-console.log('COMPRESSION', compressionMethod, 'PASSWORD', password)
 
     if(extensionName === 'br' || extensionName === 'gz'){
       let fileNameTxt = filename.replace(/\.\w+/, ".txt");
 
-      // res.setHeader(
-      //   "Content-disposition",
-      //   `attachment; filename="${fileNameTxt}"`
-      // );
-    
-      // res.setHeader("Content-type", "multipart/form-data");
-
+      res.setHeader(
+        "Content-disposition",
+        `attachment; filename="${fileNameTxt}"`
+      );
       transform.decompress(file, res);
     }
 

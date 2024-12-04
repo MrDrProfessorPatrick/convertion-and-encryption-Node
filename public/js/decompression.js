@@ -34,8 +34,12 @@ async function decompressFile(e) {
           })
         }
         let fileNameHeader = response.headers.get('content-disposition');
-        fileName = fileNameHeader ? fileNameHeader.match(/"\w.+"/g)[0] : 'decompressed/decryptedFile.txt'
-        fileName = fileName.substring(1, fileName.length - 1)
+        if(fileNameHeader.match(/"\w.+"/g)[0]){
+          fileName = fileNameHeader.match(/"\w.+"/g)[0]
+          fileName = fileName.substring(1, fileName.length-1)
+        } else {
+          fileName = 'decompressed/decryptedFile.txt';
+        }
         return response.body;
       })
       .then((rb) => {
