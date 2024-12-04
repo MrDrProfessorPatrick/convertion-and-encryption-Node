@@ -9,9 +9,7 @@ async function transformFile(req, res, next) {
 
   // regarding req options call CompressionFactory or any other
   try {
-
     let fields = {};
-
     const bb = busboy({ headers: req.headers });
 
     bb.on('field', (name, val, info) => {
@@ -59,7 +57,6 @@ async function transformFile(req, res, next) {
       transform.decompress(file, res);
     }
 
-
     if(compressionMethod) {
       transform.compress(file, res)
     }
@@ -69,12 +66,7 @@ async function transformFile(req, res, next) {
     }
   })
 
-    bb.on('close', () => {
-      console.log('Done parsing form!');
-      res.end();
-    });
-
-    req.pipe(bb);
+  req.pipe(bb);
 
 
     // let encryptionMethod = false;

@@ -92,8 +92,9 @@ class TransformFile {
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
         await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
       } else {
-        await pipeline(readable, writable);
+        await pipeline(readable, decompressionStream, writable);
       }
+      writable.end()
     } catch (error) {
       console.log(error, 'Error catched in decompress');
       throw new Error(error)
