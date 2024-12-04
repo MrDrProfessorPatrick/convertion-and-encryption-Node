@@ -115,7 +115,7 @@ class TransformFile {
       };
 
       let encryptSymetric = new EncryptSymetricStream({password:this.password});
-      let encryptedFileName = `encrypted${this.fileName}`;
+      compressionInfo.encryptedFileName = `encrypted${this.fileName}`;
 
       if(!fs.existsSync(`${__dirname}/../../modified_files`)){
         fs.mkdirSync(`${__dirname}/../../modified_files`)
@@ -126,7 +126,7 @@ class TransformFile {
       let getStreamData = new GetBytesQuantity({compressionMethod:this.compressionMethod, compressionInfo, startTime, fileNameZipped:this.fileName, bitesCounter});
 
       let writableEncryptionStream = fs.createWriteStream(
-        `${__dirname}/../../modified_files/${encryptedFileName}`
+        `${__dirname}/../../modified_files/${compressionInfo.encryptedFileName}`
       );
 
       await pipeline(
