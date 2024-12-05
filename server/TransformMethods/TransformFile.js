@@ -84,7 +84,7 @@ class TransformFile {
       let extensionName = this.fileName.split('.').reverse()[0];
 
       let decompressionStream = null
-      
+      console.log('this.password', this.password)
       if(extensionName === 'gz') decompressionStream = zlib.createInflate();
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')

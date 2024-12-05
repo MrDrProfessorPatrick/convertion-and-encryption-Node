@@ -25,7 +25,6 @@ class DecryptSymetricSplittedStream extends Transform {
            
             if(delimPos === -1){
               if(self.current){
-                console.log('CONCAT')
                 self.current = Buffer.concat([self.current, chunk])
               } else {
                 self.current = chunk;
