@@ -82,7 +82,7 @@ async function decompressFile(e) {
         fileLink.remove();
       })
       .catch((error)=>{
-        throw new Error(error);
+        alert(error);
       })
   } catch (error) {
       alert(error)
