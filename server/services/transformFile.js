@@ -53,19 +53,20 @@ async function transformFile(req, res, next) {
           transform.decompress(file, res).catch((error)=>{
             console.log('DECOMPRESS CATCH')
             req.unpipe(bb);
+            next(error)
           });
-          return;
+          // return;
         }
     
-        if(compressionMethod) {
-          transform.compress(file, res);
-          return
-        }
+        // if(compressionMethod) {
+        //   transform.compress(file, res);
+        //   return
+        // }
     
-        if(password) {
-          transform.encryptSymmetric(file, res);
-          return
-        }
+        // if(password) {
+        //   transform.encryptSymmetric(file, res);
+        //   return
+        // }
       } catch (error) {
         console.log('error catched on FILE READING')
         throw new Error(error);

@@ -84,7 +84,7 @@ class TransformFile {
       let extensionName = this.fileName.split('.').reverse()[0];
 
       let decompressionStream = null
-      console.log('this.password', this.password)
+      
       if(extensionName === 'gz') decompressionStream = zlib.createInflate();
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
@@ -94,9 +94,9 @@ class TransformFile {
       } else {
         await pipeline(readable, decompressionStream, writable);
       }
-      writable.end()
     } catch (error) {
       console.log(error, 'Error catched in decompress');
+      return writable.status(500).send('DECOMPRESS ERROR SENT')
       throw new Error(error)
     }
   }
