@@ -6,82 +6,90 @@ async function transformFile(req, res, next) {
 
   // regarding req options call CompressionFactory or any other
   try {
-    let fields = {};
-    const bb = busboy({ headers: req.headers });
-
-    bb.on('field', (name, val, info) => {
-      fields[name] = val;
-    });
-
-    bb.on('file', (name, file, info) => {
-      try {
-        const { filename } = info;
-        let extensionName = filename.split('.').reverse()[0];
-        let compressionMethod = '';
-        let encryptionMethod = '';
-        let password = fields.password;
-        let fileSize = req.headers['content-length'];
-        let filePath = '';
+      let fields = {};
+      const bb = busboy({ headers: req.headers });
   
-        if(fields.deflate === 'true') compressionMethod = 'deflate';
-        if(fields.brotli === 'true') compressionMethod = 'brotli';
-        if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
-        if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
+    function busboyCloseEventWrapper(){
+      return new Promise((resolve, reject) => {
+        bb.on('close', reject);
+      })
+    }  
+      bb.on('field', (name, val, info) => {
+        fields[name] = val;
+      });
   
-        if(extensionName === 'txt' && !compressionMethod && !encryptionMethod){
-          // TODO 
-          req.unpipe(bb);
-          return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
-        }
+      bb.on('file', (name, file, info) => {
+        try {
+          const { filename } = info;
+          let extensionName = filename.split('.').reverse()[0];
+          let compressionMethod = '';
+          let encryptionMethod = '';
+          let password = fields.password;
+          let fileSize = req.headers['content-length'];
+          let filePath = '';
     
-          let transform = new TransformFile(
-            compressionMethod,
-            encryptionMethod,
-            password,
-            fileSize,
-            filename,
-            filePath
-          );
+          if(fields.deflate === 'true') compressionMethod = 'deflate';
+          if(fields.brotli === 'true') compressionMethod = 'brotli';
+          if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
+          if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
     
-        if(extensionName === 'br' || extensionName === 'gz'){
-          let fileNameTxt = filename.replace(/\.\w+/, ".txt");
-    
-          res.setHeader(
-            "Content-disposition",
-            `attachment; filename="${fileNameTxt}"`
-          );
-          transform.decompress(file, res).catch((error)=>{
-            console.log('DECOMPRESS CATCH')
+          if(extensionName === 'txt' && !compressionMethod && !encryptionMethod){
+            // TODO 
             req.unpipe(bb);
-            next(error)
-          });
-          // return;
+            return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
+          }
+      
+            let transform = new TransformFile(
+              compressionMethod,
+              encryptionMethod,
+              password,
+              fileSize,
+              filename,
+              filePath
+            );
+      
+          if(extensionName === 'br' || extensionName === 'gz'){
+            let fileNameTxt = filename.replace(/\.\w+/, ".txt");
+      
+            res.setHeader(
+              "Content-disposition",
+              `attachment; filename="${fileNameTxt}"`
+            );
+  
+            transform.decompress(file, res).catch((error)=>{
+              console.log('DECOMPRESS CATCH')
+              req.unpipe(bb);
+              bb.emit('close');
+            });
+            
+          } else if(compressionMethod) {
+            transform.compress(file, res);
+          } else if(password){
+            transform.encryptSymmetric(file, res);
+          }
+  
+        } catch (error) {
+          console.log('error catched on FILE READING')
+          throw new Error(error);
         }
-    
-        // if(compressionMethod) {
-        //   transform.compress(file, res);
-        //   return
-        // }
-    
-        // if(password) {
-        //   transform.encryptSymmetric(file, res);
-        //   return
-        // }
-      } catch (error) {
-        console.log('error catched on FILE READING')
-        throw new Error(error);
-      }
-  })
+    })
+  
+    bb.on('close', () => {
+      console.log('Done parsing form!');
+      return res.status(500).send('DECOMPRESS ONCLOSE EVENT')
+    });
+  
+    bb.on("finish", () => {
+      console.log('ON FINISH EVENT')
+      return res.status(500).send('DECOMPRESS FINISH EVENT')
+    });
+  
+    req.pipe(bb);
 
-  bb.on('close', () => {
-    console.log('Done parsing form!');
-  });
 
-  req.pipe(bb);
- 
   } catch (error) {
-      console.log('Error occured on file transformation');
-      return res.status(400).json('Error occured on file transformation');
+    console.log('Error occured on file transformation', error);
+    return res.status(400).json('Error occured on file transformation');
   }
 }
 

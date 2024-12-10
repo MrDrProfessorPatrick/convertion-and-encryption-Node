@@ -15,6 +15,7 @@ function busboyWrapper(wrappedMethod, req, res) {
       wrappedMethod(file, req, res);
     })
     req.pipe(bb)
+    return bb;
 }
 
 module.exports = busboyWrapper;

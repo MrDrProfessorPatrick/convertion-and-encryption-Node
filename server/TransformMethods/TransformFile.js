@@ -96,7 +96,6 @@ class TransformFile {
       }
     } catch (error) {
       console.log(error, 'Error catched in decompress');
-      return writable.status(500).send('DECOMPRESS ERROR SENT')
       throw new Error(error)
     }
   }
