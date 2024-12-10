@@ -1,4 +1,5 @@
 const busboy = require('busboy');
+import { EventEmitter } from 'events'
 
 const TransformFile = require('../TransformMethods/TransformFile');
 
@@ -8,12 +9,17 @@ async function transformFile(req, res, next) {
   try {
       let fields = {};
       const bb = busboy({ headers: req.headers });
+      const errorEvent = new EventEmitter()
   
-    function busboyCloseEventWrapper(){
+    function busboyErrorEventWrapper(){
       return new Promise((resolve, reject) => {
-        bb.on('close', reject);
+        errorEvent.on('error', ()=>{
+          resolve();
+          return res.status(500).send('ERROR EVENT')
+        } );
       })
     }  
+
       bb.on('field', (name, val, info) => {
         fields[name] = val;
       });
@@ -59,6 +65,7 @@ async function transformFile(req, res, next) {
             transform.decompress(file, res).catch((error)=>{
               console.log('DECOMPRESS CATCH')
               req.unpipe(bb);
+              errorEvent.emit('error');
               bb.emit('close');
             });
             
@@ -86,6 +93,7 @@ async function transformFile(req, res, next) {
   
     req.pipe(bb);
 
+    await busboyErrorEventWrapper();
 
   } catch (error) {
     console.log('Error occured on file transformation', error);
