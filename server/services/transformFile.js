@@ -11,13 +11,10 @@ async function transformFile(req, res, next) {
       const bb = busboy({ headers: req.headers });
       const errorEvent = new EventEmitter();
   
-    function busboyErrorEventWrapper(){
+    function busboyWrapper(){
       console.log('busboyErrorEventWrapper')
       return new Promise((resolve, reject) => {
-        errorEvent.once('error', resolve);
-      })
-    }  
-
+        
       bb.on('field', (name, val, info) => {
         fields[name] = val;
       });
@@ -55,21 +52,18 @@ async function transformFile(req, res, next) {
           if(extensionName === 'br' || extensionName === 'gz'){
             let fileNameTxt = filename.replace(/\.\w+/, ".txt");
       
-            // res.setHeader(
-            //   "Content-disposition",
-            //   `attachment; filename="${fileNameTxt}"`
-            // );
+            res.setHeader(
+              "Content-disposition",
+              `attachment; filename="${fileNameTxt}"`
+            );
   
             transform.decompress(file, res).catch((error)=>{
               console.log('DECOMPRESS CATCH')
               req.unpipe(bb);
               // errorEvent.emit('error');
               bb.emit('close')
-
             });
 
-            return res.status(400).json('Error after decompress')
-            
           } else if(compressionMethod) {
             transform.compress(file, res);
           } else if(password){
@@ -84,22 +78,25 @@ async function transformFile(req, res, next) {
   
     bb.on('close', () => {
       console.log('Done parsing form!');
-      return res.status(500).send('DECOMPRESS ONCLOSE EVENT')
+      // return res.status(500).send('DECOMPRESS ONCLOSE EVENT')
+      resolve('error closed')
     });
   
     bb.on("finish", () => {
       console.log('ON FINISH EVENT')
-      return res.status(500).send('DECOMPRESS FINISH EVENT')
+      // return res.status(500).send('DECOMPRESS FINISH EVENT')
+      resolve('FINISH')
     });
  
-
-  
     req.pipe(bb);
-    // let result = await busboyErrorEventWrapper();
+      })
+    }  
 
-    //  console.log('sync result', result)
+     let result = await busboyWrapper();
+     console.log('sync result', result)
+     console.log('is header sent', res.headersSent)
+    return res.status(500).send(result);
 
-    //  return res.status(500).json('ERROR OCCURED');
   } catch (error) {
     console.log('Error occured on file transformation', error);
     // return res.status(400).json('Error occured on file transformation');
