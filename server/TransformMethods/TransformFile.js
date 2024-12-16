@@ -83,19 +83,24 @@ class TransformFile {
     try {
       let extensionName = this.fileName.split('.').reverse()[0];
 
-      let decompressionStream = null
+      const ac = new AbortController();
+      const signal = ac.signal;
+
+      let decompressionStream = new DecompressionStream({compressionType:'gz'})
       
-      if(extensionName === 'gz') decompressionStream = zlib.createInflate();
-      if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
+      // if(extensionName === 'gz') decompressionStream 
+      // if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
         await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
       } else {
-        await pipeline(readable, decompressionStream, writable);
+        await pipeline(readable, decompressionStream, writable, {signal});
       }
     } catch (error) {
-      console.log(error, 'Error catched in decompress');
+      // console.log(error, 'Error catched in decompress');
+      ac.abort();
+      console.log('ACCCCCC')
       throw new Error(error)
     }
   }

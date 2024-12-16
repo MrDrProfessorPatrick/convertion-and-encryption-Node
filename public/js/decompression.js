@@ -29,6 +29,7 @@ async function decompressFile(e) {
       body: formData,
     })
       .then((response) => {
+        console.log('response', response)
         if(response.status>=400) {
           console.log('response >= 400')
           let errorMessage = response.json();
@@ -82,9 +83,11 @@ async function decompressFile(e) {
         fileLink.remove();
       })
       .catch((error)=>{
+        console.log('error catched in promise', error)
         alert(error);
       })
   } catch (error) {
+    console.log('error trycatch', error)
       alert(error)
   }
 }

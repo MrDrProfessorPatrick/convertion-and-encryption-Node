@@ -4,28 +4,26 @@ const { Transform } = require("stream");
 class DecompressionStream extends Transform {
     constructor(options) {
       super(options);
-      this.compressionType = options;
+      this.compressionType = options.compressionType;
     }
 
     _transform(chunk, encoding, done) {
         try {
-            if(this.compressionType === 'gzip'){
-                let gzipDecompressed = zlib.gunzipSync(chunk);
+            if(this.compressionType === 'gz'){
+                let gzipDecompressed = zlib.inflateSync(chunk);
+                console.log('IS NEVER PUSHED')
                 this.push(gzipDecompressed);
                 // this.push(chunk)
             }
 
-            if(this.compressionType === 'brotli'){
+            if(this.compressionType === 'br'){
                 this.push(zlib.brotliDecompressSync(chunk));
-            }
-
-            if(this.compressionType === 'deflate'){
-                this.push(zlib.deflateRawSync(chunk));
             }
 
             done();
         } catch (error) {
-            console.log('Error catched in _transform DecompressionStream', error)
+            console.log('Error catched in _transform DecompressionStream', error);
+            done(error)
         }
     }
   }
