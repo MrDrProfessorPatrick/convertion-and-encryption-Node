@@ -29,15 +29,13 @@ async function decompressFile(e) {
       body: formData,
     })
       .then((response) => {
-        console.log('response', response)
         if(response.status>=400) {
-          console.log('response >= 400')
           let errorMessage = response.json();
-          console.log('errorMessage', errorMessage)
           return new Promise((resolve, reject)=>{
             reject(errorMessage);
           })
         }
+
         let fileNameHeader = response.headers.get('content-disposition');
         if(fileNameHeader.match(/"\w.+"/g)[0]){
           fileName = fileNameHeader.match(/"\w.+"/g)[0]
@@ -83,11 +81,12 @@ async function decompressFile(e) {
         fileLink.remove();
       })
       .catch((error)=>{
-        console.log('error catched in promise', error)
-        alert(error);
+        error.then((errData)=>{
+          alert(errData);
+        })
       })
   } catch (error) {
-    console.log('error trycatch', error)
+      console.log('error trycatch', error)
       alert(error)
   }
 }

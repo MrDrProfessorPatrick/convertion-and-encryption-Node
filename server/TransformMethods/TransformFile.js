@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const zlib = require('node:zlib'); 
+const PassThrough = require('node:stream')
 
 const CompressionStream = require('../helpers/CompressionStream');
 const DecompressionStream = require('../helpers/DecompressionStream');
@@ -9,6 +10,7 @@ const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const createBitesCounter = require('../helpers/createBitesCounter');
+const pipesConnector = require('../helpers/pipesConnector');
 class TransformFile {
 
   constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
@@ -81,25 +83,30 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
+      console.log('DECOMPRESS')
       let extensionName = this.fileName.split('.').reverse()[0];
-
+      console.log('passThrough', new PassThrough())
       const ac = new AbortController();
       const signal = ac.signal;
 
-      let decompressionStream = new DecompressionStream({compressionType:'gz'})
+      // let decompressionStream = new DecompressionStream({compressionType:'gz'})
+      let decompressionStream = null;
       
-      // if(extensionName === 'gz') decompressionStream 
+      if(true) decompressionStream = zlib.createInflate();
       // if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
         await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
       } else {
-        await pipeline(readable, decompressionStream, writable, {signal});
+        // TODO error doen't throw properly if you try to decompress without deciphering
+        console.log('pipesConnector')
+        let result = await pipesConnector(readable, decompressionStream);
+        console.log('result of pipesConnector', result);
+        // await pipeline(readable, decompressionStream, writable, {signal});
       }
     } catch (error) {
-      // console.log(error, 'Error catched in decompress');
-      ac.abort();
+      console.log(error, 'Error catched in decompress');
       console.log('ACCCCCC')
       throw new Error(error)
     }

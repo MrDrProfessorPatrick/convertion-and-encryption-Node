@@ -9,18 +9,18 @@ const {
 
 const router = new Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "uploads");
+//   },
 
-  filename: (req, file, cb) => {
-    const { originalname } = file;
-    cb(null, originalname);
-  },
-});
+//   filename: (req, file, cb) => {
+//     const { originalname } = file;
+//     cb(null, originalname);
+//   },
+// });
 
-var upload = multer({ storage });
+// var upload = multer({ storage });
 
 router.post("/sendfile", transformFile);
 router.post("/downloadfiles", downloadFileRequest);

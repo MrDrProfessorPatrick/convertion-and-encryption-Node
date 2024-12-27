@@ -12,8 +12,7 @@ class DecompressionStream extends Transform {
             if(this.compressionType === 'gz'){
                 let gzipDecompressed = zlib.inflateSync(chunk);
                 console.log('IS NEVER PUSHED')
-                this.push(gzipDecompressed);
-                // this.push(chunk)
+                 this.push(gzipDecompressed)
             }
 
             if(this.compressionType === 'br'){
