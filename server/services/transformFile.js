@@ -48,7 +48,7 @@ async function transformFile(req, res, next) {
                 filePath
               );
         
-            if(extensionName === 'br' || extensionName === 'gz'){
+            if(extensionName === 'br' || extensionName === 'gz') {
               let fileNameTxt = filename.replace(/\.\w+/, ".txt");
         
               res.setHeader(
@@ -56,7 +56,7 @@ async function transformFile(req, res, next) {
                 `attachment; filename="${fileNameTxt}"`
               );
     
-              transform.decompress(file, res).catch((error)=>{
+              transform.decompress(file, res).catch((error) => {
                 console.log('DECOMPRESS CATCH', error)
                 req.unpipe(bb);
                 bb.emit('close', error)
@@ -75,7 +75,7 @@ async function transformFile(req, res, next) {
       })
   
         bb.on('close', (error) => {
-          console.log('Done parsing form!', error);
+          console.log('Close parsing form!', error);
           resolve(error)
           // res.end()
         });
@@ -92,7 +92,7 @@ async function transformFile(req, res, next) {
      let result = await busboyWrapper();
      console.log('sync result', result)
      console.log('is header sent', res.headersSent)
-    return res.status(500).json(result.toString());
+    //  return res.status(500).json(result.toString());
 
   } catch (error) {
     console.log('Error occured on file transformation', error);

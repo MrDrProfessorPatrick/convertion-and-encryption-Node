@@ -11,6 +11,8 @@ const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const createBitesCounter = require('../helpers/createBitesCounter');
 const pipesConnector = require('../helpers/pipesConnector');
+const WritableWrapper = require("../helpers/WritableWrapper");
+const isDecompressionPossible = require('../helpers/IsDecompressionPossible');
 class TransformFile {
 
   constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
@@ -85,25 +87,25 @@ class TransformFile {
     try {
       console.log('DECOMPRESS')
       let extensionName = this.fileName.split('.').reverse()[0];
-      console.log('passThrough', new PassThrough())
       const ac = new AbortController();
       const signal = ac.signal;
 
       // let decompressionStream = new DecompressionStream({compressionType:'gz'})
       let decompressionStream = null;
-      
+      // TODO change decomptession types
       if(true) decompressionStream = zlib.createInflate();
       // if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
+        console.log('this.password', this.password)
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-        await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
+        let decryptionRes = await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
+        console.log('decryptionRes', decryptionRes)
       } else {
-        // TODO error doen't throw properly if you try to decompress without deciphering
-        console.log('pipesConnector')
-        let result = await pipesConnector(readable, decompressionStream);
-        console.log('result of pipesConnector', result);
-        // await pipeline(readable, decompressionStream, writable, {signal});
+        let readableResult = await isDecompressionPossible(readable);
+        console.log('readableResult', readableResult);
+        if(!readableResult) throw new Error('Decompression is not possible');
+        await pipeline(readableResult, decompressionStream, writable);
       }
     } catch (error) {
       console.log(error, 'Error catched in decompress');

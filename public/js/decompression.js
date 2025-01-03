@@ -32,6 +32,7 @@ async function decompressFile(e) {
         if(response.status>=400) {
           let errorMessage = response.json();
           return new Promise((resolve, reject)=>{
+            console.log('errorMess', errorMessage)
             reject(errorMessage);
           })
         }
