@@ -57,7 +57,6 @@ async function transformFile(req, res, next) {
               );
     
               transform.decompress(file, res).catch((error) => {
-                console.log('DECOMPRESS CATCH', error)
                 req.unpipe(bb);
                 bb.emit('close', error)
               });
@@ -69,19 +68,18 @@ async function transformFile(req, res, next) {
             }
     
           } catch (error) {
-            console.log('error catched on FILE READING')
             throw new Error(error);
           }
       })
   
         bb.on('close', (error) => {
-          console.log('Close parsing form!', error);
-          resolve(error)
-          // res.end()
+          if(error) {
+            reject(error);
+          }
         });
       
         bb.on("finish", () => {
-          resolve('FINISH')
+          resolve('Operation finished')
         });
  
       req.pipe(bb);
@@ -90,13 +88,12 @@ async function transformFile(req, res, next) {
     }  
 
      let result = await busboyWrapper();
-     console.log('sync result', result)
-     console.log('is header sent', res.headersSent)
-    //  return res.status(500).json(result.toString());
+     if(res.headersSent) return;
+     return res.status(200).json(result.toString());
 
   } catch (error) {
     console.log('Error occured on file transformation', error);
-    // return res.status(400).json('Error occured on file transformation');
+    return res.status(500).json(error.toString());
   }
 }
 
