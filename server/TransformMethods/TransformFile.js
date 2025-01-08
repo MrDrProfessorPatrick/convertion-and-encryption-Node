@@ -98,8 +98,10 @@ class TransformFile {
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
         console.log('this.password', this.password)
+        let readableResult = await isDecompressionPossible(readable, this.compressionMethod, this.password);
+        console.log('readableResult', readableResult);
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-        let decryptionRes = await pipeline(readable, decryptSymetricSplitted, decompressionStream, writable);
+        let decryptionRes = await pipeline(readableResult, decryptSymetricSplitted, decompressionStream, writable);
         console.log('decryptionRes', decryptionRes)
       } else {
         let readableResult = await isDecompressionPossible(readable);

@@ -1,16 +1,46 @@
 const { PassThrough } = require('node:stream');
 const zlib = require('node:zlib');
+const { pipeline } = require("node:stream/promises");
+const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
+const StreamAborter = require("../helpers/StreamAborter");
 
-function isDecompressionPossible(readable, decompressionMethod){
+
+async function isDecompressionPossible(readable, decompressionMethod, password){
 
   let readableCopy = new PassThrough();
   let readableResult = new PassThrough();
+  let writableCopy = new PassThrough();
+  const ac = new AbortController();
+  const signal = ac.signal;
   
   readable.pipe(readableCopy);
   readable.pipe(readableResult);
 
     return new Promise((resolve, reject) => {
       try {
+
+        if(password){
+          let streamAborter = new StreamAborter({ac});
+          let decompressionStream = null;
+          let decryptStream = new DecryptSymetricSplittedStream({key:password});
+          
+          if(true) decompressionStream = zlib.createInflate();
+
+            pipeline(readableCopy, decryptStream, decompressionStream, streamAborter, writableCopy, {signal})
+            .then(() => resolve(readableResult))
+            .catch((error) => {
+              console.log('Catched error ', error);
+              if(error.name === 'AbortError') {
+                // if AbortError it means that decryption and decompression works fine;
+                resolve(readableResult);
+                } else {
+                  reject(error);
+                }
+            })
+          return;
+        }
+
+
         readableCopy.on('readable', () => {
           let cnt = 0;
           while (null !== (chunk = readableCopy.read())) {
@@ -22,17 +52,14 @@ function isDecompressionPossible(readable, decompressionMethod){
             break;
           };
               cnt++
-              if(cnt > 0) {
-                console.log('cnt', cnt)
+              if(cnt > 2) {
                 readableCopy.destroy();
                 break;
               }
-            console.log('chunk length', chunk.length)
           }
         });
         
         readableCopy.on('close', ()=>{
-          console.log('CLOSE')
           resolve(readableResult);
         })
 

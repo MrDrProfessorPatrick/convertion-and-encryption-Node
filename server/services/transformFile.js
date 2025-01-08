@@ -73,6 +73,7 @@ async function transformFile(req, res, next) {
       })
   
         bb.on('close', (error) => {
+          console.log('bb.close', error)
           if(error) {
             reject(error);
           }

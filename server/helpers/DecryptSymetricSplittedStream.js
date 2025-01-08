@@ -92,7 +92,8 @@ class DecryptSymetricSplittedStream extends Transform {
         throw new Error('No key for decryption')
       }
     } catch (error) {
-        console.log(error, 'Error catch in DecryptSymetricStream')
+      console.log(error, 'Error catch in DecryptSymetricStream')
+      done(error);
     }
   }
 
