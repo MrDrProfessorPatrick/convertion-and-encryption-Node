@@ -1,25 +1,20 @@
-const zlib = require("zlib");
-const { Transform } = require("stream");
+const { Writable } = require("stream");
 
-class StreamAborter extends Transform {
+class StreamAborter extends Writable {
     constructor(options) {
         super(options);
         this.ac = options.ac;
         this.counter = 0
     }
 
-    _transform(chunk, encoding, done) {
+    _write(chunk, encoding, done) {
         this.counter++;
-        console.log('counter StreamAborter', this.counter);
-        if(this.counter > 1){
-            console.log('this.ac', this.ac);
+        if(this.counter > 2){
             this.ac.abort();
             done('AbortError');
             return;
         }
-        console.log('chunk', chunk);
 
-        this.push(chunk);
         done();
     }
 }
