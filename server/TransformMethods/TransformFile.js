@@ -10,8 +10,7 @@ const { pipeline } = require("node:stream/promises");
 const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const createBitesCounter = require('../helpers/createBitesCounter');
-const pipesConnector = require('../helpers/pipesConnector');
-const WritableWrapper = require("../helpers/WritableWrapper");
+
 const isDecompressionPossible = require('../helpers/IsDecompressionPossible');
 class TransformFile {
 
@@ -74,7 +73,6 @@ class TransformFile {
           getStreamData,
           writableStream
         ).catch((error)=>{
-          console.log(error, 'Error in gzip pipeline');
           throw new Error('Error in compress pipeline', error) 
         });    
 
@@ -85,7 +83,6 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
-      console.log('DECOMPRESS')
       let extensionName = this.fileName.split('.').reverse()[0];
       const ac = new AbortController();
       const signal = ac.signal;
@@ -145,7 +142,6 @@ class TransformFile {
       ).catch((err)=> console.log(err, 'Error in pipeline in encryptSymetric'));
   
     } catch (error) {
-      console.log(error, 'Error catched in ecryptSymetric')
       throw new Error(error)
     }
   }
@@ -153,14 +149,11 @@ class TransformFile {
   async decryptSymmetric(readable, writable){
     try {
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-
       await pipeline(readable, decryptSymetricSplitted, writable).catch((error)=>{
-        console.log(error, 'Error in decryptSymmetric pipeline');
         throw new Error(error);
       })
 
     } catch (error) {
-      console.log(error, "Error catched in decryptSymmetric")
       throw new Error(error)
     }
   }

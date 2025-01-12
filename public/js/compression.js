@@ -253,8 +253,6 @@ function submintFile(e) {
             }
           },
         });
-      
-
 
     } catch (error) {
       throw new Error(error);

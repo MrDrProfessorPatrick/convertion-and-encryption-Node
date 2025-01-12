@@ -18,6 +18,7 @@ async function decompressFile(e) {
   try {
     e.preventDefault();
     const formData = new FormData();
+    formData.append('operation', 'decompress');
     formData.append('password', decryptionPassword.value);
     formData.append('file', fileDecompress.files[0]);
 
@@ -38,7 +39,7 @@ async function decompressFile(e) {
         }
 
         let fileNameHeader = response.headers.get('content-disposition');
-        if(fileNameHeader.match(/"\w.+"/g)[0]){
+        if(fileNameHeader && fileNameHeader.match(/"\w.+"/g)[0]){
           fileName = fileNameHeader.match(/"\w.+"/g)[0]
           fileName = fileName.substring(1, fileName.length-1)
         } else {
@@ -80,11 +81,13 @@ async function decompressFile(e) {
         document.body.appendChild(fileLink);
         fileLink.click();
         fileLink.remove();
+        URL.revokeObjectURL();
       })
       .catch((error)=>{
-        error.then((errData)=>{
-          alert(errData);
-        })
+        console.log('ERROR DECOMPRESSION', error);
+        // error.then((errData)=>{
+        //   alert(errData);
+        // })
       })
   } catch (error) {
       console.log('error trycatch', error)

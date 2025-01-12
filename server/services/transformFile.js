@@ -27,15 +27,18 @@ async function transformFile(req, res, next) {
             let password = fields.password;
             let fileSize = req.headers['content-length'];
             let filePath = '';
+            let operation = fields.operation === 'decompress' ? 'decompress' : 'compress';
+
+            console.log('FIELDS', fields);
       
             if(fields.deflate === 'true') compressionMethod = 'deflate';
             if(fields.brotli === 'true') compressionMethod = 'brotli';
             if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
             if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
       
-            if(extensionName === 'txt' && !compressionMethod && !encryptionMethod){
+            if(extensionName === 'txt' && !compressionMethod && !encryptionMethod) {
               // TODO 
-              req.unpipe(bb);
+              // req.unpipe(bb);
               // return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
             }
         
@@ -47,26 +50,44 @@ async function transformFile(req, res, next) {
                 filename,
                 filePath
               );
-        
-            if(extensionName === 'br' || extensionName === 'gz') {
-              let fileNameTxt = filename.replace(/\.\w+/, ".txt");
-        
-              res.setHeader(
-                "Content-disposition",
-                `attachment; filename="${fileNameTxt}"`
-              );
-    
-              transform.decompress(file, res).catch((error) => {
-                req.unpipe(bb);
-                bb.emit('close', error)
-              });
 
-            } else if(compressionMethod) {
-              transform.compress(file, res);
-            } else if(password){
-              transform.encryptSymmetric(file, res);
+            if(operation === 'decompress') {
+
+              if(extensionName === 'br' || extensionName === 'gz') {
+                let fileNameTxt = filename.replace(/\.\w+/, ".txt");
+
+                res.setHeader(
+                  "Content-disposition",
+                  `attachment; filename="${fileNameTxt}"`
+                );
+      
+                transform.decompress(file, res).catch((error) => {
+                  req.unpipe(bb);
+                  bb.emit('close', error)
+                });
+
+              } else { 
+
+                res.setHeader(
+                  "Content-disposition",
+                  `attachment; filename="${filename}"`
+                );
+
+                transform.decryptSymmetric(file, res).catch((error) => {
+                  console.log('error catched decyrptSymmetric', error)
+                  req.unpipe(bb);
+                  bb.emit('close', error);
+                });
+              }
             }
-    
+
+            if(operation === 'compress') { 
+              if(compressionMethod) {
+                transform.compress(file, res);
+              } else if(password){
+                transform.encryptSymmetric(file, res);
+              }
+            }
           } catch (error) {
             throw new Error(error);
           }
