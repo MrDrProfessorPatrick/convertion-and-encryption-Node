@@ -84,13 +84,11 @@ async function decompressFile(e) {
         URL.revokeObjectURL();
       })
       .catch((error)=>{
-        console.log('ERROR DECOMPRESSION', error);
-        // error.then((errData)=>{
-        //   alert(errData);
-        // })
+        error.then((errData)=>{
+          alert(errData);
+        })
       })
   } catch (error) {
-      console.log('error trycatch', error)
       alert(error)
   }
 }

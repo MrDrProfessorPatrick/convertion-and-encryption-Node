@@ -1,6 +1,5 @@
 const fs = require("node:fs");
 const zlib = require('node:zlib'); 
-const PassThrough = require('node:stream')
 
 const CompressionStream = require('../helpers/CompressionStream');
 const DecompressionStream = require('../helpers/DecompressionStream');
@@ -11,7 +10,7 @@ const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const createBitesCounter = require('../helpers/createBitesCounter');
 
-const isDecompressionPossible = require('../helpers/IsDecompressionPossible');
+const isConversionPossible = require('../helpers/IsConversionPossible');
 class TransformFile {
 
   constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
@@ -83,9 +82,8 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
+      console.log('DECOMPRESS RUN')
       let extensionName = this.fileName.split('.').reverse()[0];
-      const ac = new AbortController();
-      const signal = ac.signal;
 
       let decompressionStream = null;
 
@@ -93,11 +91,14 @@ class TransformFile {
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
-        let readableResult = await isDecompressionPossible(readable, this.compressionMethod, this.password);
+        // TODO change compression method in isConversionPossible
+        let readableResult = await isConversionPossible(readable, true, this.password);
         let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
+        console.log('readableReslt in decompress', readableResult);
         await pipeline(readableResult, decryptSymetricSplitted, decompressionStream, writable);
       } else {
-        let readableResult = await isDecompressionPossible(readable);
+        let readableResult = await isConversionPossible(readable);
+
         if(!readableResult) throw new Error('Decompression is not possible');
         await pipeline(readableResult, decompressionStream, writable);
       }
@@ -148,11 +149,12 @@ class TransformFile {
 
   async decryptSymmetric(readable, writable){
     try {
+      let readableResult = await isConversionPossible(readable, null, this.password);
+      console.log('readableResult in decryptSymmetric', readableResult)
+      if(!readableResult) throw new Error('Decryption is not possible');
       let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-      await pipeline(readable, decryptSymetricSplitted, writable).catch((error)=>{
-        throw new Error(error);
-      })
 
+      await pipeline(readableResult, decryptSymetricSplitted, writable);
     } catch (error) {
       throw new Error(error)
     }

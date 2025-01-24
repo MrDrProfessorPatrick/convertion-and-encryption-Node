@@ -14,6 +14,8 @@ class DecryptSymetricSplittedStream extends Transform {
   
   _transform(chunk, encoding, done) {
     let self = this;
+    console.log('DECRYPT chunk', chunk)
+    console.log('this.iv', this.iv);
     try {
       if(this.key){
         function chunkHandler(chunk){
@@ -80,7 +82,7 @@ class DecryptSymetricSplittedStream extends Transform {
           this.chunksToPush = this.chunksToPush.slice(1);
         }
         this.chunksToPush.forEach((chunk)=>{
-          let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv)
+          let { decrypted } =  decryptSymetricService(chunk, this.key, this.iv);
           this.decryptedArr.push(decrypted);
         })
        }
@@ -98,6 +100,8 @@ class DecryptSymetricSplittedStream extends Transform {
   }
 
     _flush(cb){
+      console.log('flush is called')
+
       if(this.current){
         try {
           let { decrypted } =  decryptSymetricService(this.current, this.key, this.iv)

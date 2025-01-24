@@ -36,11 +36,11 @@ async function transformFile(req, res, next) {
             if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
             if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
       
-            if(extensionName === 'txt' && !compressionMethod && !encryptionMethod) {
+            // if(extensionName === 'txt' && !compressionMethod && !encryptionMethod) {
               // TODO 
               // req.unpipe(bb);
               // return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
-            }
+            // }
         
               let transform = new TransformFile(
                 compressionMethod,
@@ -60,10 +60,10 @@ async function transformFile(req, res, next) {
                   "Content-disposition",
                   `attachment; filename="${fileNameTxt}"`
                 );
-      
+                console.log('DECOMPRESSION OPERATION')
                 transform.decompress(file, res).catch((error) => {
                   req.unpipe(bb);
-                  bb.emit('close', error)
+                  bb.emit('close', error);
                 });
 
               } else { 
@@ -110,11 +110,13 @@ async function transformFile(req, res, next) {
     }  
 
      let result = await busboyWrapper();
+     console.log('res.headersSent', res.headersSent)
      if(res.headersSent) return;
      return res.status(200).json(result.toString());
 
   } catch (error) {
-    console.log('Error occured on file transformation', error);
+    console.log('res.headersSent', res.headersSent)
+    console.log('error catched in transformFile', error);
     return res.status(500).json(error.toString());
   }
 }
