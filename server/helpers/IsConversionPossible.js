@@ -1,44 +1,61 @@
-const { PassThrough } = require('node:stream');
+const { PassThrough, Transform } = require('node:stream');
+const EventEmitter = require('node:events');
 const zlib = require('node:zlib');
 const { pipeline } = require("node:stream/promises");
 const DecryptSymetricSplittedStream = require("./DecryptSymetricSplittedStream");
 const StreamAborter = require("./StreamAborter");
 
 
-async function isConversionPossible(readable, decompressionMethod, password){
+async function isConversionPossible(readable, decompressionMethod, password, writable){
 
-  new PassThrough();
-  
- let readableCopy = readable.pipe(new PassThrough());
-//  let readableResult = readable.pipe(new PassThrough());
+function handlePipeError(streams) {
+  streams.forEach((stream) => {
+    stream.destroy();
+  })
+}  
+
+class MyEmitter extends EventEmitter {};
+
+const myEmitter = new MyEmitter();
+
+myEmitter
+.on('custom', (resumeStream) => {
+  resumeStream
+  .on("error", (error) => {
+    handlePipeError([resumeStream, writable]);
+    reject(error);
+  })
+  .pipe(writable)
+  .on("error", (error) => {
+    handlePipeError([resumeStream, writable]);
+    reject(error);
+  });
+})
 
   try {
     let decompressionStream = null;
-    let streamAborter = new StreamAborter("STREAM ABORTER");
+    let streamAborter = new StreamAborter(myEmitter);
     let decryptStream = new DecryptSymetricSplittedStream({key:password});
 
     if(true) decompressionStream = zlib.createInflate();
-    console.log('decompressionMethod in isConversionPossible', decompressionMethod)
 
   return new Promise((resolve, reject) => {
-    pipeline(readableCopy, decryptStream, streamAborter)
-    .then(() => {
-      console.log('reqdable result resolved')
-      resolve(readableResult);
-
+    readable
+    .on("error", (error) => {
+      handlePipeError([readable, decryptStream, streamAborter]);
+      reject(error);
     })
-    .catch((error) => {
-      if(error === 'AbortError') {
-        // if AbortError it means that decryption and decompression works fine;
-        console.log('resolve AbortError')
-        // resolve(readableResult);
-  
-        } else {
-          console.log('error in conversion possible', error)
-          reject(error);
-        }
+    .pipe(decryptStream)
+    .on("error", (error) => {
+      handlePipeError([readable, decryptStream, streamAborter]);
+      reject(error);
     })
-   })  
+    .pipe(streamAborter)
+    .on("error", (error) => {
+      handlePipeError([readable, decryptStream, streamAborter]);
+      reject(error);
+    })
+  });
 
 
     // if(!decompressionMethod) {

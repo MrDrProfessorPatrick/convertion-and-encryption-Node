@@ -149,13 +149,9 @@ class TransformFile {
 
   async decryptSymmetric(readable, writable){
     try {
-      let readableResult = await isConversionPossible(readable, null, this.password);
-      console.log('readableResult in decryptSymmetric', readableResult)
-      if(!readableResult) throw new Error('Decryption is not possible');
-      let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-
-      await pipeline(readableResult, decryptSymetricSplitted, writable);
+      await isConversionPossible(readable, null, this.password, writable);
     } catch (error) {
+      console.log('decryptSymmetric error', error)
       throw new Error(error)
     }
   }

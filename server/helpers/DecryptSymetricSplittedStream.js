@@ -100,7 +100,7 @@ class DecryptSymetricSplittedStream extends Transform {
   }
 
     _flush(cb){
-      console.log('flush is called')
+      console.log('flush is called in decrypt')
 
       if(this.current){
         try {

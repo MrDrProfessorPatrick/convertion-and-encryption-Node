@@ -1,23 +1,27 @@
-const { Writable } = require("stream");
+const { Writable, Transform } = require("stream");
 
-class StreamAborter extends Writable {
+class StreamAborter extends Transform {
     constructor(options) {
         super(options);
-        this.options = options;
+        this.myEmitter = options;
         this.counter = 0
         this.collector = [];
+        this.isEmitted = false;
     }
 
-    _write(chunk, encoding, done) {
-        console.log('options', this.options);
-        console.log('streamaborter', chunk)
-        console.log('counter', this.counter);
+    _transform(chunk, encoding, done) {
         this.counter++;
         this.collector.push(chunk);
         if(this.counter > 2) {
-            console.log('abortError call')
-            done('AbortError');
-            return;
+            !this.isEmitted && this.myEmitter.emit('custom', this);
+            this.isEmitted = true;
+
+            if(this.collector.length > 0) {
+                this.collector.forEach((chunk) => {
+                    this.push(chunk);
+                });
+                this.collector = [];
+             }
         }
         done();
     }
