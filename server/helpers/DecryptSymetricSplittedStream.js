@@ -13,10 +13,8 @@ class DecryptSymetricSplittedStream extends Transform {
   }
   
   _transform(chunk, encoding, done) {
-    let self = this;
-    console.log('DECRYPT chunk', chunk)
-    console.log('this.iv', this.iv);
     try {
+      let self = this;
       if(this.key){
         function chunkHandler(chunk){
           if(chunk.length === 0) return; 
@@ -47,7 +45,7 @@ class DecryptSymetricSplittedStream extends Transform {
       
             if(delimPos > 0 && delimPos < chunk.length-3){
               let prevChunk = chunk.subarray(0, delimPos);
-              let nextChunk = chunk.subarray(delimPos+3) //doesn't include DELIMITER
+              let nextChunk = chunk.subarray(delimPos+3) // doesn't include DELIMITER
 
               if(self.current){
                 let fullChunk = Buffer.concat([self.current, prevChunk]);
@@ -94,14 +92,11 @@ class DecryptSymetricSplittedStream extends Transform {
         throw new Error('No key for decryption')
       }
     } catch (error) {
-      console.log(error, 'Error catch in DecryptSymetricStream')
       done(error);
     }
   }
 
     _flush(cb){
-      console.log('flush is called in decrypt')
-
       if(this.current){
         try {
           let { decrypted } =  decryptSymetricService(this.current, this.key, this.iv)

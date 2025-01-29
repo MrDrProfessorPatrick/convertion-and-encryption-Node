@@ -10,7 +10,7 @@ const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const createBitesCounter = require('../helpers/createBitesCounter');
 
-const isConversionPossible = require('../helpers/IsConversionPossible');
+const reverseConversion = require('../helpers/reverseConversion');
 class TransformFile {
 
   constructor(compressionMethod, encryptionMethod, password, originalFileSize, fileName, filePath){
@@ -91,16 +91,10 @@ class TransformFile {
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
       if(this.password){
-        // TODO change compression method in isConversionPossible
-        let readableResult = await isConversionPossible(readable, true, this.password);
-        let decryptSymetricSplitted = new DecryptSymetricSplittedStream({key:this.password});
-        console.log('readableReslt in decompress', readableResult);
-        await pipeline(readableResult, decryptSymetricSplitted, decompressionStream, writable);
+        // TODO change compression method in reverseConversion
+        await reverseConversion(readable, true, this.password, writable);
       } else {
-        let readableResult = await isConversionPossible(readable);
-
-        if(!readableResult) throw new Error('Decompression is not possible');
-        await pipeline(readableResult, decompressionStream, writable);
+        await reverseConversion(readable, false, this.password, writable);
       }
     } catch (error) {
       throw new Error(error)
@@ -149,9 +143,8 @@ class TransformFile {
 
   async decryptSymmetric(readable, writable){
     try {
-      await isConversionPossible(readable, null, this.password, writable);
+      await reverseConversion(readable, null, this.password, writable);
     } catch (error) {
-      console.log('decryptSymmetric error', error)
       throw new Error(error)
     }
   }
