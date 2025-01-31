@@ -1,5 +1,4 @@
 const busboy = require('busboy');
-const EventEmitter = require('events');
 
 const TransformFile = require('../TransformMethods/TransformFile');
 
@@ -35,12 +34,24 @@ async function transformFile(req, res, next) {
             if(fields.brotli === 'true') compressionMethod = 'brotli';
             if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
             if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
-      
-            // if(extensionName === 'txt' && !compressionMethod && !encryptionMethod) {
-              // TODO 
-              // req.unpipe(bb);
-              // return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
-            // }
+
+            if(extensionName !== 'txt' || extensionName != 'gz' || extensionName != 'br') {
+              return res.status(400).json('Choose the file with extension like .txt, .br or .gz');
+            }
+
+            if(operation === 'compress') {
+              if(extensionName === 'txt' && !compressionMethod && !encryptionMethod) {
+                req.unpipe(bb);
+                return res.status(400).json('Choose the decompression method or file with extension like .br or .gz to decompress');
+              }
+            }
+
+            if(operation === 'decompress') {
+              if(extensionName === 'txt' && !password){
+                req.unpipe(bb);
+                return res.status(400).json('Choose the password to decrypt the file if it is encrypted');
+              }
+            }
         
               let transform = new TransformFile(
                 compressionMethod,
@@ -60,7 +71,7 @@ async function transformFile(req, res, next) {
                   "Content-disposition",
                   `attachment; filename="${fileNameTxt}"`
                 );
-                console.log('DECOMPRESSION OPERATION')
+
                 transform.decompress(file, res).catch((error) => {
                   req.unpipe(bb);
                   bb.emit('close', error);
@@ -94,7 +105,6 @@ async function transformFile(req, res, next) {
       })
   
         bb.on('close', (error) => {
-          console.log('bb.close', error)
           if(error) {
             reject(error);
           }
@@ -110,12 +120,10 @@ async function transformFile(req, res, next) {
     }  
 
      let result = await busboyWrapper();
-     console.log('res.headersSent', res.headersSent)
      if(res.headersSent) return;
      return res.status(200).json(result.toString());
 
   } catch (error) {
-    console.log('res.headersSent', res.headersSent)
     console.log('error catched in transformFile', error);
     return res.status(500).json(error.toString());
   }

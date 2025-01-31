@@ -82,7 +82,6 @@ class TransformFile {
 
   async decompress(readable, writable){
     try {
-      console.log('DECOMPRESS RUN')
       let extensionName = this.fileName.split('.').reverse()[0];
 
       let decompressionStream = null;
@@ -94,7 +93,7 @@ class TransformFile {
         // TODO change compression method in reverseConversion
         await reverseConversion(readable, true, this.password, writable);
       } else {
-        await reverseConversion(readable, false, this.password, writable);
+        await reverseConversion(readable, true, this.password, writable);
       }
     } catch (error) {
       throw new Error(error)
