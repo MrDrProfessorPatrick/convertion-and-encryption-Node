@@ -1,20 +1,17 @@
+import {renderCompressionScale} from './renderScale.js';
+
 const decompressionForm = document.getElementById("decompressionForm");
 const fileDecompression = document.getElementById("inputFileDecompression");
 const fileNameDecompression = document.getElementById("fileNameDecompression");
-const decompressButton = document.getElementById("decompressionUpload");
-const noDecompression = document.getElementById("noDecompression");
-const textDecompress = document.getElementById("textDecompress");
-const imageDecompress = document.getElementById("imageDecompress");
-const imageTypeCheckbox = document.getElementById("imageDecompress");
-const textTypeCheckbox = document.getElementById("textDecompress");
 const decryptionPassword = document.getElementById('decryptionPassword');
 const fileDecompress = document.getElementById("inputFileDecompression");
+const reverseScale = document.getElementById('reverse-conversion-scale');
 
 function changeFile(e) {
   fileNameDecompression.innerHTML = e.target.files[0].name;
 }
 
-async function decompressFile(e) {
+async function decompressFile(e, scaleContainer) {
   try {
     e.preventDefault();
     const formData = new FormData();
@@ -22,15 +19,23 @@ async function decompressFile(e) {
     formData.append('password', decryptionPassword.value);
     formData.append('file', fileDecompress.files[0]);
 
+    if(!fileDecompression.files[0]){
+      return alert('Choose the file to decompress');
+    }
+
     let currentFileExtension = fileDecompression.files[0].name.match(/\.\w+/)[0];
     var fileName;
+    let originalFilelength = fileDecompression.files[0].size;
+    let valueLoaded = 0;
+
+    if (currentFileExtension !== 'txt') originalFilelength *= 2;
 
     fetch('/sendfile', {
       method: 'POST',
       body: formData,
     })
       .then((response) => {
-        if(response.status>=400) {
+        if(response.status >= 400) {
           let errorMessage = response.json();
           return new Promise((resolve, reject)=>{
             console.log('errorMess', errorMessage)
@@ -58,9 +63,14 @@ async function decompressFile(e) {
               return reader.read().then(({ done, value }) => {
                 // If there is no more data to read
                 if (done) {
+                renderCompressionScale(reverseScale, valueLoaded, valueLoaded, 'reverseId', 'reverseScale');
                   controller.close();
                   return value;
                 }
+                const decoder = new TextDecoder("utf8");
+                let sizeObjDecoded = decoder.decode(value).trim();
+                valueLoaded += value.byteLength;
+                renderCompressionScale(reverseScale, originalFilelength, valueLoaded, 'reverseId', 'reverseScale');
                 // Get the data and send it to the browser via the controller
                 controller.enqueue(value);
                 // Check chunks by logging to the console
@@ -81,9 +91,10 @@ async function decompressFile(e) {
         document.body.appendChild(fileLink);
         fileLink.click();
         fileLink.remove();
-        URL.revokeObjectURL();
+        URL.revokeObjectURL(fileUrl);
       })
-      .catch((error)=>{
+      .catch((error) => {
+        console.log('decompression catched error', error);
         error.then((errData)=>{
           alert(errData);
         })

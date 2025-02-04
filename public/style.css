@@ -23,7 +23,13 @@ form {
 
 .decompression-container {
   display: flex;
+  flex-direction: column;
   border: 1px solid black;
+}
+
+.upload-files{
+  background-color: red;
+  height: 100px;
 }
 
 .decompression-message{
@@ -32,6 +38,12 @@ form {
 
 .decompression-container-hidden {
   display: none;
+}
+
+.reverse-conversion-scale {
+  display:flex;
+  align-items: center;
+  background-color: rgb(221, 221, 221);
 }
 
 .zlib-not-compressed-scale {

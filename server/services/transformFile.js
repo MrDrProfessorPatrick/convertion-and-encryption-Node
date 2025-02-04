@@ -35,10 +35,6 @@ async function transformFile(req, res, next) {
             if(fields.symetricEncryption === 'true') encryptionMethod = 'symetric';
             if(fields.asymetricEncryption === 'true') encryptionMethod = 'asymetric';
 
-            if(extensionName !== 'txt' || extensionName != 'gz' || extensionName != 'br') {
-              return res.status(400).json('Choose the file with extension like .txt, .br or .gz');
-            }
-
             if(operation === 'compress') {
               if(extensionName === 'txt' && !compressionMethod && !encryptionMethod) {
                 req.unpipe(bb);

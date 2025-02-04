@@ -1,3 +1,5 @@
+import {renderCompressionScale, renderInitialScale} from './renderScale.js';
+
 const file = document.getElementById("inputFile");
 const fileName = document.getElementById("fileName");
 const submitInput = document.getElementById("inputSubmit");
@@ -14,61 +16,6 @@ const encryptionPassword = document.getElementById("passwordInput");
 const submitCompression = document.getElementById("file-manager-button-submit");
 
 let downloadedFileName = "";
-
-function renderInitialScale(containerToInsert, sizeObj) {
-  const isInitialScaleExists = document.getElementById("initialScale");
-  const isInitialSizeExists = document.getElementById("initialSize");
-
-  if (isInitialScaleExists) isInitialScaleExists.remove();
-  if (isInitialSizeExists) isInitialSizeExists.remove();
-
-  const initialScale = document.createElement("div");
-  initialScale.id = "initialScale";
-  initialScale.style.backgroundColor = "green";
-  initialScale.style.height = "10px";
-  initialScale.style.width = "100%";
-
-  const initialSize = document.createElement("div");
-  initialSize.id = "initialSize";
-  initialSize.style.fontWeight = "bold";
-  initialSize.style.textAlign = "center";
-  initialSize.innerHTML = sizeObj.originalSize + " kb";
-
-  containerToInsert.append(initialScale);
-  containerToInsert.append(initialSize);
-}
-
-function renderCompressionScale(
-  containerToInsert,
-  initialSize,
-  compressionSize,
-  compressScaleId,
-  comressSizeId
-) {
-  const isGzipScaleExists = document.getElementById(compressScaleId);
-  const isGzipSizeExists = document.getElementById(comressSizeId);
-
-  if (isGzipScaleExists) isGzipScaleExists.remove();
-  if (isGzipSizeExists) isGzipSizeExists.remove();
-
-  let compressedScaleWidth =
-    Number(compressionSize * 100) / Number(initialSize);
-
-  const compressedScale = document.createElement("div");
-  compressedScale.id = compressScaleId;
-  compressedScale.style.backgroundColor = "green";
-  compressedScale.style.height = "10px";
-  compressedScale.style.width = `${compressedScaleWidth}%`;
-
-  const compressedSize = document.createElement("div");
-  compressedSize.id = comressSizeId;
-  compressedSize.style.fontWeight = "bold";
-  compressedSize.style.textAlign = "center";
-  compressedSize.innerHTML = compressionSize + " kb";
-
-  containerToInsert.append(compressedScale);
-  containerToInsert.append(compressedSize);
-}
 
 function renderCompressedFileName(fileName) {
   const compressedFilesContainer = document.querySelector(".download-files");

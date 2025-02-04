@@ -104,66 +104,65 @@
 
     <!-- DECOMPRESSION SECTION -->
     <div class="decompression-container-hidden">
+          <div class="decompression-container">
+            <form
+            id="decompressionForm"
+            enctype="multipart/form-data"
+          >
+            <label for="inputFileDecompression" class="chose-file-button">Chose file</label>
+            <span class="file-availability" id="fileNameDecompression">No file chosen</span>
+            <input
+              type="file"
+              name="file"
+              id="inputFileDecompression"
+              style="display: none"
 
-      <form
-        id="decompressionForm"
-        enctype="multipart/form-data"
-
-      >
-        <div class="decompression-container">
-          <label for="inputFileDecompression" class="chose-file-button">Chose file</label>
-          <span class="file-availability" id="fileNameDecompression">No file chosen</span>
-          <input
-            type="file"
-            name="file"
-            id="inputFileDecompression"
-            style="display: none"
-
-          />
-          <button class="file-manager-button" id="decompressionUpload" type="submit">
-            Download
-          </button>
-          <div class="decompression-message">
-            You can decompress files with .gz or .br extensions
-          </div>        
-    
-      <fieldset>
-        <div>
-          <label for="nodecryption">No decryption</label>
-          <input
-            type="radio"
-            id="noDecryptionRadio"
-            name="decryption"
-            value="false"
-            checked
-        />
-      </div>
-    
-      <div>
-        <label for="decryption">Decrypt</label>
-          <input
-            type="radio"
-            id="decryptionRadio"
-            name="decryption"
-            value="true"
-        />
-      </div>
+            />
+            <button class="file-manager-button" id="decompressionUpload" type="submit">
+              Download
+            </button>
+            <div class="decompression-message">
+              You can decompress files with .gz or .br extensions
+            </div>        
       
-      <div class="password-input-hidden" id="decryptPasswordInputContainer">
-      <label for="password">Password</label>
-        <input
-          type="password"
-          id="decryptionPassword"
-          name="password"
-        />
-      </div>  
-      </fieldset>
+        <fieldset>
+          <div>
+            <label for="nodecryption">No decryption</label>
+            <input
+              type="radio"
+              id="noDecryptionRadio"
+              name="decryption"
+              value="false"
+              checked
+          />
         </div>
+      
+        <div>
+          <label for="decryption">Decrypt</label>
+            <input
+              type="radio"
+              id="decryptionRadio"
+              name="decryption"
+              value="true"
+          />
+        </div>
+        
+        <div class="password-input-hidden" id="decryptPasswordInputContainer">
+        <label for="password">Password</label>
+          <input
+            type="password"
+            id="decryptionPassword"
+            name="password"
+          />
+        </div>  
+        </fieldset>
       </form>
-    </div>
+      </div>
 
-    <script type="text/javascript" src="/js/compression.js"></script>
-    <script type="text/javascript" src="/js/decompression.js"></script>
+      <div id="reverse-conversion-scale" class="reverse-conversion-scale"></div>
+    </div>
+          <script type="module" src="/js/compression.js"></script>
+          <script type="module" src="/js/decompression.js"></script>
 
     <script>
       // SWITCHER COMPRESSION-DECOMPRESSION
@@ -198,9 +197,13 @@
     </script>
 
     <script>
-
       const passwordFormContainer = document.getElementById("passwordInputContainer");
       const decryptPasswordContainer = document.getElementById("decryptPasswordInputContainer");
+      const noEncryptionInput = document.getElementById('noEncryption');
+      const symetricEncryptionInput = document.getElementById('symetricEncryption');
+      const asymetricEncryptionInput = document.getElementById('asymetricEncryption');
+      const noDecryptionInput = document.getElementById('noDecryptionRadio');
+      const decryptionInput = document.getElementById('decryptionRadio');
 
       noEncryptionInput.addEventListener('change', ()=>{
         passwordFormContainer.classList.add('password-input-hidden');
@@ -223,10 +226,10 @@
       })
 
       decryptionInput.addEventListener('change', ()=>{
+        console.log('change decryption')
         decryptPasswordContainer.classList.remove('password-input-hidden');
         passwordFormContainer.classList.add('password-input-container');
       })
-
 
     </script>
 
