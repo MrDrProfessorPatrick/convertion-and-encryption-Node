@@ -27,7 +27,3 @@ function decryptSymetricService(cipher, key, iv) {
 }
 
 module.exports = decryptSymetricService;
-
-// iv ciphered b48eee81bf1288d6c5b38fc4b1977720
-// 
-// 

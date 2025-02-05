@@ -1,15 +1,11 @@
 const fs = require("node:fs");
 const zlib = require('node:zlib'); 
 
-const CompressionStream = require('../helpers/CompressionStream');
-const DecompressionStream = require('../helpers/DecompressionStream');
 const GetBytesQuantity = require('../helpers/GetBytesQuantityStream');
 const EncryptSymetricStream = require('../helpers/encryptSymetricStream');
 const { pipeline } = require("node:stream/promises");
-const uploadsPath = require('../../uploads/uploadsFolderPath');
 const DecryptSymetricSplittedStream = require("../helpers/DecryptSymetricSplittedStream");
 const createBitesCounter = require('../helpers/createBitesCounter');
-
 const reverseConversion = require('../helpers/reverseConversion');
 class TransformFile {
 
@@ -83,18 +79,14 @@ class TransformFile {
   async decompress(readable, writable){
     try {
       let extensionName = this.fileName.split('.').reverse()[0];
-
       let decompressionStream = null;
-
+      let decryptionStream = null;
+      
       if(extensionName === 'gz') decompressionStream = zlib.createInflate();
       if(extensionName === 'br') decompressionStream = zlib.createBrotliDecompress();
       if(decompressionStream === null) throw new Error('No type of decompression was chosen')
-      if(this.password){
-        // TODO change compression method in reverseConversion
-        await reverseConversion(readable, true, this.password, writable);
-      } else {
-        await reverseConversion(readable, true, this.password, writable);
-      }
+      if(this.password) decryptionStream = new DecryptSymetricSplittedStream({key:this.password});  
+      await reverseConversion(readable, decompressionStream, decryptionStream, writable);
     } catch (error) {
       throw new Error(error)
     }
@@ -142,7 +134,10 @@ class TransformFile {
 
   async decryptSymmetric(readable, writable){
     try {
-      await reverseConversion(readable, null, this.password, writable);
+      let decryptionStream = null;
+      if(this.password) decryptionStream = new DecryptSymetricSplittedStream({key:this.password});  
+      if(decryptionStream === null) throw new Error('No password was provided');
+      await reverseConversion(readable, null, decryptionStream, writable);
     } catch (error) {
       throw new Error(error)
     }

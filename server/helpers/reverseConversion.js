@@ -1,10 +1,7 @@
 const EventEmitter = require('node:events');
-const zlib = require('node:zlib');
-const DecryptSymetricSplittedStream = require("./DecryptSymetricSplittedStream");
 const StreamAborter = require("./StreamAborter");
 
-
-async function reverseConversion(readable, decompressionMethod, password, writable){
+async function reverseConversion(readable, decompressionStream, decryptionStream, writable){
 
 function handlePipeError(streams) {
   streams.forEach((stream) => {
@@ -30,33 +27,29 @@ myEmitter.on('custom', (resumeStream) => {
   })
 
   try {
-    let decompressionStream = null;
     let streamAborter = new StreamAborter(myEmitter);
-    let decryptStream = new DecryptSymetricSplittedStream({key:password});
 
-    if(true) decompressionStream = zlib.createInflate();
-
-    if(decompressionMethod){
-      if(password) {
+    if(decompressionStream){
+      if(decryptionStream) {
         return new Promise((resolve, reject) => {
           readable
             .on("error", (error) => {
-              handlePipeError([readable, decryptStream, decompressionStream, streamAborter]);
+              handlePipeError([readable, decryptionStream, decompressionStream, streamAborter]);
               reject(error);
             })
-            .pipe(decryptStream)
+            .pipe(decryptionStream)
             .on("error", (error) => {
-              handlePipeError([readable, decryptStream, decompressionStream, streamAborter]);
+              handlePipeError([readable, decryptionStream, decompressionStream, streamAborter]);
               reject(error);
             })
             .pipe(decompressionStream)
             .on("error", (error) => {
-              handlePipeError([readable, decryptStream, decompressionStream, streamAborter]);
+              handlePipeError([readable, decryptionStream, decompressionStream, streamAborter]);
               reject(error);
             })
             .pipe(streamAborter)
             .on("error", (error) => {
-              handlePipeError([readable, decryptStream, decompressionStream, streamAborter]);
+              handlePipeError([readable, decryptionStream, decompressionStream, streamAborter]);
               reject(error);
             })
         });
@@ -81,20 +74,19 @@ myEmitter.on('custom', (resumeStream) => {
       }
   } else {
     return new Promise((resolve, reject) => {
-      if(!password) reject("Password is required");
       readable
         .on("error", (error) => {
-          handlePipeError([readable, decryptStream, streamAborter]);
+          handlePipeError([readable, decryptionStream, streamAborter]);
           reject(error);
         })
-        .pipe(decryptStream)
+        .pipe(decryptionStream)
         .on("error", (error) => {
-          handlePipeError([readable, decryptStream, streamAborter]);
+          handlePipeError([readable, decryptionStream, streamAborter]);
           reject(error);
         })
         .pipe(streamAborter)
         .on("error", (error) => {
-          handlePipeError([readable, decryptStream, streamAborter]);
+          handlePipeError([readable, decryptionStream, streamAborter]);
           reject(error);
         })
     });
